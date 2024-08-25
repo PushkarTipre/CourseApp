@@ -1,6 +1,8 @@
 import 'package:course_app/common/routes/app_routes_name.dart';
 import 'package:course_app/pages/application/view/application.dart';
+import 'package:course_app/pages/course_details/view/course_detail_view.dart';
 import 'package:course_app/pages/home/view/home.dart';
+import 'package:course_app/pages/lesson_detail/view/lesson_detail.dart';
 import 'package:course_app/pages/signin/view/sign_in.dart';
 import 'package:course_app/pages/signup/view/sign_up.dart';
 import 'package:course_app/pages/welcome/view/welcome.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 
 import '../../global.dart';
+import '../../pages/buy_course/view/buy_course.dart';
 
 class AppPages {
   static List<RouteEntity> routes() {
@@ -17,6 +20,11 @@ class AppPages {
       RouteEntity(path: AppRoutesName.REGISTER, page: const Sign_Up()),
       RouteEntity(path: AppRoutesName.APPLICATION, page: const Application()),
       RouteEntity(path: AppRoutesName.HOME, page: const Home()),
+      RouteEntity(
+          path: AppRoutesName.COURSE_DETAIL, page: const CourseDetail()),
+      RouteEntity(
+          path: AppRoutesName.LESSON_DETAIL, page: const LessonDetail()),
+      RouteEntity(path: AppRoutesName.BUY_COURSE, page: const BuyCourse())
     ];
   }
 

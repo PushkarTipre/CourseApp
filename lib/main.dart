@@ -2,6 +2,7 @@ import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
 import 'package:course_app/common/utils/http_util.dart';
 import 'package:course_app/global.dart';
+import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -9,7 +10,8 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 Future<void> main() async {
   await Global.init();
-  HttpUtil();
+  //HttpUtil().post("api/login");
+  FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
   runApp(const ProviderScope(child: MyApp()));
 }
 

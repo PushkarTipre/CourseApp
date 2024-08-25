@@ -42,9 +42,9 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                   SizedBox(
                     height: 30.h,
                   ),
-                  Center(
-                    child: const Text14Normal(
-                        text: 'Enter your details below & signup'),
+                  const Center(
+                    child:
+                        Text14Normal(text: 'Enter your details below & signup'),
                   ),
                   SizedBox(
                     height: 50.h,
@@ -113,7 +113,7 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                     height: 85.h,
                   ),
                   Center(
-                    child: appButton(
+                    child: AppButton(
                       text: 'Signup',
                       isLogin: true,
                       onPressed: () => _controller.handleSignup(),

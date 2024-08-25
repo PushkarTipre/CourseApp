@@ -1,12 +1,15 @@
 import 'dart:convert';
+import 'dart:developer';
 
 import 'package:course_app/common/global_loader/global_loader.dart';
 import 'package:course_app/common/utils/constants.dart';
+import 'package:course_app/common/utils/http_util.dart';
 import 'package:course_app/global.dart';
 import 'package:course_app/main.dart';
 import 'package:course_app/pages/signin/repo/sign_in_repo.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -39,12 +42,13 @@ class Sign_In_Controller {
     }
     ref.read(appLoaderProvider.notifier).setLoaderValue(true);
     try {
-      final cred = await SignInRepo.firebaseSignInRepo(email, password);
+      final cred = await SignInRepo.firebaseSignIn(email, password);
 
       if (cred.user == null) {
         toastInfo('User Not Found');
         return;
-      } else if (!cred.user!.emailVerified) {
+      }
+      if (!cred.user!.emailVerified) {
         toastInfo('You must verify your email before signing in');
         return;
       }
@@ -54,43 +58,46 @@ class Sign_In_Controller {
         String? email = user.email;
         String? id = user.uid;
         String? photoUrl = user.photoURL;
-        LoginRequestEntity loginRequestEntity = LoginRequestEntity();
 
+        LoginRequestEntity loginRequestEntity = LoginRequestEntity();
         loginRequestEntity.avatar = photoUrl;
+        loginRequestEntity.name = displayName;
         loginRequestEntity.email = email;
         loginRequestEntity.open_id = id;
-        loginRequestEntity.name = displayName;
         loginRequestEntity.type = 1;
         asyncPostAllDate(loginRequestEntity);
-        print('User logged in');
+        log('User logged in');
       } else {
         toastInfo('Login error');
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'wrong-password') {
-        toastInfo('your password is wrong');
-      } else {
-        toastInfo('An error occurred');
+      if (e.code == 'user-not-found') {
+        toastInfo("User not found");
+      } else if (e.code == 'wrong-password') {
+        toastInfo("Your password is wrong");
       }
-      print(e.code);
-      //toastInfo('An error occurred');
-    } catch (e) {}
+    } catch (e) {
+      if (kDebugMode) {
+        print(e.toString());
+      }
+    }
     ref.read(appLoaderProvider.notifier).setLoaderValue(false);
   }
 
-  void asyncPostAllDate(LoginRequestEntity loginRequestEntity) {
-    try {
-      //User info in shared preferences used to remember user on device
-      //var navigator = Navigator.of(ref.context);
-      Global.storageService.setString(
-          AppConstants.STORAGE_USER_PROFILE_KEY,
-          jsonEncode(
-              {'name': 'Hawk', 'email': 'psuhkar@gmail.com', 'age': 21}));
+  Future<void> asyncPostAllDate(LoginRequestEntity loginRequestEntity) async {
+    var result = await SignInRepo.login(params: loginRequestEntity);
+    if (result.code == 200) {
+      try {
+        Global.storageService.setString(
+            AppConstants.STORAGE_USER_PROFILE_KEY, jsonEncode(result.data));
+        Global.storageService.setString(
+            AppConstants.STORAGE_USER_TOKEN_KEY, result.data!.access_token!);
 
-      Global.storageService
-          .setString(AppConstants.STORAGE_USER_TOKEN_KEY, 'value');
-      navKey.currentState
-          ?.pushNamedAndRemoveUntil('/application', (route) => false);
-    } catch (e) {}
+        navKey.currentState
+            ?.pushNamedAndRemoveUntil('/application', (route) => false);
+      } catch (e) {}
+    } else {
+      toastInfo("Login Error");
+    }
   }
 }

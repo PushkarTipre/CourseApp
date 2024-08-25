@@ -1,4 +1,8 @@
+import 'dart:developer';
+
+import 'package:course_app/common/routes/app_routes_name.dart';
 import 'package:course_app/common/utils/app_colors.dart';
+import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/widgets/app_shadows.dart';
 import 'package:course_app/common/widgets/image_widgets.dart';
@@ -19,7 +23,7 @@ class UserName extends StatelessWidget {
     print("MY username");
     return Container(
       child: text24Normal(
-          text: Global.storageService.getUserProfile()["name"] ?? "",
+          text: Global.storageService.getUserProfile().name ?? "",
           //color: AppColors.pri,
           fontWeight: FontWeight.bold),
     );
@@ -39,7 +43,6 @@ class HelloText extends StatelessWidget {
     );
   }
 }
-
 
 class HomeBanner extends StatelessWidget {
   final PageController controller;
@@ -98,15 +101,27 @@ Widget _bannerContainer({required String imgPath}) {
   );
 }
 
-AppBar homeAppBar() {
+AppBar homeAppBar(WidgetRef ref) {
+  var profileState = ref.watch(homeUserProfileProvider);
   return AppBar(
     title: Container(
       margin: EdgeInsets.only(left: 7.w, right: 7.w),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          appImage(width: 18.w, height: 12.h, iconPath: Img_Res.menu),
-          GestureDetector(child: const AppBoxDecorationImage())
+          const AppImage(width: 18, height: 12, imagePath: Img_Res.menu),
+          profileState.when(
+            data: (data) {
+              log("This is HERE :${data.avatar}");
+              return GestureDetector(
+                  child: AppBoxDecorationImage(
+                imagePath: "${AppConstants.SERVER_API_URL}${data.avatar}",
+              ));
+            },
+            error: (error, stack) =>
+                AppImage(width: 18.w, height: 12.h, imagePath: Img_Res.menu),
+            loading: () => const CircularProgressIndicator(),
+          )
         ],
       ),
     ),
@@ -173,20 +188,45 @@ class HomeMenuBar extends StatelessWidget {
 }
 
 class CourseItemGrid extends StatelessWidget {
-  const CourseItemGrid({super.key});
+  final WidgetRef ref;
+  const CourseItemGrid({super.key, required this.ref});
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      child: GridView.builder(
-          shrinkWrap: true,
-          physics: ScrollPhysics(),
-          gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2, crossAxisSpacing: 14, mainAxisSpacing: 14),
-          itemCount: 6,
-          itemBuilder: (_, int index) {
-            return appImage();
-          }),
+    final courseState = ref.watch(homeCourseListProvider);
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 15.h),
+      child: courseState.when(
+          data: (data) => GridView.builder(
+              shrinkWrap: true,
+              physics: const ScrollPhysics(),
+              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+                  crossAxisCount: 2,
+                  crossAxisSpacing: 15,
+                  mainAxisSpacing: 15,
+                  childAspectRatio: 1.6),
+              itemCount: data?.length,
+              itemBuilder: (_, int index) {
+                return AppBoxDecorationImage(
+                  fit: BoxFit.fitHeight,
+                  imagePath:
+                      "${AppConstants.IMAGE_UPLOADS_PATH}${data?[index].thumbnail}",
+                  courseItem: data![index],
+                  func: () {
+                    Navigator.of(context)
+                        .pushNamed(AppRoutesName.COURSE_DETAIL, arguments: {
+                      "id": data[index].id!,
+                    });
+                  },
+                );
+              }),
+          error: (error, stackTrace) {
+            print(stackTrace.toString());
+            return Center(child: Text(error.toString()));
+          },
+          loading: () => Center(
+                child: Text("Loading"),
+              )),
     );
   }
 }

@@ -80,7 +80,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                     height: 100.h,
                   ),
                   Center(
-                      child: appButton(
+                      child: AppButton(
                           text: 'Login',
                           onPressed: () {
                             _controller.handleSignIn(ref);
@@ -89,7 +89,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                     height: 15.h,
                   ),
                   Center(
-                    child: appButton(
+                    child: AppButton(
                         text: 'Register',
                         isLogin: false,
                         onPressed: () {

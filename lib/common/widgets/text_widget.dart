@@ -17,16 +17,19 @@ class Text16Normal extends StatelessWidget {
   final FontWeight weight;
   final String text;
   final Color color;
-  const Text16Normal(
-      {super.key,
-      this.color = AppColors.primaryThreeElementText,
-      this.text = '',
-      this.weight = FontWeight.normal});
+  final TextAlign align;
+  const Text16Normal({
+    super.key,
+    this.color = AppColors.primaryThreeElementText,
+    this.text = '',
+    this.weight = FontWeight.normal,
+    this.align = TextAlign.center,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      textAlign: TextAlign.center,
+      textAlign: align,
       text,
       style: TextStyle(color: color, fontSize: 16, fontWeight: weight),
     );
@@ -36,18 +39,19 @@ class Text16Normal extends StatelessWidget {
 class Text14Normal extends StatelessWidget {
   final String text;
   final Color color;
+  final FontWeight weight;
   const Text14Normal(
       {super.key,
       this.text = '',
-      this.color = AppColors.primaryThreeElementText});
+      this.color = AppColors.primaryThreeElementText,
+      this.weight = FontWeight.normal});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       textAlign: TextAlign.center,
       text,
-      style:
-          TextStyle(color: color, fontSize: 16, fontWeight: FontWeight.normal),
+      style: TextStyle(color: color, fontSize: 16, fontWeight: weight),
     );
   }
 }
@@ -64,9 +68,62 @@ class Text10Normal extends StatelessWidget {
   Widget build(BuildContext context) {
     return Text(
       textAlign: TextAlign.center,
+      maxLines: 1,
       text,
-      style:
-          TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.normal),
+      style: TextStyle(
+        color: color,
+        fontSize: 10,
+        fontWeight: FontWeight.normal,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class Text9Normal extends StatelessWidget {
+  final String text;
+  final Color color;
+  const Text9Normal(
+      {super.key,
+      this.text = '',
+      this.color = AppColors.primaryThreeElementText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      textAlign: TextAlign.center,
+      text,
+      style: TextStyle(
+        color: color,
+        fontSize: 9.sp,
+        fontWeight: FontWeight.normal,
+        overflow: TextOverflow.ellipsis,
+      ),
+    );
+  }
+}
+
+class FadeText extends StatelessWidget {
+  final String text;
+  final Color color;
+  final double fontSize;
+  const FadeText({
+    super.key,
+    this.fontSize = 10,
+    this.text = '',
+    this.color = AppColors.primaryThreeElementText,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      textAlign: TextAlign.left,
+      maxLines: 1,
+      overflow: TextOverflow.fade,
+      softWrap: false,
+      text,
+      style: TextStyle(
+          color: color, fontSize: fontSize.sp, fontWeight: FontWeight.bold),
     );
   }
 }
@@ -74,16 +131,36 @@ class Text10Normal extends StatelessWidget {
 class Text11Normal extends StatelessWidget {
   final String text;
   final Color color;
+  final FontWeight weight;
   const Text11Normal(
-      {super.key, this.text = '', this.color = AppColors.primaryElementText});
+      {super.key,
+      this.text = '',
+      this.color = AppColors.primaryElementText,
+      this.weight = FontWeight.normal});
 
   @override
   Widget build(BuildContext context) {
     return Text(
       textAlign: TextAlign.center,
       text,
+      style: TextStyle(color: color, fontSize: 10, fontWeight: weight),
+    );
+  }
+}
+
+class Text13Normal extends StatelessWidget {
+  final String text;
+  final Color color;
+  const Text13Normal(
+      {super.key, this.text = '', this.color = AppColors.primaryElementText});
+
+  @override
+  Widget build(BuildContext context) {
+    return Text(
+      textAlign: TextAlign.start,
+      text,
       style:
-          TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.normal),
+          TextStyle(color: color, fontSize: 13.sp, fontWeight: FontWeight.bold),
     );
   }
 }

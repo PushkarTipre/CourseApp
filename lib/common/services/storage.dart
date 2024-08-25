@@ -41,10 +41,10 @@ class StorageService {
         : false;
   }
 
-  Map getUserProfile() {
+  UserProfile getUserProfile() {
     var profile = _pref.getString(AppConstants.STORAGE_USER_PROFILE_KEY) ?? "";
     var profileJson = jsonDecode(profile);
-    // var userProfile = UserProfile.fromJson(profileJson);
-    return profileJson;
+    var userProfile = UserProfile.fromJson(profileJson);
+    return userProfile;
   }
 }

@@ -2,6 +2,7 @@ import 'package:course_app/common/utils/app_colors.dart';
 import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/widgets/image_widgets.dart';
 import 'package:course_app/pages/home/view/home.dart';
+import 'package:course_app/pages/profile/view/profile_view.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -51,20 +52,18 @@ Widget _bottomContainer(
 
 Widget appScreens({int index = 0}) {
   List<Widget> screens = [
-    Home(),
-    Center(
-      child: appImage(iconPath: Img_Res.search, width: 250, height: 250),
+    const Home(),
+    const Center(
+      child: AppImage(imagePath: Img_Res.search, width: 250, height: 250),
     ),
-    Center(
-      child: appImage(iconPath: Img_Res.play_Circle, width: 250, height: 250),
+    const Center(
+      child: AppImage(imagePath: Img_Res.play_Circle, width: 250, height: 250),
     ),
-    Center(
+    const Center(
       child:
-          appImage(iconPath: Img_Res.message_Circle, width: 250, height: 250),
+          AppImage(imagePath: Img_Res.message_Circle, width: 250, height: 250),
     ),
-    Center(
-      child: appImage(iconPath: Img_Res.profilePhoto, width: 250, height: 250),
-    ),
+    const Profile_View()
   ];
   return screens[index];
 }
