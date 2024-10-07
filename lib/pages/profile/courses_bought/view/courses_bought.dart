@@ -1,10 +1,9 @@
 import 'package:course_app/common/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../controller/courses_bought_controller.dart';
-import '../widget/courses_bought_widget.dart';
+import '../widget/courses_bought_widgets.dart';
 
 class CoursesBought extends ConsumerWidget {
   const CoursesBought({super.key});
@@ -12,26 +11,25 @@ class CoursesBought extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coursesList = ref.watch(coursesBoughtControllerProvider);
+    int i = 0;
     return Scaffold(
-      appBar: buildGlobalAppBar(title: "My Courses"),
-      body: switch (coursesList) {
-        AsyncData(:final value) => value == null
-            ? Center(
-                child: CircularProgressIndicator(),
-              )
-            : CoursesBoughtWidgets(value: value),
-        AsyncError(:final error) => Text('Error $error'),
-        _ => Center(
-            child: SizedBox(
-              height: 20.h,
-              width: 20.h,
+        appBar: buildGlobalAppBar(title: "Your courses"),
+        body: switch (coursesList) {
+          AsyncData(:final value) => value == null
+              ? const Center(
+                  child: CircularProgressIndicator(),
+                )
+              : CoursesBoughtWidgets(value: value),
+          AsyncError(:final error) => Text('Error $error'),
+          _ => const Center(
+                child: SizedBox(
+              width: 20,
+              height: 20,
               child: CircularProgressIndicator(
-                color: Colors.black26,
-                strokeWidth: 2.r,
+                color: Colors.red,
+                strokeWidth: 2,
               ),
-            ),
-          ),
-      },
-    );
+            ))
+        });
   }
 }

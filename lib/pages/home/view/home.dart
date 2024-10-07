@@ -18,7 +18,6 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
     controller =
         PageController(initialPage: ref.watch(homeScreenBannerIndexProvider));
 
@@ -46,12 +45,12 @@ class _HomeState extends ConsumerState<Home> {
                 ),
                 const HelloText(),
                 const UserName(),
-                SizedBox(
-                  height: 20.h,
-                ),
-                AppSearchBar(
-                  searchFunc: (value) => print("Homepage"),
-                ),
+                // SizedBox(
+                //   height: 20.h,
+                // ),
+                // AppSearchBar(
+                //   searchFunc: (value) => print("Homepage"),
+                // ),
                 SizedBox(
                   height: 20.h,
                 ),

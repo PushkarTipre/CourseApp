@@ -8,6 +8,4 @@ part 'profile_controller.g.dart';
 class ProfileController extends _$ProfileController {
   @override
   UserProfile build() => Global.storageService.getUserProfile();
-
-  // Add your state and logic here
 }

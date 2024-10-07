@@ -1,10 +1,12 @@
 import 'package:course_app/common/routes/app_routes_name.dart';
-import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/widgets/app_bar.dart';
-import 'package:course_app/global.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../../common/utils/constants.dart';
+import '../../../../global.dart';
 
 class SettingsView extends StatelessWidget {
   const SettingsView({super.key});
@@ -20,16 +22,17 @@ class SettingsView extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text("Confirm Logout"),
-                    content: Text("Are you sure you want to logout?"),
+                    title: Text("Confirm logout"),
+                    content: Text("Confirm logout."),
                     actions: [
                       TextButton(
+                        child: Text("Cancel"),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
-                        child: Text("Cancel"),
                       ),
                       TextButton(
+                        child: Text("Confirm"),
                         onPressed: () {
                           Global.storageService
                               .remove(AppConstants.STORAGE_USER_PROFILE_KEY);
@@ -39,22 +42,17 @@ class SettingsView extends StatelessWidget {
                               AppRoutesName.SIGN_IN,
                               (Route<dynamic> route) => false);
                         },
-                        child: Text("Confirm"),
-                      ),
+                      )
                     ],
                   );
+                  ;
                 });
           },
           child: Container(
             height: 100.h,
-            decoration: BoxDecoration(
-              image: DecorationImage(
-                fit: BoxFit.fitHeight,
-                image: AssetImage(
-                  Img_Res.logout,
-                ),
-              ),
-            ),
+            decoration: const BoxDecoration(
+                image: DecorationImage(
+                    image: AssetImage(Img_Res.logout), fit: BoxFit.fitHeight)),
           ),
         ),
       ),

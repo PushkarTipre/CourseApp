@@ -154,6 +154,7 @@ class Text13Normal extends StatelessWidget {
   final FontWeight weight;
   final TextAlign align;
   final int? maxLines;
+
   const Text13Normal({
     super.key,
     this.text = '',

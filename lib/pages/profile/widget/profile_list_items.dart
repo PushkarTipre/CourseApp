@@ -1,10 +1,12 @@
 import 'package:course_app/common/routes/app_routes_name.dart';
-import 'package:course_app/common/utils/app_colors.dart';
-import 'package:course_app/common/utils/img_res.dart';
-import 'package:course_app/common/widgets/image_widgets.dart';
-import 'package:course_app/common/widgets/text_widget.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+
+import '../../../common/utils/app_colors.dart';
+import '../../../common/utils/img_res.dart';
+import '../../../common/widgets/image_widgets.dart';
+import '../../../common/widgets/text_widget.dart';
 
 class ProfileListItems extends StatelessWidget {
   const ProfileListItems({super.key});
@@ -14,55 +16,56 @@ class ProfileListItems extends StatelessWidget {
     return Container(
       margin: EdgeInsets.symmetric(horizontal: 25.w, vertical: 30.h),
       child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          ListItems(
-              path: Img_Res.settings,
+          ListItem(
+              imagePath: Img_Res.settings,
               text: "Settings",
-              onTap: () {
-                Navigator.of(context).pushNamed(AppRoutesName.SETTINGS);
-              }),
-          ListItems(path: Img_Res.creditCard, text: "Payment details"),
-          ListItems(path: Img_Res.award, text: "Achievements "),
-          ListItems(path: Img_Res.love, text: "Love"),
-          ListItems(path: Img_Res.reminder, text: "Settings"),
+              func: () =>
+                  Navigator.of(context).pushNamed(AppRoutesName.SETTINGS)),
+          // ListItem(imagePath: Img_Res.creditCard, text: "Payment detail"),
+          // ListItem(imagePath: Img_Res.award, text: "Achievement"),
+          // ListItem(imagePath: Img_Res.love, text: "Love"),
+          // ListItem(imagePath: Img_Res.reminder, text: "Reminder")
         ],
       ),
     );
   }
 }
 
-class ListItems extends StatelessWidget {
-  final String path;
+class ListItem extends StatelessWidget {
+  final String imagePath;
   final String text;
-  final VoidCallback? onTap;
-  const ListItems(
-      {super.key, required this.path, required this.text, this.onTap});
+  final VoidCallback? func;
+  const ListItem(
+      {super.key, required this.imagePath, required this.text, this.func});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-      onTap: onTap,
+      onTap: func,
       child: Row(
         children: [
           Container(
+            width: 40.w,
+            height: 40.h,
             padding: EdgeInsets.all(7.w),
             margin: EdgeInsets.only(bottom: 15.h),
-            width: 40.w,
-            height: 40.w,
             decoration: BoxDecoration(
               color: AppColors.primaryElement,
-              borderRadius: BorderRadius.circular(10.r),
-              border: Border.all(
-                color: AppColors.primaryElement,
-              ),
+              borderRadius: BorderRadius.circular(10),
+              border: Border.all(color: AppColors.primaryElement),
             ),
-            child: AppImage(imagePath: path),
+            child: AppImage(
+              imagePath: imagePath,
+            ),
           ),
           Container(
             margin: EdgeInsets.only(left: 15.w, bottom: 15.h),
             child: Text13Normal(
-              text: text,
               align: TextAlign.center,
+              text: text,
+              color: Colors.black,
             ),
           )
         ],

@@ -24,19 +24,19 @@ var bottomTabs = <BottomNavigationBarItem>[
       activeIcon: _bottomContainer(
           color: AppColors.primaryElement, imagePath: Img_Res.play_Circle),
       backgroundColor: AppColors.primaryBackground,
-      label: 'Search'),
+      label: 'Play'),
   BottomNavigationBarItem(
       icon: _bottomContainer(imagePath: Img_Res.message_Circle),
       activeIcon: _bottomContainer(
           color: AppColors.primaryElement, imagePath: Img_Res.message_Circle),
       backgroundColor: AppColors.primaryBackground,
-      label: 'Search'),
+      label: 'Chat'),
   BottomNavigationBarItem(
       icon: _bottomContainer(imagePath: Img_Res.profilePhoto),
       activeIcon: _bottomContainer(
           color: AppColors.primaryElement, imagePath: Img_Res.profilePhoto),
       backgroundColor: AppColors.primaryBackground,
-      label: 'Search'),
+      label: 'Profile'),
 ];
 
 Widget _bottomContainer(
@@ -54,7 +54,7 @@ Widget _bottomContainer(
 Widget appScreens({int index = 0}) {
   List<Widget> screens = [
     const Home(),
-    Search(),
+    const Search(),
     const Center(
       child: AppImage(imagePath: Img_Res.play_Circle, width: 250, height: 250),
     ),
@@ -62,7 +62,7 @@ Widget appScreens({int index = 0}) {
       child:
           AppImage(imagePath: Img_Res.message_Circle, width: 250, height: 250),
     ),
-    const Profile_View()
+    const Profile()
   ];
   return screens[index];
 }

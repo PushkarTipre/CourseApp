@@ -20,7 +20,6 @@ class UserName extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print("MY username");
     return Container(
       child: text24Normal(
           text: Global.storageService.getUserProfile().name ?? "",
@@ -109,13 +108,14 @@ AppBar homeAppBar(WidgetRef ref) {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const AppImage(width: 18, height: 12, imagePath: Img_Res.menu),
+          const Text("PVG COET",
+              style: TextStyle(color: AppColors.primaryText)),
           profileState.when(
             data: (data) {
               log("This is HERE :${data.avatar}");
               return GestureDetector(
                   child: AppBoxDecorationImage(
-                imagePath: "${AppConstants.SERVER_API_URL}${data.avatar}",
+                imagePath: "${AppConstants.IMAGE_UPLOADS_PATH}${data.avatar}",
               ));
             },
             error: (error, stack) =>
@@ -137,7 +137,7 @@ class HomeMenuBar extends StatelessWidget {
       children: [
         Container(
           margin: EdgeInsets.only(top: 15.h),
-          child: Row(
+          child: const Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -146,11 +146,11 @@ class HomeMenuBar extends StatelessWidget {
                 weight: FontWeight.bold,
                 color: AppColors.primaryText,
               ),
-              GestureDetector(
-                child: Text10Normal(
-                  text: "See all",
-                ),
-              )
+              // GestureDetector(
+              //   child: Text10Normal(
+              //     text: "See all",
+              //   ),
+              // )
             ],
           ),
         ),
@@ -165,13 +165,6 @@ class HomeMenuBar extends StatelessWidget {
               padding: EdgeInsets.only(
                   left: 15.w, right: 15.w, top: 5.h, bottom: 5.h),
               child: Text11Normal(text: "Popular"),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 30.w),
-              child: Text11Normal(
-                text: "Popular",
-                color: AppColors.primaryThreeElementText,
-              ),
             ),
             Container(
               margin: EdgeInsets.only(left: 30.w),
