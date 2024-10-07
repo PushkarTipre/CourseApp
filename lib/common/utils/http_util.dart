@@ -114,12 +114,11 @@ class ErrorEntity implements Exception {
 ErrorEntity createErrorEntity(DioException error) {
   switch (error.type) {
     case DioExceptionType.badResponse:
-      print("Response status code: ${error.response?.statusCode}");
-      print("Response data: ${error.response?.data}");
+      log("Response status code: ${error.response?.statusCode}");
+      log("Response data: ${error.response?.data}");
       return ErrorEntity(
           code: error.response?.statusCode ?? -1,
           message: "Bad Response: ${error.response?.statusMessage}");
-    // ... (keep other cases)
 
     case DioExceptionType.connectionTimeout:
       return ErrorEntity(code: -1, message: "Connection timeout");

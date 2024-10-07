@@ -49,7 +49,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                   SizedBox(
                     height: 50.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                       controller: _controller.emailController,
                       text: 'Email',
                       iconName: Img_Res.user,
@@ -60,7 +60,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                       controller: _controller.passwordController,
                       text: 'Password',
                       iconName: Img_Res.lock,

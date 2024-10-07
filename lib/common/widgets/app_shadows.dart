@@ -76,7 +76,7 @@ class AppBoxDecorationImage extends StatelessWidget {
         child: CachedNetworkImage(
           placeholder: (context, url) => Container(
             alignment: Alignment.center,
-            child: CircularProgressIndicator(),
+            child: const Center(child: CircularProgressIndicator()),
           ),
           errorWidget: (context, url, error) => Image.asset(Img_Res.defaultImg),
           imageUrl: imagePath,

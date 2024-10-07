@@ -3,6 +3,7 @@ import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/widgets/image_widgets.dart';
 import 'package:course_app/pages/home/view/home.dart';
 import 'package:course_app/pages/profile/view/profile_view.dart';
+import 'package:course_app/pages/search/view/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
@@ -53,9 +54,7 @@ Widget _bottomContainer(
 Widget appScreens({int index = 0}) {
   List<Widget> screens = [
     const Home(),
-    const Center(
-      child: AppImage(imagePath: Img_Res.search, width: 250, height: 250),
-    ),
+    Search(),
     const Center(
       child: AppImage(imagePath: Img_Res.play_Circle, width: 250, height: 250),
     ),

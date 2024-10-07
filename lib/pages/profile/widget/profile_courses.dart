@@ -5,6 +5,8 @@ import 'package:course_app/common/widgets/text_widget.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/routes/app_routes_name.dart';
+
 class ProfileCourses extends StatelessWidget {
   const ProfileCourses({super.key});
 
@@ -21,7 +23,9 @@ class ProfileCourses extends StatelessWidget {
           ),
           ProfileLink(
             imgPath: Img_Res.profileBook,
-            text: "Buy Coursees",
+            text: "Courses Bought",
+            onTap: () =>
+                Navigator.of(context).pushNamed(AppRoutesName.COURSES_BOUGHT),
           ),
           ProfileLink(
             imgPath: Img_Res.profileStar,
@@ -36,11 +40,14 @@ class ProfileCourses extends StatelessWidget {
 class ProfileLink extends StatelessWidget {
   final String imgPath;
   final String text;
-  const ProfileLink({super.key, required this.imgPath, required this.text});
+  final VoidCallback? onTap;
+  const ProfileLink(
+      {super.key, required this.imgPath, required this.text, this.onTap});
 
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
+      onTap: onTap,
       child: Container(
         padding: EdgeInsets.symmetric(vertical: 7.h),
         width: 100.w,

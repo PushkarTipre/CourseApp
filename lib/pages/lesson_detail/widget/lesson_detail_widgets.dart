@@ -35,7 +35,7 @@ class LessonVideos extends StatelessWidget {
           height: 80.h,
           decoration: appBoxShadow(
             radius: 10.w,
-            color: Color.fromRGBO(255, 255, 255, 1),
+            color: const Color.fromRGBO(255, 255, 255, 1),
             bR: 3,
             sR: 2,
           ),
@@ -51,8 +51,7 @@ class LessonVideos extends StatelessWidget {
                 AppBoxDecorationImage(
                   height: 60.h,
                   width: 60.w,
-                  imagePath:
-                      "${AppConstants.IMAGE_UPLOADS_PATH}${lessonData[index].thumbnail}",
+                  imagePath: "${lessonData[index].thumbnail}",
                   fit: BoxFit.fill,
                 ),
                 SizedBox(

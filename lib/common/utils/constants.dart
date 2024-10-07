@@ -1,6 +1,6 @@
 class AppConstants {
   static const String SERVER_API_URL =
-      "https://b665-117-236-69-93.ngrok-free.app/";
+      "https://69fb-116-75-62-66.ngrok-free.app/";
   // static const String SERVER_API_URL = "http://192.168.0.104:8000/";
   static const String STORAGE_USER_PROFILE_KEY = "user_profile";
   static const String STORAGE_USER_TOKEN_KEY = "user_token";

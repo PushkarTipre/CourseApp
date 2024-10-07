@@ -62,7 +62,8 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                     ? appBoxShadow()
                                     : networkImageDecoration(
                                         imagePath:
-                                            "${AppConstants.IMAGE_UPLOADS_PATH}${data.lessonItem[0].thumbnail}"),
+                                            "${data.lessonItem[0].thumbnail}"),
+                                // "${AppConstants.IMAGE_UPLOADS_PATH}${data.lessonItem[0].thumbnail}"),
                                 child: FutureBuilder(
                                   future: data.initializeVideoPlayer,
                                   builder: (context, snapshot) {

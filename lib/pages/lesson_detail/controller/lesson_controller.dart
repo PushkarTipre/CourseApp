@@ -90,17 +90,20 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
   final response =
       await LessonRepo.courseLessonDetail(params: lessonRequestEntity);
   if (response.code == 200) {
-    var url =
-        "${AppConstants.IMAGE_UPLOADS_PATH}${response.data!.elementAt(0).url!}";
+    // var url =
+    //     "${AppConstants.IMAGE_UPLOADS_PATH}${response.data!.elementAt(0).url!}";
+
+    var url = response.data!.elementAt(0).url!;
 
     videoPlayerController = VideoPlayerController.network(url);
 
     var initializeVideoPlayerFuture = videoPlayerController?.initialize();
     LessonVideo vidInstance = LessonVideo(
-        lessonItem: response.data!,
-        isPlay: true,
-        initializeVideoPlayer: initializeVideoPlayerFuture,
-        url: url);
+      lessonItem: response.data!,
+      isPlay: true,
+      initializeVideoPlayer: initializeVideoPlayerFuture,
+      url: url,
+    );
     videoPlayerController?.play();
     ref
         .read(lessonDataControllerProvider.notifier)
@@ -149,7 +152,8 @@ class LessonDataController extends _$LessonDataController {
     //done with resource release
 
     //next start again
-    var vidUrl = "${AppConstants.IMAGE_UPLOADS_PATH}$url";
+    // var vidUrl = "${AppConstants.IMAGE_UPLOADS_PATH}$url";
+    var vidUrl = url;
     // print(vidUrl.toString());
 
     videoPlayerController = VideoPlayerController.network(vidUrl);

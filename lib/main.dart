@@ -29,12 +29,8 @@ class MyApp extends StatelessWidget {
           navigatorKey: navKey,
           title: 'Flutter Demo',
           theme: AppTheme.appThemeData,
-
-          // initialRoute: "/",
-          // routes: routesMap,
           onGenerateRoute: (settings) =>
               AppPages.generateRouteSettings(settings),
-          //home: Welcome(),
         );
       },
     );

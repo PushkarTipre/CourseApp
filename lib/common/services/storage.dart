@@ -47,4 +47,8 @@ class StorageService {
     var userProfile = UserProfile.fromJson(profileJson);
     return userProfile;
   }
+
+  Future<bool> remove(String key) async {
+    return await _pref.remove(key);
+  }
 }

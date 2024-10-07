@@ -1,6 +1,7 @@
 import 'dart:developer';
 import 'dart:ui';
 
+import 'package:course_app/common/routes/app_routes_name.dart';
 import 'package:course_app/common/widgets/button_widgets.dart';
 import 'package:course_app/pages/buy_course/view/buy_course.dart';
 import 'package:flutter/cupertino.dart';
@@ -45,6 +46,10 @@ class CourseDetailIconText extends StatelessWidget {
       child: Row(
         children: [
           GestureDetector(
+            onTap: () {
+              Navigator.of(context).pushNamed(AppRoutesName.AUTHOR_PAGE,
+                  arguments: {"token": courseItem.user_token});
+            },
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 15.w, vertical: 5.h),
               decoration: appBoxShadow(radius: 7.w),
@@ -238,7 +243,7 @@ class LessonInfo extends StatelessWidget {
                   color: AppColors.primaryText,
                   weight: FontWeight.bold,
                 )
-              : SizedBox(),
+              : const SizedBox(),
           SizedBox(
             height: 10.h,
           ),
@@ -254,7 +259,7 @@ class LessonInfo extends StatelessWidget {
                 height: 80.h,
                 decoration: appBoxShadow(
                   radius: 10.w,
-                  color: Color.fromRGBO(255, 255, 255, 1),
+                  color: const Color.fromRGBO(255, 255, 255, 1),
                   bR: 3,
                   sR: 2,
                 ),
@@ -270,8 +275,8 @@ class LessonInfo extends StatelessWidget {
                       AppBoxDecorationImage(
                         height: 60.h,
                         width: 60.w,
-                        imagePath:
-                            "${AppConstants.IMAGE_UPLOADS_PATH}${lessonData[index].thumbnail}",
+                        imagePath: "${lessonData[index].thumbnail}",
+                        // "${AppConstants.IMAGE_UPLOADS_PATH}${lessonData[index].thumbnail}",
                         fit: BoxFit.fill,
                       ),
                       SizedBox(

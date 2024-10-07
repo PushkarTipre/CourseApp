@@ -49,7 +49,7 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                   SizedBox(
                     height: 50.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                     text: 'User Name',
                     iconName: Img_Res.user,
                     hintText: 'Enter your User Name',
@@ -62,7 +62,7 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                     text: 'Email',
                     iconName: Img_Res.user,
                     hintText: 'Enter your email address',
@@ -75,7 +75,7 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                     text: 'Password',
                     iconName: Img_Res.lock,
                     hintText: 'Enter your password',
@@ -89,7 +89,7 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                   SizedBox(
                     height: 20.h,
                   ),
-                  appTextField(
+                  AppTextFields(
                     text: 'Confirm Password',
                     iconName: Img_Res.lock,
                     hintText: 'Enter your password again',

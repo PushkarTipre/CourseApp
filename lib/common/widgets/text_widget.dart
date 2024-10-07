@@ -151,16 +151,30 @@ class Text11Normal extends StatelessWidget {
 class Text13Normal extends StatelessWidget {
   final String text;
   final Color color;
-  const Text13Normal(
-      {super.key, this.text = '', this.color = AppColors.primaryElementText});
+  final FontWeight weight;
+  final TextAlign align;
+  final int? maxLines;
+  const Text13Normal({
+    super.key,
+    this.text = '',
+    this.color = AppColors.primaryElementText,
+    this.weight = FontWeight.bold,
+    this.align = TextAlign.start,
+    this.maxLines,
+  });
 
   @override
   Widget build(BuildContext context) {
     return Text(
-      textAlign: TextAlign.start,
+      // textAlign: TextAlign.start,
+      maxLines: maxLines,
+      textAlign: align,
       text,
-      style:
-          TextStyle(color: color, fontSize: 13.sp, fontWeight: FontWeight.bold),
+      style: TextStyle(
+        color: color,
+        fontSize: 13.sp,
+        fontWeight: weight,
+      ),
     );
   }
 }

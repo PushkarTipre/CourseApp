@@ -29,6 +29,7 @@ class Img_Res {
   static const String arrowRight = '$_iconBase/arrow_right.png';
   static const String headPic = '$_iconBase/headpic.png';
   static const String edit_img = '$_iconBase/edit_3.png';
+  static const String background = '$_iconBase/background.png';
 
   static const String reading = '$_imageBase/reading.png';
   static const String man = '$_imageBase/man.png';
@@ -36,4 +37,10 @@ class Img_Res {
   static const String profileVideo = '$_imageBase/profile_video.png';
   static const String profileBook = '$_imageBase/profile_book.png';
   static const String profileStar = '$_imageBase/profile_star.png';
+  static const String settings = '$_imageBase/settings.png';
+  static const String creditCard = '$_imageBase/credit-card.png';
+  static const String award = '$_imageBase/award.png';
+  static const String love = '$_imageBase/heart(1).png';
+  static const String reminder = '$_imageBase/cube.png';
+  static const String logout = '$_imageBase/Logout.png';
 }
