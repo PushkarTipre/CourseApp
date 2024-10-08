@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/routes/app_routes_name.dart';
 import '../../../common/utils/app_colors.dart';
 import '../../../common/utils/constants.dart';
 import '../../../common/widgets/image_widgets.dart';
@@ -17,23 +18,28 @@ class ProfileImageWidget extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var profileImage = ref.read(profileControllerProvider);
-        return Container(
-            alignment: Alignment.bottomRight,
-            width: 80.w,
-            height: 80.h,
-            decoration: profileImage.avatar == null
-                ? BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20.w),
-                    image: const DecorationImage(
-                        image: AssetImage(Img_Res.headPic)))
-                : BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.w),
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            "${AppConstants.IMAGE_UPLOADS_PATH}${profileImage.avatar}"))),
-            child: AppImage(
-                width: 25.w, height: 25.h, imagePath: Img_Res.edit_img));
+        return GestureDetector(
+          onTap: () {
+            Navigator.of(context).pushNamed(AppRoutesName.EDIT_PROFILE);
+          },
+          child: Container(
+              alignment: Alignment.bottomRight,
+              width: 80.w,
+              height: 80.h,
+              decoration: profileImage.avatar == null
+                  ? BoxDecoration(
+                      color: Colors.blue,
+                      borderRadius: BorderRadius.circular(20.w),
+                      image: const DecorationImage(
+                          image: AssetImage(Img_Res.headPic)))
+                  : BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.w),
+                      image: DecorationImage(
+                          image: NetworkImage(
+                              "${AppConstants.IMAGE_UPLOADS_PATH}${profileImage.avatar}"))),
+              child: AppImage(
+                  width: 25.w, height: 25.h, imagePath: Img_Res.edit_img)),
+        );
       },
     );
   }

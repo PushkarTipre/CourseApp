@@ -62,6 +62,7 @@ class UserProfile {
   String? avatar;
   int? online;
   int? type;
+  String? job;
 
   UserProfile({
     this.access_token,
@@ -71,7 +72,30 @@ class UserProfile {
     this.avatar,
     this.online,
     this.type,
+    this.job,
   });
+
+  UserProfile copyWith({
+    String? access_token,
+    String? token,
+    String? name,
+    String? description,
+    String? avatar,
+    int? online,
+    int? type,
+    String? job,
+  }) {
+    return UserProfile(
+      access_token: access_token ?? this.access_token,
+      token: token ?? this.token,
+      name: name ?? this.name,
+      description: description ?? this.description,
+      avatar: avatar ?? this.avatar,
+      online: online ?? this.online,
+      type: type ?? this.type,
+      job: job ?? this.job,
+    );
+  }
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
@@ -82,6 +106,7 @@ class UserProfile {
       avatar: json["avatar"],
       online: json["online"],
       type: json["type"],
+      job: json["job"],
     );
   }
 
@@ -93,6 +118,7 @@ class UserProfile {
         "avatar": avatar,
         "online": online,
         "type": type,
+        "job": job,
       };
 }
 
