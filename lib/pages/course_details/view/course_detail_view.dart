@@ -17,6 +17,7 @@ class CourseDetail extends ConsumerStatefulWidget {
 
 class _CourseDetailState extends ConsumerState<CourseDetail> {
   late var args;
+
   @override
   void didChangeDependencies() {
     var id = ModalRoute.of(context)!.settings.arguments as Map;

@@ -88,11 +88,13 @@ class LessonVideoItem {
   String? name;
   String? url;
   String? thumbnail;
+  String? course_video_id;
 
   LessonVideoItem({
     this.name,
     this.url,
     this.thumbnail,
+    this.course_video_id,
   });
 
   factory LessonVideoItem.fromJson(Map<String, dynamic> json) =>
@@ -100,12 +102,14 @@ class LessonVideoItem {
         name: json["name"],
         url: json["url"],
         thumbnail: json["thumbnail"],
+        course_video_id: json["course_video_id"],
       );
 
   Map<String, dynamic> toJson() => {
         "name": name,
         "url": url,
         "thumbnail": thumbnail,
+        "course_video_id": course_video_id,
       };
 }
 
@@ -114,22 +118,30 @@ class LessonVideo {
   final Future<void>? initializeVideoPlayer;
   final bool isPlay;
   final String? url;
+  int? id;
+  final String lastPausedAt;
   LessonVideo(
       {this.lessonItem = const <LessonVideoItem>[],
       this.initializeVideoPlayer,
       this.isPlay = false,
-      this.url = ""});
+      this.url = "",
+      this.id,
+      this.lastPausedAt = ""});
 
   LessonVideo copyWith(
       {List<LessonVideoItem>? lessonItem,
       Future<void>? initializeVideoPlayer,
       bool? isPlay,
-      String? url}) {
+      String? url,
+      int? id,
+      String? lastPausedAt}) {
     return LessonVideo(
         lessonItem: lessonItem ?? this.lessonItem,
         initializeVideoPlayer:
             initializeVideoPlayer ?? this.initializeVideoPlayer,
         isPlay: isPlay ?? this.isPlay,
-        url: url ?? this.url);
+        url: url ?? this.url,
+        id: id ?? this.id,
+        lastPausedAt: lastPausedAt ?? this.lastPausedAt);
   }
 }
