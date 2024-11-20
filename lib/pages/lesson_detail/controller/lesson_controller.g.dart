@@ -158,7 +158,7 @@ class _LessonDetailControllerProviderElement
 }
 
 String _$lessonDataControllerHash() =>
-    r'07eb97b39dcd862b5cafd5fece6299430b2ae102';
+    r'd93b497bee2e18f1d1e7bae9b2013e4a53845181';
 
 /// See also [LessonDataController].
 @ProviderFor(LessonDataController)

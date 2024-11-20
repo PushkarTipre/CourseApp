@@ -179,8 +179,10 @@ String _formatDuration(Duration duration) {
 @riverpod
 class LessonDataController extends _$LessonDataController {
   late final VideoAnalyticsService analyticsService;
+  String _lastLoggedTimestamp = '';
   String lastPausedTimestamp = '0:00';
   int currentVideoIndex = 0;
+  bool _isLoggingInProgress = false;
   @override
   FutureOr<LessonVideo> build() async {
     // Initialize analytics service
@@ -196,12 +198,12 @@ class LessonDataController extends _$LessonDataController {
     return LessonVideo();
   }
 
-  void updateCurrentVideoIndex(int index) {
-    currentVideoIndex = index;
+  void updateCurrentVideoIndex(int videoId) {
+    currentVideoIndex = videoId; // Store the actual video ID, not the index
+
     // Log the update for debugging
     if (state.value?.lessonItem != null && state.value!.lessonItem.isNotEmpty) {
-      log("Updated current video index to: $index");
-      log("Current video ID: ${state.value!.lessonItem[index].course_video_id}");
+      log("Updated current video ID to: $videoId");
     }
   }
 
@@ -242,15 +244,27 @@ class LessonDataController extends _$LessonDataController {
           videoPlayerController!.videoPlayerController?.value.duration;
 
       if (position != null && duration != null) {
+        String currentTimestamp = formatDuration(position);
+
+        // Check if this timestamp at this position has already been logged
+        if (currentTimestamp == _lastLoggedTimestamp) {
+          _isLoggingInProgress = false;
+          return;
+        }
+
+        _lastLoggedTimestamp = currentTimestamp;
         lastPausedTimestamp = formatDuration(position);
         log('Video paused at: $lastPausedTimestamp');
 
         if (state.value?.lessonItem != null &&
             state.value!.lessonItem.isNotEmpty) {
-          String courseVideoId = state
-              .value!.lessonItem[currentVideoIndex].course_video_id
-              .toString();
-          log("Current course_video_id: $currentVideoIndex");
+          String courseVideoId = currentVideoIndex.toString();
+          log("Logging pause event for course_video_id: $courseVideoId");
+
+          // String courseVideoId = state
+          //     .value!.lessonItem[currentVideoIndex].course_video_id
+          //     .toString();
+          // log("Current course_video_id: $currentVideoIndex");
 
           // Log to analytics service with proper duration information
           analyticsService.logPauseEvent(courseVideoId, position, duration);
@@ -293,8 +307,23 @@ class LessonDataController extends _$LessonDataController {
           initializeVideoPlayer: null,
         ));
 
+    // Reset the last logged timestamp when changing videos
+    _lastLoggedTimestamp = '';
+    _isLoggingInProgress = false;
+
     // Signal that this is a new video/screen navigation
     analyticsService.onEnterVideoScreen();
+
+    // Make sure the video ID is updated before starting the new video
+    if (state.value?.lessonItem != null) {
+      for (var i = 0; i < state.value!.lessonItem.length; i++) {
+        if (state.value!.lessonItem[i].url == url) {
+          updateCurrentVideoIndex(
+              int.parse(state.value!.lessonItem[i].course_video_id!));
+          break;
+        }
+      }
+    }
 
     var vidUrl = url;
     videoPlayerController = BetterPlayerController(

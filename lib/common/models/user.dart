@@ -63,6 +63,7 @@ class UserProfile {
   int? online;
   int? type;
   String? job;
+  String? id;
 
   UserProfile({
     this.access_token,
@@ -73,6 +74,7 @@ class UserProfile {
     this.online,
     this.type,
     this.job,
+    this.id,
   });
 
   UserProfile copyWith({
@@ -84,6 +86,7 @@ class UserProfile {
     int? online,
     int? type,
     String? job,
+    String? id,
   }) {
     return UserProfile(
       access_token: access_token ?? this.access_token,
@@ -94,6 +97,7 @@ class UserProfile {
       online: online ?? this.online,
       type: type ?? this.type,
       job: job ?? this.job,
+      id: id ?? this.id,
     );
   }
 
@@ -107,6 +111,7 @@ class UserProfile {
       online: json["online"],
       type: json["type"],
       job: json["job"],
+      id: json["id"],
     );
   }
 
@@ -119,6 +124,7 @@ class UserProfile {
         "online": online,
         "type": type,
         "job": job,
+        "id": id,
       };
 }
 

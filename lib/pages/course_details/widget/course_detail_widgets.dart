@@ -1,9 +1,8 @@
-import 'dart:developer';
 import 'dart:ui';
 
 import 'package:course_app/common/routes/app_routes_name.dart';
 import 'package:course_app/common/widgets/button_widgets.dart';
-import 'package:course_app/pages/buy_course/view/buy_course.dart';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -227,7 +226,13 @@ class CourseInfo extends StatelessWidget {
 class LessonInfo extends StatelessWidget {
   final List<LessonItem> lessonData;
   final WidgetRef ref;
-  const LessonInfo({super.key, required this.lessonData, required this.ref});
+  final int courseId;
+  const LessonInfo({
+    super.key,
+    required this.lessonData,
+    required this.ref,
+    required this.courseId,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -268,7 +273,10 @@ class LessonInfo extends StatelessWidget {
                     ref.watch(lessonDetailControllerProvider(
                         index: lessonData[index].id!));
                     Navigator.of(context).pushNamed("/lesson_detail",
-                        arguments: {"id": lessonData[index].id});
+                        arguments: {
+                          "id": lessonData[index].id,
+                          "courseId": courseId
+                        });
                   },
                   child: Row(
                     children: [

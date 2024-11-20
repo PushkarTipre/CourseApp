@@ -17,7 +17,7 @@ import 'package:video_player/video_player.dart';
 import '../../../cleardata.dart';
 import '../../../common/services/storage.dart';
 import '../../../global.dart';
-import '../../../test.dart';
+import 'test.dart';
 import '../controller/lesson_controller.dart';
 import '../lesson_time/repo/analytics.dart';
 import '../lesson_time/view/lesson_time.dart';
@@ -65,20 +65,29 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     super.dispose();
   }
 
+  @override
+  void didChangeDependencies() {
+    // TODO: implement didChangeDependencies
+    var courseId = ModalRoute.of(context)!.settings.arguments as Map;
+    args = courseId["courseId"];
+    super.didChangeDependencies();
+  }
+
   void syncVideoIndex(int index) {
     setState(() {
       videoIndex = index;
       if (ref.read(lessonDataControllerProvider).value?.lessonItem != null) {
+        // Make sure we're getting the course_video_id from the correct index
         currentVideoId = ref
             .read(lessonDataControllerProvider)
             .value
             ?.lessonItem[index]
             .course_video_id;
 
-        // Update the controller's index before playing the next video
+        // Immediately update the controller's video index
         ref
             .read(lessonDataControllerProvider.notifier)
-            .updateCurrentVideoIndex(index);
+            .updateCurrentVideoIndex(int.parse(currentVideoId!));
 
         log("Synced video index to $index");
         log("Synced video ID to $currentVideoId");
@@ -92,6 +101,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
   @override
   Widget build(BuildContext context) {
+    log("Lesson detail page with course id: $args");
     secureScreen();
     // var lessonDetail = ref.watch(lessonDetailControllerProvider(index: args.toInt()));
     var lessonData = ref.watch(lessonDataControllerProvider);

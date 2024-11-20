@@ -5,7 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../common/models/lesson_entities.dart';
 import '../../../common/utils/app_colors.dart';
 import '../../../common/widgets/app_shadows.dart';
 import '../../../common/widgets/image_widgets.dart';

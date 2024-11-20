@@ -6,7 +6,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../utils/constants.dart';
 import '../utils/img_res.dart';
 
 BoxDecoration appBoxShadow({

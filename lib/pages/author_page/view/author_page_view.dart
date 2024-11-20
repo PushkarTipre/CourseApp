@@ -1,12 +1,9 @@
-import 'package:course_app/common/models/course_enties.dart';
-import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/widgets/app_bar.dart';
 import 'package:course_app/pages/author_page/controller/author_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../common/widgets/button_widgets.dart';
 import '../widget/author_widgets.dart';
 
 class AuthorPageView extends ConsumerStatefulWidget {

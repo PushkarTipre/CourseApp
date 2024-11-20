@@ -1,6 +1,6 @@
 import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
-import 'package:course_app/common/utils/http_util.dart';
+
 import 'package:course_app/global.dart';
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
