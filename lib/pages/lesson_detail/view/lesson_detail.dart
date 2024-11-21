@@ -65,13 +65,13 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     super.dispose();
   }
 
-  @override
-  void didChangeDependencies() {
-    // TODO: implement didChangeDependencies
-    var courseId = ModalRoute.of(context)!.settings.arguments as Map;
-    args = courseId["courseId"];
-    super.didChangeDependencies();
-  }
+  // @override
+  // void didChangeDependencies() {
+  //   // TODO: implement didChangeDependencies
+  //   var courseId = ModalRoute.of(context)!.settings.arguments as Map;
+  //   args = courseId["courseId"];
+  //   super.didChangeDependencies();
+  // }
 
   void syncVideoIndex(int index) {
     setState(() {
@@ -101,6 +101,15 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
   @override
   Widget build(BuildContext context) {
+    final args =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final lessonId = args['id'];
+    final courseId = args['courseId'];
+
+    ref.watch(lessonDetailControllerProvider(index: lessonId));
+
+    // Store the courseId in your LessonDataController for later use
+    ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
     log("Lesson detail page with course id: $args");
     secureScreen();
     // var lessonDetail = ref.watch(lessonDetailControllerProvider(index: args.toInt()));
@@ -186,7 +195,8 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                 ElevatedButton(
                                   onPressed: () async {
                                     await analyticsService.clearAnalyticsData(
-                                        videoId: currentVideoId!);
+                                        courseId: courseId.toString(),
+                                        courseVideoId: currentVideoId!);
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       SnackBar(
                                           content: Text(
@@ -204,6 +214,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                         MaterialPageRoute(
                                           builder: (context) =>
                                               VideoAnalyticsScreen2(
+                                            courseId: courseId.toString(),
                                             videoId: currentVideoId!,
                                             videoTitle: data
                                                 .lessonItem[videoIndex].name!,

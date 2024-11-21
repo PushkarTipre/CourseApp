@@ -6,11 +6,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 class VideoAnalyticsScreen2 extends ConsumerWidget {
+  final String courseId;
   final String videoId;
   final String videoTitle;
 
   const VideoAnalyticsScreen2({
     super.key,
+    required this.courseId,
     required this.videoId,
     required this.videoTitle,
   });
@@ -40,14 +42,14 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Video Analytics'),
+        title: Text('Video Analytics:${courseId.toString()}'),
         elevation: 0,
       ),
       body: FutureBuilder<Map<String, dynamic>>(
         future: ref
             .read(lessonDataControllerProvider.notifier)
             .analyticsService
-            .generateAnalyticsReport(videoId),
+            .generateAnalyticsReport(courseId.toString(), videoId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -135,6 +137,13 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
             Text(
               title,
               style: TextStyle(fontSize: 16),
+            ),
+            Text(
+              'CourseId: $courseId',
+              style: TextStyle(
+                fontSize: 14,
+                color: Colors.grey[600],
+              ),
             ),
             Text(
               'ID: $videoId',

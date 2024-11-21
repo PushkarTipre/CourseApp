@@ -106,6 +106,12 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
 
     var url = response.data!.elementAt(0).url!;
 
+    int courseVideoId = int.parse(response.data!.elementAt(0).course_video_id!);
+    // Update the video index with correct ID immediately
+    ref
+        .read(lessonDataControllerProvider.notifier)
+        .updateCurrentVideoIndex(courseVideoId);
+
     // videoPlayerController = VideoPlayerController.network(url);
     videoPlayerController = BetterPlayerController(
         const BetterPlayerConfiguration(
@@ -183,6 +189,14 @@ class LessonDataController extends _$LessonDataController {
   String lastPausedTimestamp = '0:00';
   int currentVideoIndex = 0;
   bool _isLoggingInProgress = false;
+  int? _courseId;
+
+  void setCourseId(int courseId) {
+    _courseId = courseId;
+  }
+
+  int? get courseId => _courseId;
+
   @override
   FutureOr<LessonVideo> build() async {
     // Initialize analytics service
@@ -259,7 +273,7 @@ class LessonDataController extends _$LessonDataController {
         if (state.value?.lessonItem != null &&
             state.value!.lessonItem.isNotEmpty) {
           String courseVideoId = currentVideoIndex.toString();
-          log("Logging pause event for course_video_id: $courseVideoId");
+          log("Logging pause event for course_video_id: $courseVideoId and courseId: $_courseId");
 
           // String courseVideoId = state
           //     .value!.lessonItem[currentVideoIndex].course_video_id
@@ -267,12 +281,13 @@ class LessonDataController extends _$LessonDataController {
           // log("Current course_video_id: $currentVideoIndex");
 
           // Log to analytics service with proper duration information
-          analyticsService.logPauseEvent(courseVideoId, position, duration);
+          analyticsService.logPauseEvent(
+              courseId.toString(), courseVideoId, position, duration);
 
           // Generate and print report for debugging
           log("Generating report for course_video_id: $courseVideoId");
           analyticsService
-              .generateAnalyticsReport(courseVideoId)
+              .generateAnalyticsReport(courseId.toString(), courseVideoId)
               .then((report) {
             print('Analytics Report: $report');
           });

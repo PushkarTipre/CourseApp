@@ -103,10 +103,11 @@ class VideoAnalyticsService {
     _isNewScreenNavigation = true;
   }
 
-  Future<void> logPauseEvent(
-      String videoId, Duration position, Duration totalDuration) async {
+  Future<void> logPauseEvent(String courseId, String videoId, Duration position,
+      Duration totalDuration) async {
     try {
-      final analytics = await _getVideoAnalytics(videoId);
+      final uniqueVideoId = '$courseId-$videoId';
+      final analytics = await _getVideoAnalytics(uniqueVideoId);
       final now = DateTime.now();
 
       // Create new session if this is a new screen navigation
@@ -136,7 +137,7 @@ class VideoAnalyticsService {
 
       // Update analytics with new session
       final updatedAnalytics = VideoAnalytics(
-        videoId: videoId,
+        videoId: uniqueVideoId,
         watchSessions: [
           ...analytics.watchSessions
               .sublist(0, analytics.watchSessions.length - 1),
@@ -147,25 +148,28 @@ class VideoAnalyticsService {
       );
 
       // Save updated analytics
-      await _saveVideoAnalytics(videoId, updatedAnalytics);
+      await _saveVideoAnalytics(courseId, videoId, updatedAnalytics);
     } catch (e) {
       print('Error logging pause event: $e');
     }
   }
 
   Future<void> _saveVideoAnalytics(
-      String videoId, VideoAnalytics analytics) async {
+      String courseId, String videoId, VideoAnalytics analytics) async {
     try {
+      final uniqueVideoId = '$courseId-$videoId';
       final jsonData = json.encode(analytics.toJson());
-      await _storage.setString('${_analyticsKey}_$videoId', jsonData);
+      await _storage.setString('${_analyticsKey}_$uniqueVideoId', jsonData);
     } catch (e) {
       print('Error saving video analytics: $e');
     }
   }
 
-  Future<Map<String, dynamic>> generateAnalyticsReport(String videoId) async {
+  Future<Map<String, dynamic>> generateAnalyticsReport(
+      String courseId, String videoId) async {
     try {
-      final analytics = await _getVideoAnalytics(videoId);
+      final uniqueVideoId = '$courseId-$videoId';
+      final analytics = await _getVideoAnalytics(uniqueVideoId);
 
       // Calculate total pauses across all sessions
       final totalPauses = analytics?.watchSessions
@@ -179,6 +183,8 @@ class VideoAnalyticsService {
           _calculateAverageViewingDuration(analytics!);
       log('Analytics report generated successfully for video $videoId.');
       return {
+        'courseId': courseId,
+        'courseVideoId': videoId,
         'totalSessions': analytics?.watchSessions.length,
         'totalPauses': totalPauses,
         'commonPausePoints': commonPausePoints,
@@ -354,12 +360,16 @@ class VideoAnalyticsService {
     return "$hours:$minutes:$seconds";
   }
 
-  Future<void> clearAnalyticsData({String? videoId}) async {
+  Future<void> clearAnalyticsData(
+      {String? courseId, String? courseVideoId}) async {
     try {
-      if (videoId != null) {
-        // Clear data for a specific video
-        await _storage.remove('${_analyticsKey}_$videoId');
+      if (courseId != null && courseVideoId != null) {
+        // Clear data for a specific video in a course
+        final uniqueVideoId = '$courseId-$courseVideoId';
+        await _storage.remove('${_analyticsKey}_$uniqueVideoId');
+        log('Cleared analytics for course $courseId, video $courseVideoId');
       }
+
       print("Analytics data cleared successfully.");
     } catch (e) {
       print("Error clearing analytics data: $e");
