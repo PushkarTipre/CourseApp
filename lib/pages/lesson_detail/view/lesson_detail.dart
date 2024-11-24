@@ -197,6 +197,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                     await analyticsService.clearAnalyticsData(
                                         courseId: courseId.toString(),
                                         courseVideoId: currentVideoId!);
+
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: Text(
@@ -349,9 +350,10 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                   padding:
                                       EdgeInsets.only(left: 25.w, right: 25.w),
                                   child: LessonVideos(
-                                      lessonData: data.lessonItem,
-                                      ref: ref,
-                                      syncVidIndex: syncVideoIndex),
+                                    lessonData: data.lessonItem,
+                                    ref: ref,
+                                    syncVidIndex: syncVideoIndex,
+                                  ),
                                 )
                               ],
                             );

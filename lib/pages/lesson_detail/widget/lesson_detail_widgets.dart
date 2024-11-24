@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../common/utils/app_colors.dart';
-import '../../../common/utils/constants.dart';
+
 import '../../../common/utils/img_res.dart';
 import '../../../common/widgets/app_shadows.dart';
 import '../../../common/widgets/image_widgets.dart';
@@ -41,6 +41,7 @@ class LessonVideos extends StatelessWidget {
           ),
           child: InkWell(
             onTap: () {
+              syncVidIndex?.call(index);
               var vidUrl = lessonData[index].url;
               ref
                   .read(lessonDataControllerProvider.notifier)
@@ -66,15 +67,9 @@ class LessonVideos extends StatelessWidget {
                         text: lessonData[index].name ?? "No Name Available",
                         color: AppColors.primaryText,
                       ),
-                      // Text10Normal(
-                      //   text: lessonData[index].description ??
-                      //       "No Description Available",
-                      //   color: AppColors.primaryText,
-                      // ),
                     ],
                   ),
                 ),
-                //Expanded(child: Container()),
                 AppImage(
                   imagePath: Img_Res.arrowRight,
                   width: 24.w,
