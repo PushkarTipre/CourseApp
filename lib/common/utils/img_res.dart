@@ -39,6 +39,7 @@ class Img_Res {
   static const String love = '$_iconBase/heart(1).png';
   static const String reminder = '$_iconBase/cube.png';
   static const String logout = '$_iconBase/Logout.png';
+  static const String restart = '$_iconBase/restart.jpg';
 
   static const String reading = '$_imageBase/reading.png';
   static const String man = '$_imageBase/man.png';

@@ -1,130 +1,105 @@
-// lib/services/video_analytics.dart
-
 import 'dart:convert';
 import 'dart:developer';
-import 'dart:math' as math;
-import '../../../../common/services/storage.dart'; // Update with your actual storage service import
-
-// Models
-class VideoAnalytics {
-  final String videoId;
-  final List<WatchSession> watchSessions;
-  final String totalWatchTime;
-  final int pauseCount;
-
-  VideoAnalytics({
-    required this.videoId,
-    required this.watchSessions,
-    required this.totalWatchTime,
-    required this.pauseCount,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'videoId': videoId,
-        'watchSessions':
-            watchSessions.map((session) => session.toJson()).toList(),
-        'totalWatchTime': totalWatchTime,
-        'pauseCount': pauseCount,
-      };
-
-  factory VideoAnalytics.fromJson(Map<String, dynamic> json) => VideoAnalytics(
-        videoId: json['videoId'],
-        watchSessions: (json['watchSessions'] as List)
-            .map((session) => WatchSession.fromJson(session))
-            .toList(),
-        totalWatchTime: json['totalWatchTime'],
-        pauseCount: json['pauseCount'],
-      );
-}
-
-class WatchSession {
-  final String date;
-  final String startTime;
-  final String endTime;
-  final List<PauseEvent> pauseEvents;
-
-  WatchSession({
-    required this.date,
-    required this.startTime,
-    required this.endTime,
-    required this.pauseEvents,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'date': date,
-        'startTime': startTime,
-        'endTime': endTime,
-        'pauseEvents': pauseEvents.map((event) => event.toJson()).toList(),
-      };
-
-  factory WatchSession.fromJson(Map<String, dynamic> json) => WatchSession(
-        date: json['date'],
-        startTime: json['startTime'],
-        endTime: json['endTime'],
-        pauseEvents: (json['pauseEvents'] as List)
-            .map((event) => PauseEvent.fromJson(event))
-            .toList(),
-      );
-}
-
-class PauseEvent {
-  final String timestamp;
-  final String duration;
-  final double videoProgress;
-
-  PauseEvent({
-    required this.timestamp,
-    required this.duration,
-    required this.videoProgress,
-  });
-
-  Map<String, dynamic> toJson() => {
-        'timestamp': timestamp,
-        'duration': duration,
-        'videoProgress': videoProgress,
-      };
-
-  factory PauseEvent.fromJson(Map<String, dynamic> json) => PauseEvent(
-        timestamp: json['timestamp'],
-        duration: json['duration'],
-        videoProgress: json['videoProgress'],
-      );
-}
+import '../../../../common/models/pause_event_entity.dart';
+import '../../../../common/models/user.dart';
+import '../../../../common/models/video_abalytics_entity.dart';
+import '../../../../common/models/watch_session_entity.dart';
+import '../../../../common/services/storage.dart';
+import '../../../../global.dart';
 
 class VideoAnalyticsService {
   final StorageService _storage;
-  static const String _analyticsKey = 'video_analytics';
+  static const String _analyticsKey = 'video_analysis_data';
   bool _isNewScreenNavigation = true; // Track screen navigation
+  bool _isVideoRestart = false; // New flag to track video restarts
+  DateTime? _actualStartTime;
+  bool _isCurrentSessionValid = false; // New flag to track session validity
 
-  VideoAnalyticsService(this._storage);
+  VideoAnalyticsService(this._storage) {
+    if (!_storage.isLoggedIn()) {
+      throw Exception('User must be logged in to track video analytics');
+    }
+  }
 
-  // Call this when entering video screen
+  Map<String, dynamic> _generateEmptyReport() {
+    return {
+      'userInfo': UserProfile(
+        id: '',
+        name: null,
+      ).toJson(),
+      'totalSessions': 0,
+      'totalPauses': 0,
+      'commonPausePoints': <double>[],
+      'averageViewingDuration': '0:00:00',
+      'detailedSessions': [],
+    };
+  }
+
+  void logPlayStart() {
+    _actualStartTime = DateTime.now();
+    _isCurrentSessionValid = true; // Mark session as valid when playback starts
+  }
+
   void onEnterVideoScreen() {
     _isNewScreenNavigation = true;
+    _isVideoRestart = false;
+    _actualStartTime = null; // Reset the start time
+    _isCurrentSessionValid = false; // Reset session validity
+  }
+
+  // New method to handle video restart
+  void onVideoRestart() {
+    _isVideoRestart = true;
+    _isNewScreenNavigation = true; // Treat restart as new navigation
+    _actualStartTime = null; // Reset the start time
+    _isCurrentSessionValid = false; // Reset session validity
   }
 
   Future<void> logPauseEvent(String courseId, String videoId, Duration position,
       Duration totalDuration) async {
     try {
-      final uniqueVideoId = '$courseId-$videoId';
+      final userProfile = Global.storageService.getUserProfile();
+      final uniqueVideoId =
+          '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
       final analytics = await _getVideoAnalytics(uniqueVideoId);
       final now = DateTime.now();
 
       // Create new session if this is a new screen navigation
       WatchSession currentSession;
-      if (_isNewScreenNavigation) {
-        currentSession = _createNewSession();
-        analytics!.watchSessions.add(currentSession);
-        _isNewScreenNavigation = false; // Reset flag
+      if (analytics!.watchSessions.isEmpty || !_isCurrentSessionValid) {
+        currentSession = WatchSession(
+            date: _formatDate(_actualStartTime ?? now), // Use actual start time
+            startTime: _formatTimestamp(
+                _actualStartTime ?? now), // Use actual start time
+            endTime: _formatTimestamp(now), // Current time for end
+            pauseEvents: []);
+        analytics.watchSessions.add(currentSession);
+        _isCurrentSessionValid = true; // Mark the new session as valid
       } else {
-        currentSession = analytics!.watchSessions.last;
+        currentSession = analytics.watchSessions.last;
+        if (_isNewScreenNavigation && _isVideoRestart) {
+          currentSession = WatchSession(
+              date:
+                  _formatDate(_actualStartTime ?? now), // Use actual start time
+              startTime: _formatTimestamp(
+                  _actualStartTime ?? now), // Use actual start time
+              endTime: _formatTimestamp(now), // Current time for end
+              pauseEvents: []);
+          analytics.watchSessions.add(currentSession);
+        }
       }
+/*
+if (currentSession.pauseEvents.isNotEmpty)
 
+
+ */
+      // Reset the new screen navigation flag after handling session creation
+      _isNewScreenNavigation = false;
       // Update session end time
       final updatedSession = WatchSession(
-        date: currentSession.date,
+        date: _formatDate(_actualStartTime ?? now), // Use actual start time,
         startTime: currentSession.startTime,
-        endTime: _formatTimestamp(now),
+        endTime: _formatTimestamp(now), // Use actual end time
         pauseEvents: [
           ...currentSession.pauseEvents,
           PauseEvent(
@@ -135,8 +110,15 @@ class VideoAnalyticsService {
         ],
       );
 
+      final sessionIndex = analytics.watchSessions.length - 1;
+      final updatedSessions = List<WatchSession>.from(analytics.watchSessions);
+      updatedSessions[sessionIndex] = updatedSession;
+
       // Update analytics with new session
       final updatedAnalytics = VideoAnalytics(
+        userProfile: analytics.userProfile,
+        courseId: courseId,
+        courseVideoId: videoId,
         videoId: uniqueVideoId,
         watchSessions: [
           ...analytics.watchSessions
@@ -157,7 +139,9 @@ class VideoAnalyticsService {
   Future<void> _saveVideoAnalytics(
       String courseId, String videoId, VideoAnalytics analytics) async {
     try {
-      final uniqueVideoId = '$courseId-$videoId';
+      final userProfile = Global.storageService.getUserProfile();
+      final uniqueVideoId =
+          '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
       final jsonData = json.encode(analytics.toJson());
       await _storage.setString('${_analyticsKey}_$uniqueVideoId', jsonData);
     } catch (e) {
@@ -168,7 +152,9 @@ class VideoAnalyticsService {
   Future<Map<String, dynamic>> generateAnalyticsReport(
       String courseId, String videoId) async {
     try {
-      final uniqueVideoId = '$courseId-$videoId';
+      final userProfile = Global.storageService.getUserProfile();
+      final uniqueVideoId =
+          '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
       final analytics = await _getVideoAnalytics(uniqueVideoId);
 
       // Calculate total pauses across all sessions
@@ -180,17 +166,18 @@ class VideoAnalyticsService {
 
       // Calculate average viewing duration
       final averageViewingDuration =
-          _calculateAverageViewingDuration(analytics!);
-      log('Analytics report generated successfully for video $videoId.');
+          _calculateAverageViewingDuration(analytics);
+      log('Analytics report generated successfully for video $uniqueVideoId.');
       return {
         'courseId': courseId,
         'courseVideoId': videoId,
-        'totalSessions': analytics?.watchSessions.length,
+        'uniqueVideoId': uniqueVideoId,
+        'totalSessions': analytics.watchSessions.length,
         'totalPauses': totalPauses,
         'commonPausePoints': commonPausePoints,
         'averageViewingDuration': averageViewingDuration,
         'detailedSessions':
-            analytics?.watchSessions.map((s) => s.toJson()).toList(),
+            analytics.watchSessions.map((s) => s.toJson()).toList(),
       };
     } catch (e) {
       print('Error generating analytics report: $e');
@@ -198,56 +185,19 @@ class VideoAnalyticsService {
     }
   }
 
-  // Future<Map<String, dynamic>> generateAnalyticsReport(String videoId) async {
-  //   try {
-  //     final analytics = await _getVideoAnalytics(videoId);
-  //
-  //     if (analytics == null) {
-  //       return _generateEmptyReport();
-  //     }
-  //
-  //     // Calculate total pauses across all sessions
-  //     final totalPauses = analytics.watchSessions
-  //         .fold(0, (sum, session) => sum + session.pauseEvents.length);
-  //
-  //     // Find common pause points
-  //     final commonPausePoints = _findCommonPausePoints(analytics);
-  //
-  //     // Calculate average viewing duration
-  //     final averageViewingDuration =
-  //         _calculateAverageViewingDuration(analytics);
-  //
-  //     return {
-  //       'totalSessions': analytics.watchSessions.length,
-  //       'totalPauses': totalPauses,
-  //       'commonPausePoints': commonPausePoints,
-  //       'averageViewingDuration': averageViewingDuration,
-  //       'detailedSessions':
-  //           analytics.watchSessions.map((s) => s.toJson()).toList(),
-  //     };
-  //   } catch (e) {
-  //     print('Error generating analytics report: $e');
-  //     return _generateEmptyReport();
-  //   }
-  // }
-
-  Map<String, dynamic> _generateEmptyReport() {
-    return {
-      'totalSessions': 0,
-      'totalPauses': 0,
-      'commonPausePoints': <double>[],
-      'averageViewingDuration': '0:00:00',
-      'detailedSessions': [],
-    };
-  }
-
   Future<VideoAnalytics?> _getVideoAnalytics(String videoId) async {
     try {
       final String data = await _storage.getString('${_analyticsKey}_$videoId');
 
-      if (data == null || data.isEmpty) {
+      final parts = videoId.split('_');
+      final userId = parts[0];
+      final userName = parts[1];
+      final courseId = parts[2];
+      final courseVideoId = parts[3];
+      log("User ID: $userId, User Name: $userName, Course ID: $courseId, Course Video ID: $courseVideoId");
+      if (data.isEmpty) {
         log('No existing analytics found for video $videoId, creating initial analytics');
-        return _createInitialAnalytics(videoId);
+        return _createInitialAnalytics(courseId, courseVideoId, videoId);
       }
 
       try {
@@ -257,40 +207,42 @@ class VideoAnalyticsService {
         return analytics;
       } catch (parseError) {
         log('Error parsing analytics data: $parseError');
-        return _createInitialAnalytics(videoId);
+        return _createInitialAnalytics(courseId, courseVideoId, videoId);
       }
     } catch (e) {
       log('Error retrieving video analytics: $e');
-      return _createInitialAnalytics(videoId);
+      return null;
+      // return _createInitialAnalytics(videoId, courseId, courseVideoId);
     }
   }
 
-  VideoAnalytics _createInitialAnalytics(String videoId) {
+  VideoAnalytics _createInitialAnalytics(
+      String courseId, String courseVideoId, String uniqueVideoId) {
+    final userProfile = Global.storageService.getUserProfile();
     return VideoAnalytics(
-      videoId: videoId,
-      watchSessions: [_createNewSession()],
+      courseId: courseId,
+      courseVideoId: courseVideoId,
+      videoId: uniqueVideoId,
+      watchSessions: [],
       totalWatchTime: "0:00:00",
       pauseCount: 0,
+      userProfile: UserProfile(
+        id: userProfile.id ?? '',
+        name: userProfile.name,
+        token: userProfile.token,
+      ),
     );
   }
 
-  WatchSession _createNewSession() {
-    final now = DateTime.now();
-    return WatchSession(
-      date: _formatDate(now),
-      startTime: _formatTimestamp(now),
-      endTime: _formatTimestamp(now),
-      pauseEvents: [],
-    );
-  }
+  void logCompletionEvent(String courseId, String courseVideoId) {
+    // Implement your completion logging logic
+    // This could involve recording the full watch time, marking as completed, etc.
+    log('Video Completed: Course $courseId, Video $courseVideoId');
 
-  String _formatDate(DateTime dateTime) {
-    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
-  }
+    // Example: Save completion status
+    Global.storageService.markVideoAsCompleted(courseId, courseVideoId);
 
-  String _formatTimestamp(DateTime dateTime) {
-    return "${_formatDate(dateTime)} "
-        "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+    log('Video completion logged, restart flag set: $_isVideoRestart');
   }
 
   List<double> _findCommonPausePoints(VideoAnalytics analytics) {
@@ -360,12 +312,21 @@ class VideoAnalyticsService {
     return "$hours:$minutes:$seconds";
   }
 
+  String _formatDate(DateTime dateTime) {
+    return "${dateTime.year}-${dateTime.month.toString().padLeft(2, '0')}-${dateTime.day.toString().padLeft(2, '0')}";
+  }
+
+  String _formatTimestamp(DateTime dateTime) {
+    return "${_formatDate(dateTime)} "
+        "${dateTime.hour.toString().padLeft(2, '0')}:${dateTime.minute.toString().padLeft(2, '0')}:${dateTime.second.toString().padLeft(2, '0')}";
+  }
+
   Future<void> clearAnalyticsData(
       {String? courseId, String? courseVideoId}) async {
     try {
       if (courseId != null && courseVideoId != null) {
-        // Clear data for a specific video in a course
-        final uniqueVideoId = '$courseId-$courseVideoId';
+        final userProfile = Global.storageService.getUserProfile();
+        final uniqueVideoId = '${userProfile.id}_${courseId}_$courseVideoId';
         await _storage.remove('${_analyticsKey}_$uniqueVideoId');
         log('Cleared analytics for course $courseId, video $courseVideoId');
       }

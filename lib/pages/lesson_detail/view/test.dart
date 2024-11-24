@@ -1,9 +1,9 @@
-// lib/screens/video_analytics_screen.dart
-
 import 'package:course_app/pages/lesson_detail/controller/lesson_controller.dart';
-import 'package:course_app/pages/lesson_detail/lesson_time/repo/analytics.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../../common/models/watch_session_entity.dart';
 
 class VideoAnalyticsScreen2 extends ConsumerWidget {
   final String courseId;
@@ -250,10 +250,17 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
               itemCount: sessions.length,
               itemBuilder: (context, index) {
                 final session = sessions[index];
+
+                String startTime = session.startTime.contains(' ')
+                    ? session.startTime.split(' ')[1]
+                    : session.startTime;
+                String endTime = session.endTime.contains(' ')
+                    ? session.endTime.split(' ')[1]
+                    : session.endTime;
                 return ExpansionTile(
                   title: Text('Session ${index + 1} - ${session.date}'),
                   subtitle: Text(
-                    '${_formatVideoTime(session.startTime.split(' ')[1])} - ${_formatVideoTime(session.endTime.split(' ')[1])}',
+                    '${_formatVideoTime(startTime)} - ${_formatVideoTime(endTime)}',
                   ),
                   children: [
                     ListView.builder(

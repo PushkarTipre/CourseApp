@@ -2,96 +2,22 @@ import 'dart:developer';
 
 import 'package:better_player/better_player.dart';
 import 'package:course_app/common/models/lesson_entities.dart';
-import 'package:course_app/common/utils/constants.dart';
+
 import 'package:course_app/global.dart';
-import 'package:course_app/pages/course_details/repo/course_detail.dart';
+
 import 'package:course_app/pages/lesson_detail/repo/lesson_repo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
-import 'package:video_player/video_player.dart';
 
 import '../../../common/services/storage.dart';
 import '../lesson_time/repo/analytics.dart';
 
 part 'lesson_controller.g.dart';
-//
-// VideoPlayerController? videoPlayerController;
-// @riverpod
-// Future<void> lessonDetailController(LessonDetailControllerRef ref,
-//     {required int index}) async {
-//   LessonRequestEntity lessonRequestEntity = LessonRequestEntity();
-//   lessonRequestEntity.id = index;
-//   final response =
-//       await LessonRepo.courseLessonDetail(params: lessonRequestEntity);
-//   if (response.code == 200) {
-//     var url =
-//         "${AppConstants.IMAGE_UPLOADS_PATH}${response.data!.elementAt(0).url}";
-//     videoPlayerController = VideoPlayerController.network(url);
-//     var initializedVideoPlayerFuture = videoPlayerController?.initialize();
-//     LessonVideo vidInstance = LessonVideo(
-//         lessonItem: response.data!,
-//         isPlay: false,
-//         initializeVideoPlayer: initializedVideoPlayerFuture,
-//         url: url);
-//     log("THIS IS URL $url");
-//     videoPlayerController?.play();
-//     ref
-//         .read(lessonDataControllerProvider.notifier)
-//         .updateLessonData(vidInstance);
-//   } else {
-//     log("Request failed ${response.code} ${response.msg}");
-//   }
-// }
-//
-// @riverpod
-// class LessonDataController extends _$LessonDataController {
-//   @override
-//   FutureOr<LessonVideo> build() async {
-//     return LessonVideo();
-//   }
-//
-//   void updateLessonData(LessonVideo lessons) {
-//     update((data) => lessons);
-//     // update((data) => data.copyWith(
-//     //       url: lessons.url,
-//     //       lessonItem: lessons.lessonItem,
-//     //       initializeVideoPlayer: lessons.initializeVideoPlayer,
-//     //       isPlay: lessons.isPlay,
-//     //     ));
-//   }
-//
-//   void playPause(bool isPlay) {
-//     update((data) => data.copyWith(isPlay: isPlay));
-//   }
-//
-//   void playNextVid(String url) async {
-//     if (videoPlayerController != null) {
-//       videoPlayerController?.pause();
-//       videoPlayerController?.dispose();
-//     }
-//     update((data) => data.copyWith(isPlay: false, initializeVideoPlayer: null));
-//     var vidUrl = "${AppConstants.IMAGE_UPLOADS_PATH}$url";
-//     videoPlayerController = VideoPlayerController.network(vidUrl);
-//     var initializedVideoPlayerFuture =
-//         videoPlayerController?.initialize().then((value) {
-//       videoPlayerController?.seekTo(Duration(seconds: 0));
-//       videoPlayerController?.play();
-//     });
-//     update((data) => data.copyWith(
-//           url: vidUrl,
-//           initializeVideoPlayer: initializedVideoPlayerFuture,
-//           isPlay: true,
-//         ));
-//     // videoPlayerController?.play();
-//   }
-// }
-
-// VideoPlayerController? videoPlayerController;
 
 //Part-1
 BetterPlayerController? videoPlayerController;
-
+bool isRestart = false;
 final storageService = StorageService().init();
 @riverpod
 Future<void> lessonDetailController(LessonDetailControllerRef ref,
@@ -101,9 +27,6 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
   final response =
       await LessonRepo.courseLessonDetail(params: lessonRequestEntity);
   if (response.code == 200) {
-    // var url =
-    //     "${AppConstants.IMAGE_UPLOADS_PATH}${response.data!.elementAt(0).url!}";
-
     var url = response.data!.elementAt(0).url!;
 
     int courseVideoId = int.parse(response.data!.elementAt(0).course_video_id!);
@@ -111,28 +34,34 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
     ref
         .read(lessonDataControllerProvider.notifier)
         .updateCurrentVideoIndex(courseVideoId);
-
-    // videoPlayerController = VideoPlayerController.network(url);
+    // If this is a restart, trigger a new screen navigation in analytics
+    if (isRestart) {
+      ref
+          .read(lessonDataControllerProvider.notifier)
+          .analyticsService
+          .onEnterVideoScreen();
+    }
     videoPlayerController = BetterPlayerController(
-        const BetterPlayerConfiguration(
-            autoDetectFullscreenAspectRatio: true,
-            fit: BoxFit.fill,
-            autoPlay: true,
-            expandToFill: true,
-            startAt: Duration(seconds: 0),
-            controlsConfiguration: BetterPlayerControlsConfiguration(
-              enableProgressBar: true,
-              enableProgressText: true,
-              enablePlayPause: true,
-              enableSkips: false,
-              enableFullscreen: true,
-              enableMute: true,
-              enableOverflowMenu: true,
-              enableProgressBarDrag: false,
-            )),
+        BetterPlayerConfiguration(
+          autoDetectFullscreenAspectRatio: true,
+          fit: BoxFit.fill,
+          autoPlay: true,
+          expandToFill: true,
+          startAt: Duration(seconds: 0),
+          controlsConfiguration: BetterPlayerControlsConfiguration(
+            enableProgressBar: true,
+            enableProgressText: true,
+            enablePlayPause: true,
+            enableSkips: false,
+            enableFullscreen: true,
+            enableMute: true,
+            enableOverflowMenu: true,
+            enableProgressBarDrag: false,
+            enableRetry: isRestart,
+          ),
+        ),
         betterPlayerDataSource: BetterPlayerDataSource.network(url));
 
-    // var initializeVideoPlayerFuture = videoPlayerController?.initialize();
     var initializeVideoPlayerFuture = videoPlayerController
         ?.setupDataSource(BetterPlayerDataSource.network(url));
 
@@ -247,6 +176,10 @@ class LessonDataController extends _$LessonDataController {
     if (!isPlay) {
       // Log the timestamp when the video is paused
       logPauseTimestamp();
+    } else if (isRestart) {
+      // If this is a restart, inform the analytics service
+      analyticsService.onVideoRestart();
+      isRestart = false; // Reset the restart flag
     }
   }
 
@@ -357,6 +290,7 @@ class LessonDataController extends _$LessonDataController {
               enableMute: true,
               enableOverflowMenu: true,
               enableProgressBarDrag: false,
+              enableRetry: true,
             )),
         betterPlayerDataSource: BetterPlayerDataSource.network(url));
 
@@ -376,7 +310,45 @@ class LessonDataController extends _$LessonDataController {
       playPause(false);
       logPauseTimestamp();
     } else if (event.betterPlayerEventType == BetterPlayerEventType.play) {
+      if (isRestart) {
+        // Handle restart specific logic
+        analyticsService.onVideoRestart();
+        isRestart = false;
+      }
+      analyticsService.logPlayStart(); // This sets the actual start time
       playPause(true);
+    } else if (event.betterPlayerEventType == BetterPlayerEventType.finished) {
+      _handleVideoCompletion();
+    }
+  }
+
+  void _handleVideoCompletion() {
+    // Set the play state to false to show restart/play icon
+    playPause(false);
+
+    if (state.value?.lessonItem != null && state.value!.lessonItem.isNotEmpty) {
+      String courseVideoId = currentVideoIndex.toString();
+
+      // Log completion event and set up for restart
+      analyticsService.logCompletionEvent(courseId.toString(), courseVideoId);
+
+      // Mark video as completed
+      Global.storageService
+          .markVideoAsCompleted(courseId.toString(), courseVideoId);
+
+      // Generate and print report
+      analyticsService
+          .generateAnalyticsReport(courseId.toString(), courseVideoId)
+          .then((report) {
+        print('Video Completion Report: $report');
+      });
+
+      // Save completion timestamp
+      Global.storageService
+          .saveVideoCompletionTimestamp(courseId.toString(), courseVideoId);
+
+      // Set isRestart flag for the video player
+      isRestart = true;
     }
   }
 

@@ -128,6 +128,49 @@ class StorageService {
     }).toList();
   }
 
+  Future<bool> markVideoAsCompleted(
+      String courseId, String courseVideoId) async {
+    // Store completion status for the video using SharedPreferences
+    return await _pref.setBool(
+        'completed_course_${courseId}_video_$courseVideoId', true);
+  }
+
+  bool isVideoCompleted(String courseId, String courseVideoId) {
+    // Check if a video is marked as completed
+    return _pref.getBool('completed_course_${courseId}_video_$courseVideoId') ??
+        false;
+  }
+
+  Future<bool> saveVideoCompletionTimestamp(
+      String courseId, String courseVideoId) async {
+    // Save the timestamp when the video was completed
+    return await _pref.setString(
+        'completion_timestamp_course_${courseId}_video_$courseVideoId',
+        DateTime.now().toIso8601String());
+  }
+
+  String? getVideoCompletionTimestamp(String courseId, String courseVideoId) {
+    // Retrieve the completion timestamp for a video
+    return _pref.getString(
+        'completion_timestamp_course_${courseId}_video_$courseVideoId');
+  }
+
+  // Method to get all completed videos for a specific course
+  List<String> getCompletedVideosForCourse(String courseId) {
+    List<String> completedVideos = [];
+
+    _pref.getKeys().forEach((key) {
+      if (key.startsWith('completed_course_${courseId}_video_')) {
+        // Extract the video ID from the key
+        String videoId =
+            key.replaceFirst('completed_course_${courseId}_video_', '');
+        completedVideos.add(videoId);
+      }
+    });
+
+    return completedVideos;
+  }
+
   // Method to clear timestamps for a specific video
   Future<bool> clearVideoTimestamps(String courseVideoId) async {
     return await _pref.remove('video_pause_$courseVideoId');

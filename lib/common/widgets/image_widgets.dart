@@ -18,6 +18,7 @@ class AppImage extends StatelessWidget {
   final String imagePath;
   final double width;
   final double height;
+
   const AppImage(
       {super.key,
       this.imagePath = Img_Res.defaultImg,

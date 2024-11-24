@@ -2,7 +2,7 @@ import 'dart:async';
 import 'dart:developer';
 
 import 'package:better_player/better_player.dart';
-import 'package:course_app/common/utils/constants.dart';
+
 import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
 import 'package:course_app/common/widgets/app_bar.dart';
@@ -12,26 +12,24 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
-import 'package:video_player/video_player.dart';
 
-import '../../../cleardata.dart';
 import '../../../common/services/storage.dart';
+import '../../../csv_export.dart';
 import '../../../global.dart';
 import 'test.dart';
 import '../controller/lesson_controller.dart';
 import '../lesson_time/repo/analytics.dart';
-import '../lesson_time/view/lesson_time.dart';
+
 import '../widget/lesson_detail_widgets.dart';
 
 class LessonDetail extends ConsumerStatefulWidget {
-  const LessonDetail({Key? key}) : super(key: key);
+  const LessonDetail({super.key});
 
   @override
   ConsumerState<LessonDetail> createState() => _LessonDetailState();
 }
 
 class _LessonDetailState extends ConsumerState<LessonDetail> {
-  late var args;
   int videoIndex = 0;
 
   late StorageService storageService;
@@ -103,14 +101,16 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
   Widget build(BuildContext context) {
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    final lessonId = args['id'];
+    // final lessonId = args['id'];
     final courseId = args['courseId'];
 
-    ref.watch(lessonDetailControllerProvider(index: lessonId));
+    log(" courseId: $courseId");
+
+    // ref.watch(lessonDetailControllerProvider(index: lessonId));
 
     // Store the courseId in your LessonDataController for later use
     ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
-    log("Lesson detail page with course id: $args");
+    // log("Lesson detail page with course id: $args");
     secureScreen();
     // var lessonDetail = ref.watch(lessonDetailControllerProvider(index: args.toInt()));
     var lessonData = ref.watch(lessonDataControllerProvider);
@@ -167,7 +167,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                                     ),
                                                     Text(
                                                       'Last paused at: ${data.lastPausedAt}',
-                                                      style: TextStyle(
+                                                      style: const TextStyle(
                                                           fontSize: 16),
                                                     ),
 
@@ -186,7 +186,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                 ),
                                 Text(
                                   'Last paused at: ${data.lastPausedAt}',
-                                  style: TextStyle(fontSize: 16),
+                                  style: const TextStyle(fontSize: 16),
                                 ),
                                 SizedBox(
                                   height: 20.h,
@@ -198,12 +198,12 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                         courseId: courseId.toString(),
                                         courseVideoId: currentVideoId!);
                                     ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
+                                      const SnackBar(
                                           content: Text(
                                               'All analytics data cleared!')),
                                     );
                                   },
-                                  child: Text('Clear All Analytics Data'),
+                                  child: const Text('Clear All Analytics Data'),
                                 ),
 
                                 ElevatedButton(
@@ -223,6 +223,14 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                       );
                                     },
                                     child: const Text('View Analytics')),
+
+                                ElevatedButton.icon(
+                                  onPressed: () =>
+                                      AnalyticsExportHandler.exportAnalytics(
+                                          context),
+                                  icon: const Icon(Icons.download),
+                                  label: const Text('Export Analytics'),
+                                ),
 
                                 //video controls
                                 Padding(
@@ -348,8 +356,8 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                               ],
                             );
                           },
-                          error: (e, t) => Text("error"),
-                          loading: () => Text("Loading")),
+                          error: (e, t) => const Text("error"),
+                          loading: () => const Text("Loading")),
                     ],
                   ),
                 ),
@@ -369,8 +377,6 @@ class ClearVideoTimestampsButton extends StatefulWidget {
 
 class _ClearVideoTimestampsButtonState
     extends State<ClearVideoTimestampsButton> {
-  bool _showSnackbar = false;
-
   void _clearTimestamps() {
     // Clear all video timestamps
     Global.storageService.clearAllVideoTimestamps();

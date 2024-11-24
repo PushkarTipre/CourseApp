@@ -111,7 +111,7 @@ class UserProfile {
       online: json["online"],
       type: json["type"],
       job: json["job"],
-      id: json["id"],
+      id: json["id"].toString(),
     );
   }
 

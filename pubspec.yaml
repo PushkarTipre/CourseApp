@@ -53,6 +53,10 @@ dependencies:
   firebase_crashlytics: ^3.5.7
   better_player: ^0.0.84
   flutter_windowmanager: ^0.2.0
+  path_provider: ^2.1.5
+  share_plus: ^10.0.0
+  permission_handler: ^11.3.1
+  intl: ^0.20.0
 
 dev_dependencies:
   flutter_test:

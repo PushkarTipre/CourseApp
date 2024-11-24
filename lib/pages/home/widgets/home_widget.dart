@@ -206,6 +206,7 @@ class CourseItemGrid extends StatelessWidget {
                       "${AppConstants.IMAGE_UPLOADS_PATH}${data?[index].thumbnail}",
                   courseItem: data![index],
                   func: () {
+                    log("Course ID : ${data[index].id}");
                     Navigator.of(context)
                         .pushNamed(AppRoutesName.COURSE_DETAIL, arguments: {
                       "id": data[index].id!,
