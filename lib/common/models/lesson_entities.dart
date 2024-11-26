@@ -90,6 +90,8 @@ class LessonVideoItem {
   String? thumbnail;
   String? course_video_id;
   int? id;
+  final String? quiz;
+  final Map<String, dynamic>? quiz_json;
 
   LessonVideoItem({
     this.name,
@@ -97,6 +99,8 @@ class LessonVideoItem {
     this.thumbnail,
     this.course_video_id,
     this.id,
+    this.quiz,
+    this.quiz_json,
   });
 
   factory LessonVideoItem.fromJson(Map<String, dynamic> json) =>
@@ -106,6 +110,8 @@ class LessonVideoItem {
         thumbnail: json["thumbnail"],
         course_video_id: json["course_video_id"],
         id: json["id"],
+        quiz: json["quiz"],
+        quiz_json: json["quiz_json"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -114,6 +120,8 @@ class LessonVideoItem {
         "thumbnail": thumbnail,
         "course_video_id": course_video_id,
         "id": id,
+        "quiz": quiz,
+        "quiz_json": quiz_json,
       };
 }
 

@@ -1,14 +1,20 @@
+import 'dart:io';
+
 import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
 
 import 'package:course_app/global.dart';
+
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:webview_flutter/webview_flutter.dart';
 
 Future<void> main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  WebViewPlatform.instance = WebViewPlatform.instance;
   await Global.init();
   //HttpUtil().post("api/login");
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
