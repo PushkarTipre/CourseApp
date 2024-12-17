@@ -274,7 +274,7 @@ class LessonInfo extends StatelessWidget {
                         index: lessonData[index].id!));
                     Navigator.of(context).pushNamed("/lesson_detail",
                         arguments: {
-                          "id": lessonData[index].id,
+                          "lessonID": lessonData[index].id,
                           "courseId": courseId
                         });
                   },

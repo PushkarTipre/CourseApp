@@ -99,12 +99,14 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
   @override
   Widget build(BuildContext context) {
+    // log("Lesson ID: ${ModalRoute.of(context)!.settings.arguments}");
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
     // final lessonId = args['id'];
     final courseId = args['courseId'];
+    final lessonId = args['lessonID'];
 
-    log(" courseId: $courseId");
+    log(" courseId: $lessonId");
 
     // ref.watch(lessonDetailControllerProvider(index: lessonId));
 
@@ -353,6 +355,8 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                     lessonData: data.lessonItem,
                                     ref: ref,
                                     syncVidIndex: syncVideoIndex,
+                                    courseId: courseId,
+                                    lessonId: lessonId!,
                                   ),
                                 )
                               ],

@@ -1,4 +1,3 @@
-import 'dart:io';
 
 import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
@@ -33,7 +32,7 @@ class MyApp extends StatelessWidget {
       builder: (context, child) {
         return MaterialApp(
           navigatorKey: navKey,
-          title: 'Flutter Demo',
+          title: 'Ekaksha',
           theme: AppTheme.appThemeData,
           onGenerateRoute: (settings) =>
               AppPages.generateRouteSettings(settings),

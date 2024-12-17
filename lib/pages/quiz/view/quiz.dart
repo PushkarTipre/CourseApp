@@ -1,24 +1,31 @@
+import 'dart:developer';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-class QuizScreen extends StatefulWidget {
+import '../../../common/models/QuizSubmitRequestEntity.dart';
+import '../controller/quiz_controller.dart';
+
+class QuizScreen extends ConsumerStatefulWidget {
   final List<dynamic> quizData;
   final String? quizPdf;
   final String lessonName;
+  final String uniqueId;
 
   const QuizScreen(
-      {Key? key,
+      {super.key,
       required this.quizData,
       this.quizPdf,
-      required this.lessonName})
-      : super(key: key);
+      required this.lessonName,
+      required this.uniqueId});
 
   @override
   _QuizScreenState createState() => _QuizScreenState();
 }
 
-class _QuizScreenState extends State<QuizScreen>
+class _QuizScreenState extends ConsumerState<QuizScreen>
     with SingleTickerProviderStateMixin {
   late List<int?> _selectedAnswers;
   late List<bool?> _answerResults;
@@ -60,7 +67,7 @@ class _QuizScreenState extends State<QuizScreen>
     }
   }
 
-  void _submitQuiz() {
+  void _submitQuiz() async {
     // Check if all questions are answered
     if (_selectedAnswers.contains(null)) {
       _showCustomSnackBar(context,
@@ -77,12 +84,40 @@ class _QuizScreenState extends State<QuizScreen>
       _quizSubmitted = true;
     });
 
-    // Show results with a beautiful custom dialog
+    final apiScore = _answerResults.where((result) => result == true).length;
+    log("API Score: $apiScore");
+
+    final submitQuizParams = QuizSubmitRequestEntity(
+      uniqueId: widget.uniqueId,
+      score: apiScore,
+    );
+
+    _showCustomSnackBar(context, 'Submitting quiz...', Colors.blue);
+
+    try {
+      final result = await ref
+          .read(submitQuizControllerProvider(params: submitQuizParams).future);
+      log("Result: $result"); // Log the result to debug
+
+      if (result != null) {
+        _showCustomSnackBar(
+            context, 'Quiz submitted successfully!', Colors.green);
+      } else {
+        _showCustomSnackBar(context,
+            'Failed to submit the quiz. Please try again.', Colors.red);
+      }
+    } catch (e) {
+      log('Error occurred while submitting quiz: $e');
+      _showCustomSnackBar(context, 'Error submitting quiz.', Colors.red);
+    }
+
+    // Show results with a custom dialog
     _showResultsDialog();
   }
 
   void _showResultsDialog() {
     final score = _calculateScore();
+
     final totalQuestions = widget.quizData.length;
     final percentage = (score / totalQuestions) * 100;
 
@@ -500,9 +535,6 @@ class _QuizScreenState extends State<QuizScreen>
                   },
                 ),
               ),
-
-              // Rest of the code remains the same as in the previous implementation
-
               Padding(
                 padding: EdgeInsets.all(16.w),
                 child: ElevatedButton(
@@ -532,89 +564,3 @@ class _QuizScreenState extends State<QuizScreen>
     );
   }
 }
-/*
-  SizedBox(height: 10.h),
-                        ...List.generate(answers.length, (answerIndex) {
-                          final answerText = answers[answerIndex];
-                          final isSelected = selectedAnswer == answerIndex;
-                          final isCorrectAnswer = correctAnswer == answerIndex;
-
-                          // Determine the background color and border color
-                          Color backgroundColor = Colors.grey.shade100;
-                          Color borderColor = Colors.transparent;
-                          Color textColor = Colors.black87;
-                          Icon? resultIcon;
-
-                          if (_quizSubmitted) {
-                            if (isCorrectAnswer) {
-                              // Always highlight the correct answer in green
-                              backgroundColor = Colors.green.shade100;
-                              borderColor = Colors.green;
-                              textColor = Colors.green.shade900;
-                              resultIcon =
-                                  Icon(Icons.check_circle, color: Colors.green);
-                            }
-
-                            if (isSelected && selectedAnswer != correctAnswer) {
-                              // Highlight the user's incorrect selection in red
-                              backgroundColor = Colors.red.shade100;
-                              borderColor = Colors.red;
-                              textColor = Colors.red.shade900;
-                              resultIcon =
-                                  Icon(Icons.cancel, color: Colors.red);
-                            }
-                          } else if (isSelected) {
-                            // Before submission, show selection in purple
-                            backgroundColor = Colors.purple.shade100;
-                            borderColor = Colors.purple;
-                            textColor = Colors.purple;
-                          }
-
-                          return Padding(
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 16.w, vertical: 4.h),
-                            child: InkWell(
-                              onTap: () =>
-                                  _selectAnswer(questionIndex, answerIndex),
-                              child: Container(
-                                padding: EdgeInsets.all(12.w),
-                                decoration: BoxDecoration(
-                                    color: backgroundColor,
-                                    borderRadius: BorderRadius.circular(10.r),
-                                    border: Border.all(
-                                        color: borderColor, width: 2)),
-                                child: Row(
-                                  children: [
-                                    Text(
-                                      '${answerIndex + 1}. ',
-                                      style: TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: textColor,
-                                      ),
-                                    ),
-                                    Expanded(
-                                      child: Text(
-                                        answerText,
-                                        style: TextStyle(
-                                          color: textColor,
-                                        ),
-                                      ),
-                                    ),
-                                    if (_quizSubmitted && resultIcon != null)
-                                      resultIcon
-                                  ],
-                                ),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                        SizedBox(height: 10.h),
-                      ],
-                    ),
-                  );
-                },
-              ),
-            ),
-
-
-**/

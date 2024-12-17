@@ -1,38 +1,46 @@
 import 'dart:developer';
+import 'dart:math' show sin;
 
-import 'package:course_app/common/models/lesson_entities.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'dart:math' show sin;
 
+import '../../../common/models/lesson_entities.dart';
+import '../../../common/models/quiz_start_request.dart';
 import '../../../common/utils/app_colors.dart';
-
 import '../../../common/utils/img_res.dart';
 import '../../../common/widgets/app_shadows.dart';
 import '../../../common/widgets/image_widgets.dart';
 import '../../../common/widgets/text_widget.dart';
-import '../../quiz.dart';
+import '../../quiz/controller/quiz_controller.dart';
+import '../../quiz/view/quiz.dart';
 import '../controller/lesson_controller.dart';
 
-class LessonVideos extends StatefulWidget {
+class LessonVideos extends ConsumerStatefulWidget {
   final List<LessonVideoItem> lessonData;
   final WidgetRef ref;
   final Function? syncVidIndex;
+  final int courseId;
+  final int lessonId;
+
   const LessonVideos({
-    super.key,
+    Key? key,
     required this.lessonData,
     required this.ref,
     required this.syncVidIndex,
-  });
+    required this.courseId,
+    required this.lessonId,
+  }) : super(key: key);
 
   @override
-  State<LessonVideos> createState() => _LessonVideosState();
+  ConsumerState<LessonVideos> createState() => _LessonVideosState();
 }
 
-class _LessonVideosState extends State<LessonVideos>
+class _LessonVideosState extends ConsumerState<LessonVideos>
     with SingleTickerProviderStateMixin {
   late AnimationController _controller;
+  late Animation<double> _animation;
+  late AnimationController _animationController;
 
   // Temporary function to simulate quiz presence
   bool hasQuiz(int index) {
@@ -47,18 +55,174 @@ class _LessonVideosState extends State<LessonVideos>
     widget.ref.read(lessonDataControllerProvider.notifier).playNextVid(vidUrl!);
   }
 
+  void _showResultsDialog(int score) {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => FadeTransition(
+        opacity: _animation,
+        child: ScaleTransition(
+          scale: _animation,
+          child: AlertDialog(
+            shape: RoundedRectangleBorder(
+              borderRadius: BorderRadius.circular(20.r),
+            ),
+            backgroundColor: Colors.white,
+            title: Center(
+              child: Text(
+                'Quiz Results',
+                style: TextStyle(
+                  color: Colors.deepPurple,
+                  fontSize: 24.sp,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TweenAnimationBuilder<double>(
+                  duration: const Duration(milliseconds: 1000),
+                  tween: Tween<double>(begin: 0, end: score.toDouble()),
+                  builder: (context, value, child) => Text(
+                    'Score: ${value.toInt()}',
+                    style: TextStyle(
+                      fontSize: 20.sp,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.deepPurple,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            actions: [
+              Center(
+                child: ElevatedButton(
+                  onPressed: () => Navigator.of(context).pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.deepPurple,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(15.r),
+                    ),
+                  ),
+                  child: Text(
+                    'Close',
+                    style: TextStyle(
+                      color: Colors.white,
+                      fontSize: 16.sp,
+                    ),
+                  ),
+                ),
+              )
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void showQuizInstructionsDialog(BuildContext context, int index) {
+    final lesson = widget.lessonData[index];
+    var startQuizParams = QuizStartRequestEntity(
+      courseId: widget.courseId,
+      courseVideoId: int.parse(lesson.course_video_id!),
+      lessonId: widget.lessonId,
+    );
+
+    showDialog(
+      context: context,
+      builder: (BuildContext dialogContext) {
+        return AlertDialog(
+          title: const Text(
+            'Quiz Instructions',
+            style: TextStyle(fontWeight: FontWeight.bold),
+          ),
+          content: const SingleChildScrollView(
+            child: ListBody(
+              children: <Widget>[
+                Text(
+                    'Before attempting the quiz, please read the following instructions carefully:'),
+                SizedBox(height: 10),
+                Text('1. You have only one attempt to complete this quiz.',
+                    style: TextStyle(fontWeight: FontWeight.w600)),
+                Text('2. You cannot pause or resume the quiz once started.'),
+                Text(
+                    '3. If you exit the quiz you wont be able to restart the quiz and the score will be marked as 0.'),
+                Text(
+                    '4. Ensure you are in a quiet, distraction-free environment.'),
+                Text(
+                    '5. No external resources or help are allowed during the quiz.'),
+                Text('6. Answer each question carefully.'),
+              ],
+            ),
+          ),
+          actions: <Widget>[
+            TextButton(
+              child: const Text('Cancel'),
+              onPressed: () => Navigator.of(dialogContext).pop(),
+            ),
+            ElevatedButton(
+              child: const Text('I Understand, Start Quiz'),
+              onPressed: () async {
+                // Close instructions dialog
+                Navigator.of(dialogContext).pop();
+
+                try {
+                  // Fetch quiz data using Riverpod
+                  final quizData = await ref.read(
+                      startQuizControllerProvider(params: startQuizParams)
+                          .future);
+
+                  if (quizData != null && quizData.quiz?.completed == true) {
+                    final score = quizData.quiz?.score ?? 0;
+
+                    _showResultsDialog(score);
+                  } else if (quizData?.quiz != null) {
+                    final uniqueId = quizData!.quiz!.uniqueId;
+                    log("Quiz unique ID: $uniqueId");
+
+                    // Navigate to quiz screen
+                    await Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => QuizScreen(
+                          quizData: lesson.quiz_json?['content'] ?? [],
+                          quizPdf: lesson.quiz,
+                          lessonName: lesson.name ?? 'Lesson Quiz',
+                          uniqueId: uniqueId,
+                        ),
+                      ),
+                    );
+                  } else {
+                    // Handle case where quiz data is null
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                          content: Text("Failed to start the quiz.")),
+                    );
+                  }
+                } catch (e) {
+                  // Close loading dialog in case of error
+                  Navigator.of(context).pop();
+
+                  // Log error and show user-friendly message
+                  print("Quiz Start Error: $e");
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                        content:
+                            Text("An error occurred while starting the quiz.")),
+                  );
+                }
+              },
+            ),
+          ],
+        );
+      },
+    );
+  }
+
   void openQuiz(int index) {
     // Navigate to quiz screen with quiz data
-    final lesson = widget.lessonData[index];
-
-    // Assuming you have a QuizScreen that takes quiz data
-    Navigator.push(
-        context,
-        MaterialPageRoute(
-            builder: (context) => QuizScreen(
-                quizData: lesson.quiz_json?['content'] ?? [],
-                quizPdf: lesson.quiz,
-                lessonName: lesson.name ?? 'Lesson Quiz')));
+    showQuizInstructionsDialog(context, index);
   }
 
   @override
@@ -68,6 +232,10 @@ class _LessonVideosState extends State<LessonVideos>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
+    _animation = CurvedAnimation(
+      parent: _controller,
+      curve: Curves.easeInOut,
+    );
   }
 
   @override
@@ -98,7 +266,6 @@ class _LessonVideosState extends State<LessonVideos>
           ),
           child: Row(
             children: [
-              // Make the main content (everything except the arrow) tappable for video
               Expanded(
                 child: InkWell(
                   onTap: () => playVideo(index),
@@ -166,7 +333,7 @@ class _LessonVideosState extends State<LessonVideos>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text13Normal(
-                              text: widget.lessonData[index].name ??
+                              text: widget.lessonData[index].id.toString() ??
                                   "No Name Available",
                               color: AppColors.primaryText,
                             ),

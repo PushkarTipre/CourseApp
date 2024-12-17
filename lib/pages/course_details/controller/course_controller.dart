@@ -12,11 +12,11 @@ Future<CourseItem?> courseDetailController(CourseDetailControllerRef ref,
     {required int index}) async {
   CourseRequestEntity courseRequestEntity = CourseRequestEntity();
   courseRequestEntity.id = index;
-  final reponse = await CourseRepo.courseDetail(params: courseRequestEntity);
-  if (reponse.code == 200) {
-    return reponse.data;
+  final response = await CourseRepo.courseDetail(params: courseRequestEntity);
+  if (response.code == 200) {
+    return response.data;
   } else {
-    log("Request failed ${reponse.code} ${reponse.msg}");
+    log("Request failed ${response.code} ${response.msg}");
   }
 
   return null;

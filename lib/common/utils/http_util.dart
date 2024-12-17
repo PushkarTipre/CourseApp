@@ -23,18 +23,6 @@ class HttpUtil {
     );
     dio = Dio(options);
 
-    // dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-    //   //  log("App Request Data ${options.uri}");
-    //   return handler.next(options);
-    // }, onResponse: (response, handler) {
-    //   // log("App Response Data${response.statusCode}");
-    //   return handler.next(response);
-    // }, onError: (DioException e, handler) {
-    //   // log("App Error Error${e.message}");
-    //   ErrorEntity errorInfo = createErrorEntity(e);
-    //   onError(errorInfo);
-    //   // return handler.next(e);
-    // }));
 
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
       print("Full URL being accessed: ${options.uri}");
@@ -89,6 +77,31 @@ class HttpUtil {
     var response = await dio.post(
       path,
       data: data,
+      queryParameters: queryParameters,
+      options: requestOptions,
+    );
+    log("response $response");
+    log("Done");
+    return response.data ?? response;
+  }
+  Future get(
+      String path, {
+        Map<String, dynamic>? queryParameters,
+        Options? options,
+      }) async {
+    log("GET");
+    Options requestOptions = options ?? Options();
+    requestOptions.headers = requestOptions.headers ?? {};
+
+    Map<String, dynamic>? authorization = getAuthorizationHeaders();
+    if (authorization != null) {
+      log("auth");
+      log(authorization.toString());
+      requestOptions.headers!.addAll(authorization);
+    }
+
+    var response = await dio.get(
+      path,
       queryParameters: queryParameters,
       options: requestOptions,
     );
