@@ -55,6 +55,7 @@ class UserLoginResponseEntity {
 
 // login result
 class UserProfile {
+  String? unique_id;
   String? access_token;
   String? token;
   String? name;
@@ -66,6 +67,7 @@ class UserProfile {
   String? id;
 
   UserProfile({
+    this.unique_id,
     this.access_token,
     this.token,
     this.name,
@@ -78,6 +80,7 @@ class UserProfile {
   });
 
   UserProfile copyWith({
+    String? unique_id,
     String? access_token,
     String? token,
     String? name,
@@ -89,6 +92,7 @@ class UserProfile {
     String? id,
   }) {
     return UserProfile(
+      unique_id: unique_id ?? this.unique_id,
       access_token: access_token ?? this.access_token,
       token: token ?? this.token,
       name: name ?? this.name,
@@ -103,6 +107,7 @@ class UserProfile {
 
   factory UserProfile.fromJson(Map<String, dynamic> json) {
     return UserProfile(
+      unique_id: json["unique_id"],
       access_token: json["access_token"],
       token: json["token"],
       name: json["name"],
@@ -116,6 +121,7 @@ class UserProfile {
   }
 
   Map<String, dynamic> toJson() => {
+        "unique_id": unique_id,
         "access_token": access_token,
         "token": token,
         "name": name,

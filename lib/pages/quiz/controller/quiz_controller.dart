@@ -1,5 +1,6 @@
 import 'dart:developer';
 
+import 'package:course_app/common/models/QuizResultResponseEntity.dart';
 import 'package:course_app/common/models/QuizSubmitRequestEntity.dart';
 import 'package:course_app/common/models/QuizSubmitResponseEntity.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
@@ -45,6 +46,24 @@ Future<QuizSubmitItem?> submitQuizController(
     }
   } catch (e) {
     log("Error occurred while submitting quiz: $e");
+  }
+  return null;
+}
+
+@riverpod
+Future<QuizResultItem?> getQuizResultController(
+  GetQuizResultControllerRef ref, {
+  required String uniqueId,
+}) async {
+  try {
+    final response = await QuizRepo.getResult(quizUniqueId: uniqueId);
+    if (response.code == 200) {
+      return response.data;
+    } else {
+      log("Request failed ${response.code} ${response.msg}");
+    }
+  } catch (e) {
+    log("Error occurred while getting quiz result: $e");
   }
   return null;
 }

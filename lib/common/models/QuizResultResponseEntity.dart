@@ -1,7 +1,7 @@
 class QuizResultResponseEntity {
   int? code;
   String? msg;
-  QuizResultResponseItem? data;
+  QuizResultItem? data;
 
   QuizResultResponseEntity({
     this.code,
@@ -13,39 +13,35 @@ class QuizResultResponseEntity {
       QuizResultResponseEntity(
         code: json["code"],
         msg: json["msg"],
-        data: json["data"] == null
-            ? null
-            : QuizResultResponseItem.fromJson(json["data"]),
+        data:
+            json["data"] == null ? null : QuizResultItem.fromJson(json["data"]),
       );
 }
 
-class QuizResultResponseItem{
+class QuizResultItem {
   final String message;
-  final Map<String, dynamic> quiz;  // Representing the quiz object, you can modify this to a specific structure if needed
+  final Map<String, dynamic> quiz;
   final int score;
   final bool completed;
 
-  QuizResultResponseItem({
+  QuizResultItem({
     required this.message,
     required this.quiz,
     required this.score,
     required this.completed,
   });
 
-  factory QuizResultResponseItem.fromJson(Map<String, dynamic> json) => QuizResultResponseItem(
-    message: json["message"],
-    quiz: json["quiz"],
-    score: json["score"],
-    completed: json["completed"],
-  );
+  factory QuizResultItem.fromJson(Map<String, dynamic> json) => QuizResultItem(
+        message: json["message"],
+        quiz: json["quiz"],
+        score: json["score"],
+        completed: json["completed"],
+      );
 
   Map<String, dynamic> toJson() => {
-    "message": message,
-    "quiz": quiz,
-    "score": score,
-    "completed": completed,
-  };
-
-
-
+        "message": message,
+        "quiz": quiz,
+        "score": score,
+        "completed": completed,
+      };
 }

@@ -1,24 +1,29 @@
 import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
+import 'package:course_app/global.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
 import 'package:intl/intl.dart';
 
+import '../../../common/models/all_quiz_result.dart';
+import '../controller/csv_export_controller.dart';
+
 // Main screen widget
-class AnalyticsScreen extends StatelessWidget {
+class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Video Analytics'),
       ),
       body: Center(
         child: ElevatedButton(
-          onPressed: () => AnalyticsExportHandler.exportAnalytics(context),
+          onPressed: () => AnalyticsExportHandler.exportAnalytics(context, ref),
           child: const Text('Export Analytics'),
         ),
       ),
@@ -54,7 +59,7 @@ class AnalyticsExportUtil {
     }
   }
 
-  static Future<String> exportAnalyticsToCSV() async {
+  static Future<String> exportAnalyticsToCSV(WidgetRef ref) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final analyticsKeys = prefs
@@ -64,10 +69,17 @@ class AnalyticsExportUtil {
 
       // CSV header
       List<String> csvRows = [
-        'Unique ID, User ID, User Name,Course ID,Course Video ID,Session Date,Session Start Time,Session End Time,Session Total Watch Time,Total Pause Count,Pause Timestamps,Pause Durations,Video Progress'
+        'Unique ID,User ID,User Name,Course ID,Course Video ID,Session Date,Session Start Time,Session End Time,Session Total Watch Time,Total Pause Count,Pause Timestamps,Pause Durations,Video Progress,Quiz Unique Id,Quiz Score,',
       ];
 
+      final uniqueId = Global.storageService.getUserProfile().unique_id;
+      log("The unique ID is $uniqueId");
+      final quizResult = await ref.read(
+        csvExportQuizResultControllerProvider(uniqueId: "6766fa42531ad").future,
+      );
+
       for (String key in analyticsKeys) {
+        log("This is the quiz result $quizResult");
         String? analyticsJson = prefs.getString(key);
         if (analyticsJson != null) {
           Map<String, dynamic> analytics = jsonDecode(analyticsJson);
@@ -97,6 +109,20 @@ class AnalyticsExportUtil {
                   .add(pauseEvent['videoProgress'].toStringAsFixed(6));
             }
 
+            String formatQuizIds(List<AllQuizResultData>? quizResults) {
+              if (quizResults == null || quizResults.isEmpty) {
+                return 'N/A';
+              }
+              return quizResults.map((quiz) => quiz.quiz_unique_id).join(';');
+            }
+
+            String formatQuizScores(List<AllQuizResultData>? quizResults) {
+              if (quizResults == null || quizResults.isEmpty) {
+                return 'N/A';
+              }
+              return quizResults.map((quiz) => quiz.score.toString()).join(';');
+            }
+
             // Create the row with grouped values
             String row = [
               videoId,
@@ -112,7 +138,9 @@ class AnalyticsExportUtil {
               analytics['pauseCount']?.toString() ?? '0',
               timestamps.join(';'),
               durations.join(';'),
-              progressValues.join(';')
+              progressValues.join(';'),
+              formatQuizIds(quizResult),
+              formatQuizScores(quizResult),
             ].join(',');
 
             csvRows.add(row);
@@ -145,7 +173,8 @@ class AnalyticsExportUtil {
 
 // Handler class for export operations
 class AnalyticsExportHandler {
-  static Future<void> exportAnalytics(BuildContext context) async {
+  static Future<void> exportAnalytics(
+      BuildContext context, WidgetRef ref) async {
     try {
       // Show loading indicator
       showDialog(
@@ -159,7 +188,7 @@ class AnalyticsExportHandler {
       );
 
       // Generate CSV file
-      String filePath = await AnalyticsExportUtil.exportAnalyticsToCSV();
+      String filePath = await AnalyticsExportUtil.exportAnalyticsToCSV(ref);
 
       // Close loading indicator
       if (context.mounted) {

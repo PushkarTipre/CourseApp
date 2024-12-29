@@ -3,6 +3,7 @@ class QuizAttempt {
   final int userId;
   final String userName;
   final String uniqueId;
+  final String quizUniqueId;
   final int courseId;
   final int lessonId;
   final String courseVideoId;
@@ -16,6 +17,7 @@ class QuizAttempt {
     required this.userId,
     required this.userName,
     required this.uniqueId,
+    required this.quizUniqueId,
     required this.courseId,
     required this.lessonId,
     required this.courseVideoId,
@@ -31,6 +33,7 @@ class QuizAttempt {
       userId: json['user_id'],
       userName: json['user_name'],
       uniqueId: json['unique_id'],
+      quizUniqueId: json['quiz_unique_id'],
       courseId: json['course_id'],
       lessonId: json['lesson_id'],
       courseVideoId: json['course_video_id'].toString(),
@@ -51,6 +54,7 @@ class QuizAttempt {
     data['user_id'] = userId;
     data['user_name'] = userName;
     data['unique_id'] = uniqueId;
+    data['quiz_unique_id'] = quizUniqueId;
     data['course_id'] = courseId;
     data['lesson_id'] = lessonId;
     data['course_video_id'] = courseVideoId;

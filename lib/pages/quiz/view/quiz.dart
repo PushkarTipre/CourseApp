@@ -12,14 +12,14 @@ class QuizScreen extends ConsumerStatefulWidget {
   final List<dynamic> quizData;
   final String? quizPdf;
   final String lessonName;
-  final String uniqueId;
+  final String quizUniqueId;
 
   const QuizScreen(
       {super.key,
       required this.quizData,
       this.quizPdf,
       required this.lessonName,
-      required this.uniqueId});
+      required this.quizUniqueId});
 
   @override
   _QuizScreenState createState() => _QuizScreenState();
@@ -88,7 +88,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
     log("API Score: $apiScore");
 
     final submitQuizParams = QuizSubmitRequestEntity(
-      uniqueId: widget.uniqueId,
+      quiz_unique_id: widget.quizUniqueId,
       score: apiScore,
     );
 

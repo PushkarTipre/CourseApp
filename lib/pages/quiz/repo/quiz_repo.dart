@@ -46,13 +46,13 @@ class QuizRepo {
 
   // Get Quiz Result
   static Future<QuizResultResponseEntity> getResult({
-    required String uniqueId,
+    required String quizUniqueId,
   }) async {
     try {
       var response = await HttpUtil().get(
         "api/getQuizResult",
         queryParameters: {
-          'unique_id': uniqueId,
+          'quiz_unique_id': quizUniqueId,
         },
       );
       return QuizResultResponseEntity.fromJson(response);

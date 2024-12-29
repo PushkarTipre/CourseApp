@@ -24,25 +24,26 @@ class LessonVideos extends ConsumerStatefulWidget {
   final int lessonId;
 
   const LessonVideos({
-    Key? key,
+    super.key,
     required this.lessonData,
     required this.ref,
     required this.syncVidIndex,
     required this.courseId,
     required this.lessonId,
-  }) : super(key: key);
+  });
 
   @override
   ConsumerState<LessonVideos> createState() => _LessonVideosState();
 }
 
 class _LessonVideosState extends ConsumerState<LessonVideos>
-    with SingleTickerProviderStateMixin {
+    with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _animation;
-  late AnimationController _animationController;
 
-  // Temporary function to simulate quiz presence
+  late AnimationController dialogController;
+  late Animation<double> dialogAnimation;
+
   bool hasQuiz(int index) {
     final lesson = widget.lessonData[index];
     return lesson.quiz != null || lesson.quiz_json != null;
@@ -56,13 +57,17 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
   }
 
   void _showResultsDialog(int score) {
+    // Initialize the animation controller
+    dialogController.forward();
+
     showDialog(
       context: context,
       barrierDismissible: false,
-      builder: (context) => FadeTransition(
-        opacity: _animation,
+      builder: (context) => WillPopScope(
+        // Prevent back button from dismissing until animation completes
+        onWillPop: () async => false,
         child: ScaleTransition(
-          scale: _animation,
+          scale: dialogAnimation,
           child: AlertDialog(
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(20.r),
@@ -82,7 +87,8 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TweenAnimationBuilder<double>(
-                  duration: const Duration(milliseconds: 1000),
+                  duration: Duration
+                      .zero, // This will show the final value immediately
                   tween: Tween<double>(begin: 0, end: score.toDouble()),
                   builder: (context, value, child) => Text(
                     'Score: ${value.toInt()}',
@@ -98,7 +104,13 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
             actions: [
               Center(
                 child: ElevatedButton(
-                  onPressed: () => Navigator.of(context).pop(),
+                  onPressed: () async {
+                    // Reverse the animation before closing
+                    await dialogController.reverse();
+                    if (context.mounted) {
+                      Navigator.of(context).pop();
+                    }
+                  },
                   style: ElevatedButton.styleFrom(
                     backgroundColor: Colors.deepPurple,
                     shape: RoundedRectangleBorder(
@@ -118,7 +130,12 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
           ),
         ),
       ),
-    );
+    ).then((_) {
+      // Only reset if the dialog was dismissed without using the button
+      if (dialogController.status != AnimationStatus.dismissed) {
+        dialogController.reset();
+      }
+    });
   }
 
   void showQuizInstructionsDialog(BuildContext context, int index) {
@@ -168,7 +185,6 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                 Navigator.of(dialogContext).pop();
 
                 try {
-                  // Fetch quiz data using Riverpod
                   final quizData = await ref.read(
                       startQuizControllerProvider(params: startQuizParams)
                           .future);
@@ -178,8 +194,8 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
 
                     _showResultsDialog(score);
                   } else if (quizData?.quiz != null) {
-                    final uniqueId = quizData!.quiz!.uniqueId;
-                    log("Quiz unique ID: $uniqueId");
+                    final quizUniqueId = quizData!.quiz!.quizUniqueId;
+                    log("Quiz unique ID: $quizUniqueId");
 
                     // Navigate to quiz screen
                     await Navigator.push(
@@ -189,7 +205,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                           quizData: lesson.quiz_json?['content'] ?? [],
                           quizPdf: lesson.quiz,
                           lessonName: lesson.name ?? 'Lesson Quiz',
-                          uniqueId: uniqueId,
+                          quizUniqueId: quizUniqueId,
                         ),
                       ),
                     );
@@ -232,15 +248,26 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
       vsync: this,
       duration: const Duration(seconds: 2),
     )..repeat();
+
     _animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
+    );
+
+    dialogController = AnimationController(
+      vsync: this,
+      duration: const Duration(milliseconds: 300),
+    );
+    dialogAnimation = CurvedAnimation(
+      parent: dialogController,
+      curve: Curves.easeOut,
     );
   }
 
   @override
   void dispose() {
     _controller.dispose();
+    dialogController.dispose();
     super.dispose();
   }
 
@@ -333,7 +360,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text13Normal(
-                              text: widget.lessonData[index].id.toString() ??
+                              text: widget.lessonData[index].name.toString() ??
                                   "No Name Available",
                               color: AppColors.primaryText,
                             ),

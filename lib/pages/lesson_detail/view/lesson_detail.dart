@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:better_player/better_player.dart';
-
 import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
 import 'package:course_app/common/widgets/app_bar.dart';
@@ -12,11 +10,12 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_windowmanager/flutter_windowmanager.dart';
-
+import 'package:better_player_enhanced/better_player.dart';
 import '../../../common/services/storage.dart';
-import '../../../csv_export.dart';
+import '../../csv_export/view/csv_export.dart';
+
 import '../../../global.dart';
-import 'test.dart';
+import 'VideoAnalyticsScreen.dart';
 import '../controller/lesson_controller.dart';
 import '../lesson_time/repo/analytics.dart';
 
@@ -230,7 +229,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                 ElevatedButton.icon(
                                   onPressed: () =>
                                       AnalyticsExportHandler.exportAnalytics(
-                                          context),
+                                          context, ref),
                                   icon: const Icon(Icons.download),
                                   label: const Text('Export Analytics'),
                                 ),

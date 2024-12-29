@@ -290,5 +290,140 @@ class _SubmitQuizControllerProviderElement
   QuizSubmitRequestEntity get params =>
       (origin as SubmitQuizControllerProvider).params;
 }
+
+String _$getQuizResultControllerHash() =>
+    r'92e2db2d3ec638e2fbe0e258d98b2c14394654dd';
+
+/// See also [getQuizResultController].
+@ProviderFor(getQuizResultController)
+const getQuizResultControllerProvider = GetQuizResultControllerFamily();
+
+/// See also [getQuizResultController].
+class GetQuizResultControllerFamily
+    extends Family<AsyncValue<QuizResultItem?>> {
+  /// See also [getQuizResultController].
+  const GetQuizResultControllerFamily();
+
+  /// See also [getQuizResultController].
+  GetQuizResultControllerProvider call({
+    required String uniqueId,
+  }) {
+    return GetQuizResultControllerProvider(
+      uniqueId: uniqueId,
+    );
+  }
+
+  @override
+  GetQuizResultControllerProvider getProviderOverride(
+    covariant GetQuizResultControllerProvider provider,
+  ) {
+    return call(
+      uniqueId: provider.uniqueId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'getQuizResultControllerProvider';
+}
+
+/// See also [getQuizResultController].
+class GetQuizResultControllerProvider
+    extends AutoDisposeFutureProvider<QuizResultItem?> {
+  /// See also [getQuizResultController].
+  GetQuizResultControllerProvider({
+    required String uniqueId,
+  }) : this._internal(
+          (ref) => getQuizResultController(
+            ref as GetQuizResultControllerRef,
+            uniqueId: uniqueId,
+          ),
+          from: getQuizResultControllerProvider,
+          name: r'getQuizResultControllerProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$getQuizResultControllerHash,
+          dependencies: GetQuizResultControllerFamily._dependencies,
+          allTransitiveDependencies:
+              GetQuizResultControllerFamily._allTransitiveDependencies,
+          uniqueId: uniqueId,
+        );
+
+  GetQuizResultControllerProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.uniqueId,
+  }) : super.internal();
+
+  final String uniqueId;
+
+  @override
+  Override overrideWith(
+    FutureOr<QuizResultItem?> Function(GetQuizResultControllerRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: GetQuizResultControllerProvider._internal(
+        (ref) => create(ref as GetQuizResultControllerRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        uniqueId: uniqueId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<QuizResultItem?> createElement() {
+    return _GetQuizResultControllerProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is GetQuizResultControllerProvider &&
+        other.uniqueId == uniqueId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, uniqueId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin GetQuizResultControllerRef
+    on AutoDisposeFutureProviderRef<QuizResultItem?> {
+  /// The parameter `uniqueId` of this provider.
+  String get uniqueId;
+}
+
+class _GetQuizResultControllerProviderElement
+    extends AutoDisposeFutureProviderElement<QuizResultItem?>
+    with GetQuizResultControllerRef {
+  _GetQuizResultControllerProviderElement(super.provider);
+
+  @override
+  String get uniqueId => (origin as GetQuizResultControllerProvider).uniqueId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

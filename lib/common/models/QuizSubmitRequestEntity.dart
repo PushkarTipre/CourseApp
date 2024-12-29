@@ -1,16 +1,16 @@
 class QuizSubmitRequestEntity {
-  final String uniqueId; // The unique identifier for the quiz attempt
-  final int score; // The score the user achieved
+  final String quiz_unique_id;
+  final int score;
 
   QuizSubmitRequestEntity({
-    required this.uniqueId,
+    required this.quiz_unique_id,
     required this.score,
   });
 
   // Convert the object to a JSON map to send in the request
   Map<String, dynamic> toJson() {
     return {
-      'unique_id': uniqueId,
+      'quiz_unique_id': quiz_unique_id,
       'score': score,
     };
   }
@@ -18,7 +18,7 @@ class QuizSubmitRequestEntity {
   // Create an instance from JSON response
   factory QuizSubmitRequestEntity.fromJson(Map<String, dynamic> json) {
     return QuizSubmitRequestEntity(
-      uniqueId: json['unique_id'] ?? '',
+      quiz_unique_id: json['quiz_unique_id'] ?? '',
       score: json['score'] ?? 0,
     );
   }

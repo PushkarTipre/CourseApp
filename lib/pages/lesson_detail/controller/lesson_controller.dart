@@ -1,10 +1,9 @@
 import 'dart:developer';
 
-import 'package:better_player/better_player.dart';
 import 'package:course_app/common/models/lesson_entities.dart';
 
 import 'package:course_app/global.dart';
-
+import 'package:better_player_enhanced/better_player.dart';
 import 'package:course_app/pages/lesson_detail/repo/lesson_repo.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';

@@ -1,11 +1,14 @@
 import 'dart:convert';
 import 'dart:developer';
+import '../../../../common/models/QuizResultResponseEntity.dart';
 import '../../../../common/models/pause_event_entity.dart';
 import '../../../../common/models/user.dart';
 import '../../../../common/models/video_abalytics_entity.dart';
 import '../../../../common/models/watch_session_entity.dart';
 import '../../../../common/services/storage.dart';
 import '../../../../global.dart';
+import '../../../quiz/controller/quiz_controller.dart';
+import '../../../quiz/repo/quiz_repo.dart';
 
 class VideoAnalyticsService {
   final StorageService _storage;
