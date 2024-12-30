@@ -5,11 +5,12 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 Widget text24Normal(
     {String text = '',
     Color color = AppColors.primaryText,
-    FontWeight fontWeight = FontWeight.normal}) {
+    FontWeight fontWeight = FontWeight.normal,
+    double fontSize = 24}) {
   return Text(
     textAlign: TextAlign.center,
     text,
-    style: TextStyle(color: color, fontSize: 24, fontWeight: fontWeight),
+    style: TextStyle(color: color, fontSize: fontSize, fontWeight: fontWeight),
   );
 }
 
@@ -119,7 +120,7 @@ class FadeText extends StatelessWidget {
     return Text(
       textAlign: TextAlign.left,
       maxLines: 1,
-      overflow: TextOverflow.fade,
+      overflow: TextOverflow.ellipsis,
       softWrap: false,
       text,
       style: TextStyle(

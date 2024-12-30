@@ -24,7 +24,7 @@ BoxDecoration appBoxShadow({
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: sR,
             blurRadius: bR,
-            offset: Offset(0, 1)),
+            offset: const Offset(0, 1)),
       ]);
 }
 
@@ -47,7 +47,7 @@ BoxDecoration appBoxShadowWithRadius(
             color: Colors.grey.withOpacity(0.1),
             spreadRadius: sR,
             blurRadius: bR,
-            offset: Offset(0, 1)),
+            offset: const Offset(0, 1)),
       ]);
 }
 
@@ -58,12 +58,13 @@ class AppBoxDecorationImage extends StatelessWidget {
   final BoxFit fit;
   final CourseItem? courseItem;
   final Function()? func;
+
   const AppBoxDecorationImage({
     super.key,
     this.height = 40,
     this.width = 40,
     this.imagePath = Img_Res.defaultImg,
-    this.fit = BoxFit.fitHeight,
+    this.fit = BoxFit.fitWidth,
     this.courseItem,
     this.func,
   });
@@ -71,49 +72,79 @@ class AppBoxDecorationImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
-        onTap: func,
-        child: CachedNetworkImage(
-          placeholder: (context, url) => Container(
-            alignment: Alignment.center,
-            child: const Center(child: CircularProgressIndicator()),
-          ),
-          errorWidget: (context, url, error) => Image.asset(Img_Res.defaultImg),
-          imageUrl: imagePath,
-          imageBuilder: (context, imageProvider) => Container(
-            height: height.h,
-            width: width.h,
-            decoration: BoxDecoration(
-              image: DecorationImage(image: imageProvider, fit: fit),
-              borderRadius: BorderRadius.all(
-                Radius.circular(20.r),
+      onTap: func,
+      child: Container(
+        height: height.h,
+        width: width.h,
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(20.r),
+          color: Colors.white,
+          boxShadow: [
+            BoxShadow(
+              color: Colors.grey.withOpacity(0.2),
+              spreadRadius: 1,
+              blurRadius: 4,
+              offset: const Offset(0, 2),
+            ),
+          ],
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Expanded(
+              flex: 2,
+              child: ClipRRect(
+                borderRadius: BorderRadius.only(
+                  topLeft: Radius.circular(20.r),
+                  topRight: Radius.circular(20.r),
+                ),
+                child: CachedNetworkImage(
+                  placeholder: (context, url) => Container(
+                    alignment: Alignment.center,
+                    child: const Center(child: CircularProgressIndicator()),
+                  ),
+                  errorWidget: (context, url, error) =>
+                      Image.asset(Img_Res.defaultImg, fit: BoxFit.cover),
+                  imageUrl: imagePath,
+                  fit: BoxFit.cover,
+                  width: double.infinity,
+                ),
               ),
             ),
-            child: courseItem == null
-                ? Container()
-                : Column(
-                    mainAxisAlignment: MainAxisAlignment.end,
+            if (courseItem != null)
+              Expanded(
+                flex: 1,
+                child: Padding(
+                  padding: EdgeInsets.all(8.w),
+                  child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Container(
-                        margin: EdgeInsets.only(
-                          left: 20.w,
-                        ),
+                      Flexible(
+                        // Wrap FadeText in Flexible
                         child: FadeText(
                           text: courseItem!.name!,
+                          fontSize: 14.sp,
+                          color: AppColors.primarySecondaryElementText,
                         ),
                       ),
-                      Container(
-                        margin: EdgeInsets.only(left: 20.w, bottom: 30.h),
+                      SizedBox(height: 4.h),
+                      Flexible(
+                        // Wrap FadeText in Flexible
                         child: FadeText(
                           text: "${courseItem!.lesson_num!} Lessons",
-                          color: AppColors.primaryFourElementText,
-                          fontSize: 8.sp,
+                          color: AppColors.primaryThreeElementText,
+                          fontSize: 12.sp,
                         ),
-                      )
+                      ),
                     ],
                   ),
-          ),
-        ));
+                ),
+              ),
+          ],
+        ),
+      ),
+    );
   }
 }
 

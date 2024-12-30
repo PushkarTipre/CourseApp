@@ -31,4 +31,6 @@ class AppColors {
   static const Color primaryElementStatus = Color.fromARGB(255, 88, 174, 127);
 
   static const Color primaryElementBg = Color.fromARGB(255, 238, 121, 99);
+
+  static const Color primaryElementBg2 = Color.fromARGB(226, 230, 243, 255);
 }

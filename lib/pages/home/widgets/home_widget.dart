@@ -30,74 +30,153 @@ class UserName extends StatelessWidget {
 }
 
 class HelloText extends StatelessWidget {
-  const HelloText({super.key});
+  String text;
+  Color color;
+  int fontSize;
+
+  HelloText(
+      {super.key,
+      this.text = "Hello, ",
+      this.color = AppColors.primaryThreeElementText,
+      this.fontSize = 24});
 
   @override
   Widget build(BuildContext context) {
     return Container(
       child: text24Normal(
-          text: "Hello",
-          color: AppColors.primaryThreeElementText,
-          fontWeight: FontWeight.bold),
+        text: text,
+        color: color,
+        fontWeight: FontWeight.bold,
+        fontSize: fontSize.sp,
+      ),
     );
   }
 }
 
-class HomeBanner extends StatelessWidget {
+class HomeBanner extends ConsumerWidget {
   final PageController controller;
-  final WidgetRef ref;
-  const HomeBanner({super.key, required this.controller, required this.ref});
+  final List<String> banners;
+  final List<String> courseNames;
+  final List<int> courseIds;
+  const HomeBanner({
+    super.key,
+    required this.controller,
+    required this.banners,
+    required this.courseNames,
+    required this.courseIds,
+  });
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
+    final homeScreenBannerIndex = ref.watch(homeScreenBannerIndexProvider);
+
+    void _onPageChanged(int index) {
+      ref.read(homeScreenBannerIndexProvider.notifier).setIndex(index);
+    }
+
+    final hasBanners = banners.isNotEmpty;
+
     return Column(
       children: [
-        SizedBox(
-          width: 325.w,
-          height: 160.h,
-          child: PageView(
-            controller: controller,
-            onPageChanged: (pageIndex) {
-              //print(pageIndex);
-              ref
-                  .read(homeScreenBannerIndexProvider.notifier)
-                  .setIndex(pageIndex);
-            },
-            children: [
-              _bannerContainer(imgPath: Img_Res.banner1),
-              _bannerContainer(imgPath: Img_Res.banner2),
-              _bannerContainer(imgPath: Img_Res.banner3),
-            ],
+        if (hasBanners)
+          SizedBox(
+            height: 290.h, // Adjust height to include both image and content.
+            child: PageView.builder(
+              controller: controller,
+              itemCount: banners.length,
+              onPageChanged: _onPageChanged,
+              itemBuilder: (context, index) {
+                return Card(
+                  elevation: 4, // Adds shadow.
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16), // Rounded corners.
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      ClipRRect(
+                        borderRadius: BorderRadius.vertical(
+                          top: Radius.circular(
+                              16), // Rounded corners for the top image.
+                        ),
+                        child: Image.network(
+                          "${AppConstants.IMAGE_UPLOADS_PATH}${banners[index]}",
+                          fit: BoxFit.cover,
+                          width: double.infinity,
+                          height: 150.h,
+                          errorBuilder: (context, error, stackTrace) =>
+                              const Icon(Icons.error),
+                        ),
+                      ),
+                      Expanded(
+                        child: Padding(
+                          padding: EdgeInsets.all(
+                              16.sp), // Padding for text and button.
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                courseNames[index],
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                                style: TextStyle(
+                                  fontSize: 16.sp,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.black,
+                                ),
+                              ),
+                              SizedBox(
+                                height: 15.h,
+                              ), // Push button to the bottom.
+                              SizedBox(
+                                width: double.infinity,
+                                child: ElevatedButton(
+                                  onPressed: () {
+                                    Navigator.of(context).pushNamed(
+                                        AppRoutesName.COURSE_DETAIL,
+                                        arguments: {"id": courseIds[index]});
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.grey.shade200,
+                                    foregroundColor: Colors.black,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("Continue"),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                );
+              },
+            ),
+          )
+        else
+          const Text(
+            "Please purchase or apply for courses to get started.",
+            style: TextStyle(color: Colors.grey),
           ),
-        ),
-        SizedBox(
-          height: 5.h,
-        ),
-        DotsIndicator(
-          mainAxisAlignment: MainAxisAlignment.center,
-          dotsCount: 3,
-          position: ref.watch(homeScreenBannerIndexProvider),
-          decorator: DotsDecorator(
-            size: const Size.square(9.0),
-            activeSize: const Size(24, 8),
-            activeShape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.w),
+        SizedBox(height: 5.h),
+        if (hasBanners)
+          DotsIndicator(
+            dotsCount: banners.length,
+            position: homeScreenBannerIndex,
+            decorator: DotsDecorator(
+              size: const Size.square(9.0),
+              activeSize: const Size(24, 8),
+              activeShape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5.w),
+              ),
             ),
           ),
-        )
       ],
     );
   }
-}
-
-Widget _bannerContainer({required String imgPath}) {
-  return Container(
-    width: 325.w,
-    height: 160.h,
-    decoration: BoxDecoration(
-      image: DecorationImage(image: AssetImage(imgPath), fit: BoxFit.fill),
-    ),
-  );
 }
 
 AppBar homeAppBar(WidgetRef ref) {
@@ -128,54 +207,107 @@ AppBar homeAppBar(WidgetRef ref) {
   );
 }
 
-class HomeMenuBar extends StatelessWidget {
+class HomeMenuBar extends StatefulWidget {
   const HomeMenuBar({super.key});
 
   @override
+  _HomeMenuBarState createState() => _HomeMenuBarState();
+}
+
+class _HomeMenuBarState extends State<HomeMenuBar> {
+  int selectedIndex = 0; // Track the selected tab index
+
+  @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        Container(
-          margin: EdgeInsets.only(top: 15.h),
-          child: const Row(
+    return Padding(
+      padding: EdgeInsets.symmetric(vertical: 20.h),
+      child: Center(
+        child: Container(
+          decoration: BoxDecoration(
+            color: AppColors.primaryElementBg2,
+            borderRadius: BorderRadius.circular(20.r),
+          ),
+          padding: EdgeInsets.all(4.w),
+          child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
             children: [
-              Text16Normal(
-                text: "Choose your course",
-                weight: FontWeight.bold,
-                color: AppColors.primaryText,
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() {
+                    selectedIndex = 0;
+                  }),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: selectedIndex == 0
+                          ? Colors.white
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: selectedIndex == 0
+                          ? [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : [],
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Popular",
+                      style: TextStyle(
+                        color: selectedIndex == 0
+                            ? AppColors.primaryText
+                            : AppColors.primarySecondaryElementText,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
               ),
-              // GestureDetector(
-              //   child: Text10Normal(
-              //     text: "See all",
-              //   ),
-              // )
+              SizedBox(width: 8.w), // Spacing between tabs
+              Expanded(
+                child: GestureDetector(
+                  onTap: () => setState(() {
+                    selectedIndex = 1;
+                  }),
+                  child: Container(
+                    decoration: BoxDecoration(
+                      color: selectedIndex == 1
+                          ? Colors.white
+                          : Colors.transparent,
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: selectedIndex == 1
+                          ? [
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.3),
+                                blurRadius: 4,
+                                offset: const Offset(0, 2),
+                              ),
+                            ]
+                          : [],
+                    ),
+                    padding: EdgeInsets.symmetric(vertical: 10.h),
+                    alignment: Alignment.center,
+                    child: Text(
+                      "Newest",
+                      style: TextStyle(
+                        color: selectedIndex == 1
+                            ? AppColors.primaryText
+                            : AppColors.primarySecondaryElementText,
+                        fontSize: 14.sp,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
             ],
           ),
         ),
-        SizedBox(
-          height: 20.h,
-        ),
-        Row(
-          children: [
-            Container(
-              decoration:
-                  appBoxShadow(color: AppColors.primaryElement, radius: 7.w),
-              padding: EdgeInsets.only(
-                  left: 15.w, right: 15.w, top: 5.h, bottom: 5.h),
-              child: Text11Normal(text: "Popular"),
-            ),
-            Container(
-              margin: EdgeInsets.only(left: 30.w),
-              child: Text11Normal(
-                text: "Newest",
-                color: AppColors.primaryThreeElementText,
-              ),
-            ),
-          ],
-        )
-      ],
+      ),
     );
   }
 }
@@ -188,39 +320,35 @@ class CourseItemGrid extends StatelessWidget {
   Widget build(BuildContext context) {
     final courseState = ref.watch(homeCourseListProvider);
     return Padding(
-      padding: EdgeInsets.symmetric(vertical: 15.h),
+      padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 6.w),
       child: courseState.when(
-          data: (data) => GridView.builder(
-              shrinkWrap: true,
-              physics: const ScrollPhysics(),
-              gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 15,
-                  mainAxisSpacing: 15,
-                  childAspectRatio: 1.6),
-              itemCount: data?.length,
-              itemBuilder: (_, int index) {
-                return AppBoxDecorationImage(
-                  fit: BoxFit.fitHeight,
-                  imagePath:
-                      "${AppConstants.IMAGE_UPLOADS_PATH}${data?[index].thumbnail}",
-                  courseItem: data![index],
-                  func: () {
-                    log("Course ID : ${data[index].id}");
-                    Navigator.of(context)
-                        .pushNamed(AppRoutesName.COURSE_DETAIL, arguments: {
-                      "id": data[index].id!,
-                    });
-                  },
-                );
-              }),
-          error: (error, stackTrace) {
-            print(stackTrace.toString());
-            return Center(child: Text(error.toString()));
-          },
-          loading: () => Center(
-                child: Text("Loading"),
-              )),
+        data: (data) => GridView.builder(
+            shrinkWrap: true,
+            physics: const ScrollPhysics(),
+            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+              crossAxisCount: 2,
+              crossAxisSpacing: 15.w,
+              mainAxisSpacing: 15.h,
+              childAspectRatio: 0.75, // Adjusted ratio for better layout
+            ),
+            itemCount: data?.length,
+            itemBuilder: (_, int index) {
+              return AppBoxDecorationImage(
+                imagePath:
+                    "${AppConstants.IMAGE_UPLOADS_PATH}${data?[index].thumbnail}",
+                courseItem: data![index],
+                func: () {
+                  Navigator.of(context).pushNamed(AppRoutesName.COURSE_DETAIL,
+                      arguments: {"id": data[index].id!});
+                },
+              );
+            }),
+        error: (error, stackTrace) {
+          print(stackTrace.toString());
+          return Center(child: Text(error.toString()));
+        },
+        loading: () => const Center(child: CircularProgressIndicator()),
+      ),
     );
   }
 }

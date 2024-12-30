@@ -6,6 +6,164 @@ part of 'home_controller.dart';
 // RiverpodGenerator
 // **************************************************************************
 
+String _$purchasedCoursesControllerHash() =>
+    r'03816dbbc349b61357fd50dfea6755fd6af6ad16';
+
+/// Copied from Dart SDK
+class _SystemHash {
+  _SystemHash._();
+
+  static int combine(int hash, int value) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + value);
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x0007ffff & hash) << 10));
+    return hash ^ (hash >> 6);
+  }
+
+  static int finish(int hash) {
+    // ignore: parameter_assignments
+    hash = 0x1fffffff & (hash + ((0x03ffffff & hash) << 3));
+    // ignore: parameter_assignments
+    hash = hash ^ (hash >> 11);
+    return 0x1fffffff & (hash + ((0x00003fff & hash) << 15));
+  }
+}
+
+/// See also [purchasedCoursesController].
+@ProviderFor(purchasedCoursesController)
+const purchasedCoursesControllerProvider = PurchasedCoursesControllerFamily();
+
+/// See also [purchasedCoursesController].
+class PurchasedCoursesControllerFamily
+    extends Family<AsyncValue<List<CoursePurchaseData>?>> {
+  /// See also [purchasedCoursesController].
+  const PurchasedCoursesControllerFamily();
+
+  /// See also [purchasedCoursesController].
+  PurchasedCoursesControllerProvider call({
+    required String userToken,
+  }) {
+    return PurchasedCoursesControllerProvider(
+      userToken: userToken,
+    );
+  }
+
+  @override
+  PurchasedCoursesControllerProvider getProviderOverride(
+    covariant PurchasedCoursesControllerProvider provider,
+  ) {
+    return call(
+      userToken: provider.userToken,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'purchasedCoursesControllerProvider';
+}
+
+/// See also [purchasedCoursesController].
+class PurchasedCoursesControllerProvider
+    extends AutoDisposeFutureProvider<List<CoursePurchaseData>?> {
+  /// See also [purchasedCoursesController].
+  PurchasedCoursesControllerProvider({
+    required String userToken,
+  }) : this._internal(
+          (ref) => purchasedCoursesController(
+            ref as PurchasedCoursesControllerRef,
+            userToken: userToken,
+          ),
+          from: purchasedCoursesControllerProvider,
+          name: r'purchasedCoursesControllerProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$purchasedCoursesControllerHash,
+          dependencies: PurchasedCoursesControllerFamily._dependencies,
+          allTransitiveDependencies:
+              PurchasedCoursesControllerFamily._allTransitiveDependencies,
+          userToken: userToken,
+        );
+
+  PurchasedCoursesControllerProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.userToken,
+  }) : super.internal();
+
+  final String userToken;
+
+  @override
+  Override overrideWith(
+    FutureOr<List<CoursePurchaseData>?> Function(
+            PurchasedCoursesControllerRef provider)
+        create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: PurchasedCoursesControllerProvider._internal(
+        (ref) => create(ref as PurchasedCoursesControllerRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        userToken: userToken,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<List<CoursePurchaseData>?> createElement() {
+    return _PurchasedCoursesControllerProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is PurchasedCoursesControllerProvider &&
+        other.userToken == userToken;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, userToken.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin PurchasedCoursesControllerRef
+    on AutoDisposeFutureProviderRef<List<CoursePurchaseData>?> {
+  /// The parameter `userToken` of this provider.
+  String get userToken;
+}
+
+class _PurchasedCoursesControllerProviderElement
+    extends AutoDisposeFutureProviderElement<List<CoursePurchaseData>?>
+    with PurchasedCoursesControllerRef {
+  _PurchasedCoursesControllerProviderElement(super.provider);
+
+  @override
+  String get userToken =>
+      (origin as PurchasedCoursesControllerProvider).userToken;
+}
+
 String _$homeScreenBannerIndexHash() =>
     r'd4eae71e984f66d01bba2ddaabd1c35a5970166f';
 

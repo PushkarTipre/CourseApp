@@ -5,31 +5,6 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-// Widget appButton(
-//     {String text = '',
-//     void Function()? onPressed,
-//     double width = 325,
-//     double height = 50,
-//     bool isLogin = true}) {
-//   return GestureDetector(
-//     onTap: onPressed,
-//     child: Container(
-//       width: width.w,
-//       height: height.h,
-//       child: Center(
-//           child: Text16Normal(
-//               text: text,
-//               color: isLogin
-//                   ? AppColors.primaryBackground
-//                   : AppColors.primaryElement)),
-//       decoration: appBoxShadow(
-//         boxBorder: Border.all(color: AppColors.primaryFourElementText),
-//         color: isLogin ? AppColors.primaryElement : Colors.white,
-//       ),
-//     ),
-//   );
-// }
-
 class AppButton extends StatelessWidget {
   final String text;
   final void Function()? onPressed;
@@ -52,16 +27,16 @@ class AppButton extends StatelessWidget {
       child: Container(
         width: width.w,
         height: height.h,
+        decoration: appBoxShadow(
+          boxBorder: Border.all(color: AppColors.primaryFourElementText),
+          color: isLogin ? AppColors.primaryElement : Colors.white,
+        ),
         child: Center(
             child: Text16Normal(
                 text: text,
                 color: isLogin
                     ? AppColors.primaryBackground
                     : AppColors.primaryElement)),
-        decoration: appBoxShadow(
-          boxBorder: Border.all(color: AppColors.primaryFourElementText),
-          color: isLogin ? AppColors.primaryElement : Colors.white,
-        ),
       ),
     );
   }
