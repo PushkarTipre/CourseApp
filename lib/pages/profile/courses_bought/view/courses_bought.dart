@@ -11,7 +11,7 @@ class CoursesBought extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coursesList = ref.watch(coursesBoughtControllerProvider);
-    int i = 0;
+
     return Scaffold(
         appBar: buildGlobalAppBar(title: "Your courses"),
         body: switch (coursesList) {

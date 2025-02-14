@@ -1,14 +1,10 @@
 import 'dart:developer';
 
-import 'package:course_app/common/api/course_api.dart';
-import 'package:course_app/common/models/course_enties.dart';
-import 'package:course_app/common/models/entities.dart';
 import 'package:course_app/pages/home/repo/HomeRepo.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../common/models/CoursePurchasedInfo.dart';
-import '../../../global.dart';
-import '../../course_details/repo/course_detail.dart';
+
 part 'mycourses_controller.g.dart';
 
 @riverpod

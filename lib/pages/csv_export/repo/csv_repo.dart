@@ -1,5 +1,3 @@
-import '../../../../common/models/QuizResultResponseEntity.dart';
-
 import '../../../../common/utils/http_util.dart';
 import '../../../common/models/all_quiz_result.dart';
 

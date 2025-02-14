@@ -1,16 +1,11 @@
-import 'package:course_app/common/models/course_enties.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
-import 'package:course_app/common/widgets/app_bar.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../../common/routes/app_routes_name.dart';
-import '../../../common/utils/app_colors.dart';
-import '../../../common/utils/constants.dart';
 import '../../../common/widgets/search_widget.dart';
-import '../../../common/widgets/text_widget.dart';
-import '../../home/widgets/home_widget.dart';
+
 import '../controller/courses_search_controller.dart';
 import '../widget/courses_search_widget.dart';
 
@@ -114,7 +109,7 @@ class Search extends ConsumerWidget {
                           ),
                         )
                       : CoursesSearchWidget(value: value),
-                  AsyncError(:final error) => Center(
+                  AsyncError() => Center(
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.center,
                         children: [

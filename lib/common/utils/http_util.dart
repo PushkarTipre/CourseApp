@@ -3,7 +3,6 @@ import 'dart:developer';
 import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/global.dart';
 import 'package:dio/dio.dart';
-import 'package:flutter/foundation.dart';
 
 class HttpUtil {
   late Dio dio;
@@ -134,15 +133,15 @@ ErrorEntity createErrorEntity(DioException error) {
     case DioExceptionType.badCertificate:
       return ErrorEntity(code: -1, message: "Bad SSL Certificate");
 
-    case DioExceptionType.badResponse:
-      switch (error.response!.statusCode) {
-        case 400:
-          return ErrorEntity(code: 400, message: "Request syntax error");
-        case 401:
-          return ErrorEntity(
-              code: 401, message: "Permission denied -- Unauthorized");
-      }
-      return ErrorEntity(code: -1, message: "Bad Response");
+    // case DioExceptionType.badResponse:
+    //   switch (error.response!.statusCode) {
+    //     case 400:
+    //       return ErrorEntity(code: 400, message: "Request syntax error");
+    //     case 401:
+    //       return ErrorEntity(
+    //           code: 401, message: "Permission denied -- Unauthorized");
+    //   }
+    //   return ErrorEntity(code: -1, message: "Bad Response");
 
     case DioExceptionType.cancel:
       return ErrorEntity(code: -1, message: "Server canceled it");

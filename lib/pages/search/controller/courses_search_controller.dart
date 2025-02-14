@@ -1,13 +1,10 @@
 import 'dart:developer';
-import 'package:course_app/pages/buy_course/repo/buy_course_repo.dart';
+
 import 'package:course_app/pages/search/repo/courses_search_repo.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../common/models/course_enties.dart';
 
-// part 'courses_search_controller.g.dart';
-//
-// @riverpod
 class CoursesSearchController extends AsyncNotifier<List<CourseItem>?> {
   @override
   FutureOr<List<CourseItem>?> build() async {

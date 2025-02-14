@@ -5,7 +5,6 @@ import 'package:course_app/common/models/lesson_entities.dart';
 import 'package:course_app/common/utils/http_util.dart';
 
 import '../../../common/models/CheckVideoAccessResponseEntity.dart';
-import '../../../common/services/storage.dart';
 
 class CourseRepo {
   static Future<CourseDetailResponseEntity> courseDetail(

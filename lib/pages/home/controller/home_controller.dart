@@ -8,7 +8,7 @@ import 'package:riverpod_annotation/riverpod_annotation.dart';
 
 import '../../../common/models/CoursePurchasedInfo.dart';
 import '../../../global.dart';
-import '../../course_details/repo/course_detail.dart';
+
 part 'home_controller.g.dart';
 
 @Riverpod(keepAlive: true)

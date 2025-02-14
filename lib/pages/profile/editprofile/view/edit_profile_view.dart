@@ -1,3 +1,4 @@
+import 'package:course_app/common/utils/pop_messages.dart';
 import 'package:course_app/pages/profile/editprofile/controller/edit_profile_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -53,18 +54,9 @@ class Edit_Profile_View extends ConsumerWidget {
                       : null,
                 )).future);
 
-                if (result != null) {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(content: Text('User updated successfully')),
-                  );
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                        content: Text('No changes were made or update failed')),
-                  );
-                }
+                toastInfo("User Updated: $result");
               },
-              child: Text('Update User'),
+              child: const Text('Update User'),
             ),
           ],
         ),

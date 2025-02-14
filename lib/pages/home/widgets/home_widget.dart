@@ -14,7 +14,6 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../global.dart';
-import '../provider/home_provider.dart';
 
 class UserName extends StatelessWidget {
   const UserName({super.key});
@@ -58,6 +57,7 @@ class HomeBanner extends ConsumerWidget {
   final List<String> banners;
   final List<String> courseNames;
   final List<int> courseIds;
+
   const HomeBanner({
     super.key,
     required this.controller,
@@ -69,6 +69,7 @@ class HomeBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeScreenBannerIndex = ref.watch(homeScreenBannerIndexProvider);
+    final theme = Theme.of(context);
 
     void onPageChanged(int index) {
       ref.read(homeScreenBannerIndexProvider.notifier).setIndex(index);
@@ -79,96 +80,206 @@ class HomeBanner extends ConsumerWidget {
     return Column(
       children: [
         if (hasBanners)
-          SizedBox(
-            height: 290.h,
+          Container(
+            height: 320.h,
+            padding: EdgeInsets.symmetric(horizontal: 6.w),
             child: PageView.builder(
               controller: controller,
               itemCount: banners.length,
               onPageChanged: onPageChanged,
               itemBuilder: (context, index) {
-                return Card(
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16),
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(16.r),
-                        ),
-                        child: Image.network(
-                          "${AppConstants.IMAGE_UPLOADS_PATH}${banners[index]}",
-                          fit: BoxFit.cover,
-                          width: double.infinity,
-                          height: 150.h,
-                          errorBuilder: (context, error, stackTrace) =>
-                              const Icon(Icons.error),
+                return Container(
+                  margin: EdgeInsets.symmetric(horizontal: 8.w),
+                  child: Card(
+                    elevation: 8,
+                    shadowColor: Colors.black26,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(24),
+                    ),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(24),
+                        gradient: LinearGradient(
+                          begin: Alignment.topCenter,
+                          end: Alignment.bottomCenter,
+                          colors: [
+                            Colors.white,
+                            Colors.grey.shade50,
+                          ],
                         ),
                       ),
-                      Expanded(
-                        child: Padding(
-                          padding: EdgeInsets.all(16.sp),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Stack(
                             children: [
-                              Text(
-                                courseNames[index],
-                                maxLines: 1,
-                                overflow: TextOverflow.ellipsis,
-                                style: TextStyle(
-                                  fontSize: 16.sp,
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
+                              ClipRRect(
+                                borderRadius: BorderRadius.vertical(
+                                  top: Radius.circular(24.r),
                                 ),
-                              ),
-                              SizedBox(
-                                height: 15.h,
-                              ),
-                              SizedBox(
-                                width: double.infinity,
-                                child: ElevatedButton(
-                                  onPressed: () {
-                                    Navigator.of(context).pushNamed(
-                                        AppRoutesName.COURSE_DETAIL,
-                                        arguments: {"id": courseIds[index]});
-                                  },
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.grey.shade200,
-                                    foregroundColor: Colors.black,
-                                    shape: RoundedRectangleBorder(
-                                      borderRadius: BorderRadius.circular(8),
+                                child: SizedBox(
+                                  height: 180.h,
+                                  width: double.infinity,
+                                  child: ShaderMask(
+                                    shaderCallback: (rect) {
+                                      return const LinearGradient(
+                                        begin: Alignment.topCenter,
+                                        end: Alignment.bottomCenter,
+                                        colors: [
+                                          Colors.black,
+                                          Colors.transparent
+                                        ],
+                                      ).createShader(
+                                        Rect.fromLTRB(
+                                            0, 0, rect.width, rect.height),
+                                      );
+                                    },
+                                    blendMode: BlendMode.dstIn,
+                                    child: Image.network(
+                                      "${AppConstants.IMAGE_UPLOADS_PATH}${banners[index]}",
+                                      fit: BoxFit.cover,
+                                      errorBuilder:
+                                          (context, error, stackTrace) => Icon(
+                                        Icons.image_not_supported_rounded,
+                                        size: 48.sp,
+                                        color: Colors.grey,
+                                      ),
                                     ),
                                   ),
-                                  child: const Text("Continue"),
+                                ),
+                              ),
+                              Positioned(
+                                top: 16.h,
+                                right: 16.w,
+                                child: Container(
+                                  padding: EdgeInsets.symmetric(
+                                    horizontal: 12.w,
+                                    vertical: 6.h,
+                                  ),
+                                  decoration: BoxDecoration(
+                                    color: Colors.black.withOpacity(0.6),
+                                    borderRadius: BorderRadius.circular(20),
+                                  ),
+                                  child: Text(
+                                    "${index + 1}/${banners.length}",
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 12.sp,
+                                      fontWeight: FontWeight.w500,
+                                    ),
+                                  ),
                                 ),
                               ),
                             ],
                           ),
-                        ),
+                          Expanded(
+                            child: Padding(
+                              padding: EdgeInsets.all(20.sp),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    courseNames[index],
+                                    maxLines: 2,
+                                    overflow: TextOverflow.ellipsis,
+                                    style: TextStyle(
+                                      fontSize: 18.sp,
+                                      fontWeight: FontWeight.bold,
+                                      color: Colors.black87,
+                                      height: 1.2,
+                                    ),
+                                  ),
+                                  const Spacer(),
+                                  SizedBox(
+                                    width: double.infinity,
+                                    child: ElevatedButton(
+                                      onPressed: () {
+                                        Navigator.of(context).pushNamed(
+                                          AppRoutesName.COURSE_DETAIL,
+                                          arguments: {"id": courseIds[index]},
+                                        );
+                                      },
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: theme.primaryColor,
+                                        foregroundColor: Colors.white,
+                                        padding: EdgeInsets.symmetric(
+                                          vertical: 12.h,
+                                        ),
+                                        elevation: 0,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius:
+                                              BorderRadius.circular(16),
+                                        ),
+                                      ),
+                                      child: Text(
+                                        "Continue Learning",
+                                        style: TextStyle(
+                                          fontSize: 16.sp,
+                                          fontWeight: FontWeight.w600,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
-                    ],
+                    ),
                   ),
                 );
               },
             ),
           )
         else
-          const Text(
-            "Please purchase or apply for courses to get started.",
-            style: TextStyle(color: Colors.grey),
+          Container(
+            padding: EdgeInsets.symmetric(
+              vertical: 24.h,
+              horizontal: 16.w,
+            ),
+            child: Column(
+              children: [
+                Icon(
+                  Icons.school_outlined,
+                  size: 48.sp,
+                  color: Colors.grey,
+                ),
+                SizedBox(height: 16.h),
+                Text(
+                  "Ready to start learning?",
+                  style: TextStyle(
+                    fontSize: 18.sp,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.black87,
+                  ),
+                ),
+                SizedBox(height: 8.h),
+                Text(
+                  "Purchase or apply for courses to begin your learning journey.",
+                  textAlign: TextAlign.center,
+                  style: TextStyle(
+                    fontSize: 14.sp,
+                    color: Colors.grey,
+                    height: 1.4,
+                  ),
+                ),
+              ],
+            ),
           ),
-        SizedBox(height: 5.h),
+        SizedBox(height: 16.h),
         if (hasBanners)
           DotsIndicator(
             dotsCount: banners.length,
             position: homeScreenBannerIndex,
             decorator: DotsDecorator(
-              size: const Size.square(9.0),
-              activeSize: const Size(24, 8),
+              size: Size(8.w, 8.w),
+              activeSize: Size(24.w, 8.w),
+              color: Colors.grey.shade300,
+              activeColor: theme.primaryColor,
+              spacing: EdgeInsets.symmetric(horizontal: 4.w),
               activeShape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5.w),
+                borderRadius: BorderRadius.circular(4.w),
               ),
             ),
           ),

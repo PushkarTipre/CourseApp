@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:course_app/common/models/QuizResultResponseEntity.dart';
 import 'package:course_app/common/models/all_quiz_result.dart';
 import 'package:course_app/pages/csv_export/repo/csv_repo.dart';
 

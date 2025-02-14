@@ -116,7 +116,7 @@ class LessonDataController extends _$LessonDataController {
   String _lastLoggedTimestamp = '';
   String lastPausedTimestamp = '0:00';
   int currentVideoIndex = 0;
-  bool _isLoggingInProgress = false;
+  bool isLoggingInProgress = false;
   int? _courseId;
 
   void setCourseId(int courseId) {
@@ -194,7 +194,7 @@ class LessonDataController extends _$LessonDataController {
 
         // Check if this timestamp at this position has already been logged
         if (currentTimestamp == _lastLoggedTimestamp) {
-          _isLoggingInProgress = false;
+          isLoggingInProgress = false;
           return;
         }
 
@@ -256,7 +256,7 @@ class LessonDataController extends _$LessonDataController {
 
     // Reset the last logged timestamp when changing videos
     _lastLoggedTimestamp = '';
-    _isLoggingInProgress = false;
+    isLoggingInProgress = false;
 
     // Signal that this is a new video/screen navigation
     analyticsService.onEnterVideoScreen();

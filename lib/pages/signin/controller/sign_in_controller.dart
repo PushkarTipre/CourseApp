@@ -3,7 +3,7 @@ import 'dart:developer';
 
 import 'package:course_app/common/global_loader/global_loader.dart';
 import 'package:course_app/common/utils/constants.dart';
-import 'package:course_app/common/utils/http_util.dart';
+
 import 'package:course_app/global.dart';
 import 'package:course_app/main.dart';
 import 'package:course_app/pages/signin/repo/sign_in_repo.dart';

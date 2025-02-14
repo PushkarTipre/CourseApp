@@ -151,7 +151,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                             right: 20.w,
                             child: Row(
                               children: List.generate(
-                                myCourses!.length,
+                                myCourses.length,
                                 (index) => Container(
                                   margin: EdgeInsets.only(left: 5.w),
                                   width: 8.w,
@@ -182,9 +182,9 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                     ListView.builder(
                       shrinkWrap: true,
                       physics: const NeverScrollableScrollPhysics(),
-                      itemCount: myCourses?.length,
+                      itemCount: myCourses.length,
                       itemBuilder: (context, index) {
-                        final course = myCourses?[index];
+                        final course = myCourses[index];
                         return Container(
                           margin: EdgeInsets.only(bottom: 20.h),
                           decoration: BoxDecoration(
@@ -216,7 +216,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                                             BorderRadius.circular(12.r),
                                         image: DecorationImage(
                                           image: NetworkImage(
-                                              "${AppConstants.IMAGE_UPLOADS_PATH}${course?.thumbnail}"),
+                                              "${AppConstants.IMAGE_UPLOADS_PATH}${course.thumbnail}"),
                                           fit: BoxFit.cover,
                                         ),
                                       ),
@@ -228,7 +228,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                                             CrossAxisAlignment.start,
                                         children: [
                                           Text(
-                                            course!.courseName,
+                                            course.courseName,
                                             style: TextStyle(
                                               fontSize: 16.sp,
                                               fontWeight: FontWeight.bold,

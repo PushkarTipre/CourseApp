@@ -8,9 +8,9 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import '../../../common/models/lesson_entities.dart';
 import '../../../common/models/quiz_start_request.dart';
 import '../../../common/utils/app_colors.dart';
-import '../../../common/utils/img_res.dart';
+
 import '../../../common/widgets/app_shadows.dart';
-import '../../../common/widgets/image_widgets.dart';
+
 import '../../../common/widgets/text_widget.dart';
 import '../../quiz/controller/quiz_controller.dart';
 import '../../quiz/view/quiz.dart';
@@ -39,7 +39,7 @@ class LessonVideos extends ConsumerStatefulWidget {
 class _LessonVideosState extends ConsumerState<LessonVideos>
     with TickerProviderStateMixin {
   late AnimationController _controller;
-  late Animation<double> _animation;
+  late Animation<double> animation;
 
   late AnimationController dialogController;
   late Animation<double> dialogAnimation;
@@ -249,7 +249,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
       duration: const Duration(seconds: 2),
     )..repeat();
 
-    _animation = CurvedAnimation(
+    animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
     );
@@ -360,7 +360,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text13Normal(
-                              text: widget.lessonData[index].name.toString() ??
+                              text: widget.lessonData[index].name ??
                                   "No Name Available",
                               color: AppColors.primaryText,
                             ),

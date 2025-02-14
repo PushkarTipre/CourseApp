@@ -45,7 +45,6 @@ class SettingsView extends StatelessWidget {
                       )
                     ],
                   );
-                  ;
                 });
           },
           child: Container(

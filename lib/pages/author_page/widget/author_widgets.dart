@@ -219,8 +219,7 @@ class AuthorCourses extends StatelessWidget {
                             ),
                             Text10Normal(
                               text:
-                                  "There are ${authorCourseList[index].lesson_num} lessons" ??
-                                      "No Description Available",
+                                  "There are ${authorCourseList[index].lesson_num} lessons",
                               color: AppColors.primaryText,
                             ),
                           ],
