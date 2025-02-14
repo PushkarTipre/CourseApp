@@ -8,5 +8,5 @@ import '../controller/home_controller.dart';
 final purchasedCoursesProvider =
     FutureProvider.family<List<CoursePurchaseData>?, String>((ref, userToken) {
   return ref
-      .watch(purchasedCoursesControllerProvider(userToken: userToken).future);
+      .read(purchasedCoursesControllerProvider(userToken: userToken).future);
 });

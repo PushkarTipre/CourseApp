@@ -14,6 +14,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../global.dart';
+import '../provider/home_provider.dart';
 
 class UserName extends StatelessWidget {
   const UserName({super.key});
@@ -23,18 +24,17 @@ class UserName extends StatelessWidget {
     return Container(
       child: text24Normal(
           text: Global.storageService.getUserProfile().name ?? "",
-          //color: AppColors.pri,
           fontWeight: FontWeight.bold),
     );
   }
 }
 
 class HelloText extends StatelessWidget {
-  String text;
-  Color color;
-  int fontSize;
+  final String text;
+  final Color color;
+  final int fontSize;
 
-  HelloText(
+  const HelloText(
       {super.key,
       this.text = "Hello, ",
       this.color = AppColors.primaryThreeElementText,
@@ -70,7 +70,7 @@ class HomeBanner extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final homeScreenBannerIndex = ref.watch(homeScreenBannerIndexProvider);
 
-    void _onPageChanged(int index) {
+    void onPageChanged(int index) {
       ref.read(homeScreenBannerIndexProvider.notifier).setIndex(index);
     }
 
@@ -80,24 +80,23 @@ class HomeBanner extends ConsumerWidget {
       children: [
         if (hasBanners)
           SizedBox(
-            height: 290.h, // Adjust height to include both image and content.
+            height: 290.h,
             child: PageView.builder(
               controller: controller,
               itemCount: banners.length,
-              onPageChanged: _onPageChanged,
+              onPageChanged: onPageChanged,
               itemBuilder: (context, index) {
                 return Card(
-                  elevation: 4, // Adds shadow.
+                  elevation: 4,
                   shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(16), // Rounded corners.
+                    borderRadius: BorderRadius.circular(16),
                   ),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       ClipRRect(
                         borderRadius: BorderRadius.vertical(
-                          top: Radius.circular(
-                              16), // Rounded corners for the top image.
+                          top: Radius.circular(16.r),
                         ),
                         child: Image.network(
                           "${AppConstants.IMAGE_UPLOADS_PATH}${banners[index]}",
@@ -110,8 +109,7 @@ class HomeBanner extends ConsumerWidget {
                       ),
                       Expanded(
                         child: Padding(
-                          padding: EdgeInsets.all(
-                              16.sp), // Padding for text and button.
+                          padding: EdgeInsets.all(16.sp),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
@@ -127,7 +125,7 @@ class HomeBanner extends ConsumerWidget {
                               ),
                               SizedBox(
                                 height: 15.h,
-                              ), // Push button to the bottom.
+                              ),
                               SizedBox(
                                 width: double.infinity,
                                 child: ElevatedButton(
@@ -319,6 +317,7 @@ class CourseItemGrid extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final courseState = ref.watch(homeCourseListProvider);
+
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 6.w),
       child: courseState.when(
@@ -345,7 +344,9 @@ class CourseItemGrid extends StatelessWidget {
             }),
         error: (error, stackTrace) {
           print(stackTrace.toString());
-          return Center(child: Text(error.toString()));
+          return const Center(
+              child: Text(
+                  "Something went wrong. Please restart the app and check internet connection."));
         },
         loading: () => const Center(child: CircularProgressIndicator()),
       ),

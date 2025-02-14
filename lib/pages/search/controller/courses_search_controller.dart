@@ -25,8 +25,6 @@ class CoursesSearchController extends AsyncNotifier<List<CourseItem>?> {
     if (response.code == 200) {
       state = AsyncValue.data(response.data);
       return;
-
-      log("Request failed ${response.code} ${response.msg}");
     }
     state = AsyncValue.data([]);
   }

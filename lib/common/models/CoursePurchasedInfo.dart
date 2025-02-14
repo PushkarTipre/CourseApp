@@ -46,15 +46,18 @@ class CoursePurchaseData {
 
   factory CoursePurchaseData.fromJson(Map<String, dynamic> json) =>
       CoursePurchaseData(
-        id: json["id"],
-        userToken: json["user_token"],
-        totalAmount: json["total_amount"],
-        courseId: json["course_id"],
-        status: json["status"],
-        createdAt: DateTime.parse(json["created_at"]),
-        updatedAt: DateTime.parse(json["updated_at"]),
-        courseName: json["course_name"],
-        description: json["description"],
-        thumbnail: json["thumbnail"],
+        id: json["id"] ?? 0,
+        userToken: json["user_token"] ?? "",
+        totalAmount: json["total_amount"] ?? "",
+        courseId: json["course_id"] ?? 0,
+        status: json["status"] ?? 0,
+        createdAt:
+            DateTime.parse(json["created_at"] ?? DateTime.now().toString()),
+        updatedAt: json["updated_at"] != null
+            ? DateTime.parse(json["updated_at"])
+            : DateTime.now(), // Default to current date if null
+        courseName: json["course_name"] ?? "",
+        description: json["description"] ?? "",
+        thumbnail: json["thumbnail"] ?? "",
       );
 }

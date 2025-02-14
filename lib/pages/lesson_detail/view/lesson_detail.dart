@@ -62,14 +62,6 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     super.dispose();
   }
 
-  // @override
-  // void didChangeDependencies() {
-  //   // TODO: implement didChangeDependencies
-  //   var courseId = ModalRoute.of(context)!.settings.arguments as Map;
-  //   args = courseId["courseId"];
-  //   super.didChangeDependencies();
-  // }
-
   void syncVideoIndex(int index) {
     setState(() {
       videoIndex = index;
@@ -81,7 +73,6 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
             ?.lessonItem[index]
             .course_video_id;
 
-        // Immediately update the controller's video index
         ref
             .read(lessonDataControllerProvider.notifier)
             .updateCurrentVideoIndex(int.parse(currentVideoId!));
@@ -98,24 +89,21 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
   @override
   Widget build(BuildContext context) {
-    // log("Lesson ID: ${ModalRoute.of(context)!.settings.arguments}");
     final args =
         ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
-    // final lessonId = args['id'];
+
     final courseId = args['courseId'];
     final lessonId = args['lessonID'];
+    final description = args['description'];
 
-    log(" courseId: $lessonId");
+    log("Description: $description");
 
-    // ref.watch(lessonDetailControllerProvider(index: lessonId));
-
-    // Store the courseId in your LessonDataController for later use
     ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
-    // log("Lesson detail page with course id: $args");
+
     secureScreen();
-    // var lessonDetail = ref.watch(lessonDetailControllerProvider(index: args.toInt()));
+
     var lessonData = ref.watch(lessonDataControllerProvider);
-    //ref.watch(videoIndexControllerProvider);
+
     return Scaffold(
         appBar: buildGlobalAppBar(title: "Lesson detail"),
         body: Center(
@@ -189,6 +177,10 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                   'Last paused at: ${data.lastPausedAt}',
                                   style: const TextStyle(fontSize: 16),
                                 ),
+                                Text(
+                                  'Lesson Description: $description',
+                                  style: const TextStyle(fontSize: 16),
+                                ),
                                 SizedBox(
                                   height: 20.h,
                                 ),
@@ -243,20 +235,6 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                     children: [
                                       GestureDetector(
                                         onTap: () {
-                                          // videoIndex = videoIndex - 1;
-                                          // if (videoIndex < 0) {
-                                          //   videoIndex = 0;
-                                          //   toastInfo("No earlier videos");
-                                          //   return;
-                                          // }
-                                          // var videoUrl =
-                                          //     data.lessonItem[videoIndex].url;
-                                          // // ref
-                                          // //     .read(lessonDataControllerProvider
-                                          // //         .notifier)
-                                          // //     .playNextVid(videoUrl!);
-                                          //
-                                          // onVideoChanged(videoUrl!);
                                           if (videoIndex > 0) {
                                             syncVideoIndex(videoIndex - 1);
                                             onVideoChanged(data

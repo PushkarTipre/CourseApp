@@ -1,4 +1,5 @@
 import 'package:course_app/common/models/course_enties.dart';
+import 'package:course_app/common/utils/pop_messages.dart';
 import 'package:course_app/common/widgets/app_bar.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,55 +20,129 @@ class Search extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final searchProvider = ref.watch(coursesSearchControllerProvider);
+    final theme = Theme.of(context);
+
     return Scaffold(
-      appBar: buildGlobalAppBar(title: "Search Courses"),
+      backgroundColor: theme.scaffoldBackgroundColor,
+      appBar: AppBar(
+        elevation: 0,
+        backgroundColor: Colors.transparent,
+        title: Text(
+          "Search Courses",
+          style: theme.textTheme.headlineSmall?.copyWith(
+            fontWeight: FontWeight.bold,
+          ),
+        ),
+        centerTitle: true,
+      ),
       body: RefreshIndicator(
         onRefresh: () {
           return ref
               .watch(coursesSearchControllerProvider.notifier)
               .reloadSearchData();
         },
-        child: Padding(
-          padding: EdgeInsets.symmetric(horizontal: 25.w),
-          child: SingleChildScrollView(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.start,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                SizedBox(
-                  height: 20.h,
-                ),
-                AppSearchBar(
-                  searchFunc: (search) {
-                    ref
-                        .watch(coursesSearchControllerProvider.notifier)
-                        .searchData(search);
-                  },
-                ),
-                Container(
-                  height: MediaQuery.of(context).size.height,
-                  child: switch (searchProvider) {
-                    AsyncData(:final value) => value!.isEmpty
-                        ? const Center(child: CircularProgressIndicator())
-                        : CoursesSearchWidget(value: value),
-                    AsyncError(:final error) => Text('Error $error'),
-                    _ => Center(
-                        child: SizedBox(
-                          height: 20.h,
-                          width: 20.h,
-                          child: CircularProgressIndicator(
-                            color: Colors.black26,
-                            strokeWidth: 2.r,
+        child: CustomScrollView(
+          slivers: [
+            SliverToBoxAdapter(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    SizedBox(height: 20.h),
+                    // Enhanced search bar
+                    Container(
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15.r),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.05),
+                            blurRadius: 10,
+                            offset: const Offset(0, 5),
                           ),
-                        ),
+                        ],
                       ),
-                  },
-                )
+                      child: AppSearchBar(
+                        searchFunc: (search) {
+                          if (search.trim().isEmpty) {
+                            toastInfo("Please enter a search term");
+                            return;
+                          }
+                          ref
+                              .watch(coursesSearchControllerProvider.notifier)
+                              .searchData(search);
+                        },
+                      ),
+                    ),
 
-                // banner(ref: ref, controller: controller)
-              ],
+                    SizedBox(height: 20.h),
+                  ],
+                ),
+              ),
             ),
-          ),
+            SliverFillRemaining(
+              child: Padding(
+                padding: EdgeInsets.symmetric(horizontal: 20.w),
+                child: switch (searchProvider) {
+                  AsyncData(:final value) => value!.isEmpty
+                      ? Center(
+                          child: Column(
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              Icon(
+                                Icons.search_off_rounded,
+                                size: 64,
+                                color: Colors.grey[400],
+                              ),
+                              SizedBox(height: 16.h),
+                              Text(
+                                "No courses found",
+                                style: theme.textTheme.titleLarge?.copyWith(
+                                  color: Colors.grey[600],
+                                  fontWeight: FontWeight.w600,
+                                ),
+                              ),
+                              SizedBox(height: 8.h),
+                              Text(
+                                "Try searching with different keywords",
+                                style: theme.textTheme.bodyMedium?.copyWith(
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ],
+                          ),
+                        )
+                      : CoursesSearchWidget(value: value),
+                  AsyncError(:final error) => Center(
+                      child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          Icon(
+                            Icons.error_outline_rounded,
+                            size: 64,
+                            color: theme.colorScheme.error,
+                          ),
+                          SizedBox(height: 16.h),
+                          Text(
+                            'Something went wrong',
+                            style: theme.textTheme.titleLarge?.copyWith(
+                              color: theme.colorScheme.error,
+                              fontWeight: FontWeight.w600,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  _ => Center(
+                      child: CircularProgressIndicator(
+                        strokeWidth: 2.r,
+                      ),
+                    ),
+                },
+              ),
+            ),
+          ],
         ),
       ),
     );

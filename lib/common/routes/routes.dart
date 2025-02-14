@@ -4,6 +4,7 @@ import 'package:course_app/pages/author_page/view/author_page_view.dart';
 import 'package:course_app/pages/course_details/view/course_detail_view.dart';
 import 'package:course_app/pages/home/view/home.dart';
 import 'package:course_app/pages/lesson_detail/view/lesson_detail.dart';
+import 'package:course_app/pages/mycourses/view/my_courses.dart';
 import 'package:course_app/pages/profile/editprofile/view/edit_profile_view.dart';
 
 import 'package:course_app/pages/signin/view/sign_in.dart';
@@ -36,6 +37,7 @@ class AppPages {
       RouteEntity(
           path: AppRoutesName.AUTHOR_PAGE, page: const AuthorPageView()),
       RouteEntity(path: AppRoutesName.EDIT_PROFILE, page: Edit_Profile_View()),
+      RouteEntity(path: AppRoutesName.MY_COURSES, page: const MyCourses())
     ];
   }
 

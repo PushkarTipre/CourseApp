@@ -103,13 +103,13 @@ class AppTextFieldOnly extends StatelessWidget {
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(top: 5.h, left: 10.w),
           hintText: hintText,
-          border: OutlineInputBorder(
+          border: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent)),
-          enabledBorder: OutlineInputBorder(
+          enabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent)),
-          focusedBorder: OutlineInputBorder(
+          focusedBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent)),
-          disabledBorder: OutlineInputBorder(
+          disabledBorder: const OutlineInputBorder(
               borderSide: BorderSide(color: Colors.transparent)),
         ),
         maxLines: 1,

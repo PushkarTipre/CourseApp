@@ -1,6 +1,6 @@
 class AppConstants {
   static const String SERVER_API_URL =
-      "https://physician-sake-convergence-earning.trycloudflare.com/";
+      "https://party-arnold-tops-two.trycloudflare.com/";
   // static const String SERVER_API_URL = "http://192.168.0.104:8000/";
   static const String STORAGE_USER_PROFILE_KEY = "user_profile";
   static const String STORAGE_USER_TOKEN_KEY = "user_token";

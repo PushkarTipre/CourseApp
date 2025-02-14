@@ -6,7 +6,8 @@ import 'firebase_options.dart';
 
 class Global {
   static late StorageService storageService;
-
+  static final RouteObserver<PageRoute> routeObserver =
+      RouteObserver<PageRoute>();
   static Future init() async {
     WidgetsFlutterBinding.ensureInitialized();
     await Firebase.initializeApp(

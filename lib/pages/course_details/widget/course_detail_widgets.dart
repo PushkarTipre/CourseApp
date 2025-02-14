@@ -1,6 +1,8 @@
+import 'dart:developer';
 import 'dart:ui';
 
 import 'package:course_app/common/routes/app_routes_name.dart';
+import 'package:course_app/common/utils/pop_messages.dart';
 import 'package:course_app/common/widgets/button_widgets.dart';
 
 import 'package:flutter/cupertino.dart';
@@ -8,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/models/CheckVideoAccessResponseEntity.dart';
 import '../../../common/models/course_enties.dart';
 import '../../../common/models/lesson_entities.dart';
 import '../../../common/utils/app_colors.dart';
@@ -17,6 +20,7 @@ import '../../../common/widgets/app_shadows.dart';
 import '../../../common/widgets/image_widgets.dart';
 import '../../../common/widgets/text_widget.dart';
 import '../../lesson_detail/controller/lesson_controller.dart';
+import '../repo/course_detail.dart';
 
 class CourseDetailThumbnail extends StatelessWidget {
   final CourseItem courseItem;
@@ -122,31 +126,6 @@ class CourseDetailDescription extends StatelessWidget {
   }
 }
 
-class CourseDetailGoBuyButton extends StatelessWidget {
-  final CourseItem courseItem;
-  const CourseDetailGoBuyButton({
-    super.key,
-    required this.courseItem,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.of(context).pushNamed("/buy_course", arguments: {
-          "id": courseItem.id,
-        });
-      },
-      child: Container(
-        margin: EdgeInsets.only(top: 10.h),
-        child: const AppButton(
-          text: "Go Buy",
-        ),
-      ),
-    );
-  }
-}
-
 class CourseDetailIncludes extends StatelessWidget {
   final CourseItem courseItem;
   const CourseDetailIncludes({super.key, required this.courseItem});
@@ -204,12 +183,12 @@ class CourseInfo extends StatelessWidget {
     return Row(
       children: [
         Container(
+          alignment: Alignment.center,
           child: AppImage(
             imagePath: imagePath,
             width: 30.w,
             height: 30.h,
           ),
-          alignment: Alignment.center,
         ),
         Container(
           margin: EdgeInsets.only(left: 10.w),
@@ -219,6 +198,110 @@ class CourseInfo extends StatelessWidget {
           ),
         ),
       ],
+    );
+  }
+}
+
+class CourseDetailButton extends StatelessWidget {
+  final String text;
+  final VoidCallback onTap;
+
+  const CourseDetailButton({
+    super.key,
+    required this.text,
+    required this.onTap,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        margin: EdgeInsets.only(top: 10.h),
+        child: AppButton(
+          text: text,
+        ),
+      ),
+    );
+  }
+}
+
+final enrollmentStatusProvider =
+    StateProvider.family<bool, String>((ref, courseId) => false);
+
+class CourseDetailGoBuyButton extends ConsumerWidget {
+  final CourseItem courseItem;
+  final String text;
+  const CourseDetailGoBuyButton({
+    super.key,
+    required this.courseItem,
+    this.text = "Go Buy",
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEnrolled =
+        ref.watch(enrollmentStatusProvider(courseItem.id!.toString()));
+    log("Course free or not: ${courseItem.is_free}");
+
+    return FutureBuilder(
+      future: CourseRepo.checkVideoAccess(courseId: courseItem.id!),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return SizedBox(
+            height: 20.h,
+          );
+        }
+
+        if (snapshot.hasData && snapshot.data?.hasAccess == true ||
+            isEnrolled) {
+          return SizedBox(
+            height: 20.h,
+          );
+        }
+
+        if (courseItem.is_free == 0) {
+          return CourseDetailButton(
+            text: text,
+            onTap: () {
+              Navigator.of(context).pushNamed(
+                AppRoutesName.BUY_COURSE,
+                arguments: {"id": courseItem.id},
+              );
+            },
+          );
+        } else {
+          return CourseDetailButton(
+            text: "Free",
+            onTap: () async {
+              try {
+                final response =
+                    await CourseRepo.enrollInCourse(courseId: courseItem.id!);
+                if (response.code == 200) {
+                  // Update the enrollment status
+                  ref
+                      .read(enrollmentStatusProvider(courseItem.id!.toString())
+                          .notifier)
+                      .state = true;
+
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Successfully enrolled in course')),
+                  );
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text('Enrollment failed')),
+                  );
+                }
+              } catch (e) {
+                log('Error enrolling in course: $e');
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text('An error occurred')),
+                );
+              }
+            },
+          );
+        }
+      },
     );
   }
 }
@@ -234,9 +317,26 @@ class LessonInfo extends StatelessWidget {
     required this.courseId,
   });
 
+  Future<void> checkAccessAndNavigate(
+      BuildContext context, LessonItem lesson) async {
+    CheckVideoAccessResponseEntity accessResponse =
+        await CourseRepo.checkVideoAccess(courseId: courseId);
+
+    if (accessResponse.hasAccess ?? false) {
+      ref.watch(lessonDetailControllerProvider(index: lesson.id!));
+      Navigator.of(context).pushNamed("/lesson_detail", arguments: {
+        "lessonID": lesson.id,
+        "courseId": courseId,
+        "description": lesson.description,
+      });
+    } else {
+      log("Access denied for you: ${accessResponse.msg}");
+      toastInfo("You need to purchase the course to access this lesson");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-    //log("My course data: ${lessonData.length}");
     return Container(
       margin: EdgeInsets.only(top: 20.h),
       child: Column(
@@ -270,13 +370,7 @@ class LessonInfo extends StatelessWidget {
                 ),
                 child: InkWell(
                   onTap: () {
-                    ref.watch(lessonDetailControllerProvider(
-                        index: lessonData[index].id!));
-                    Navigator.of(context).pushNamed("/lesson_detail",
-                        arguments: {
-                          "lessonID": lessonData[index].id,
-                          "courseId": courseId
-                        });
+                    checkAccessAndNavigate(context, lessonData[index]);
                   },
                   child: Row(
                     children: [
@@ -284,7 +378,6 @@ class LessonInfo extends StatelessWidget {
                         height: 60.h,
                         width: 60.w,
                         imagePath: "${lessonData[index].thumbnail}",
-                        // "${AppConstants.IMAGE_UPLOADS_PATH}${lessonData[index].thumbnail}",
                         fit: BoxFit.fill,
                       ),
                       SizedBox(
@@ -308,18 +401,17 @@ class LessonInfo extends StatelessWidget {
                           ],
                         ),
                       ),
-                      //Expanded(child: Container()),
                       AppImage(
                         imagePath: Img_Res.arrowRight,
                         width: 24.w,
                         height: 24.h,
-                      )
+                      ),
                     ],
                   ),
                 ),
               );
             },
-          )
+          ),
         ],
       ),
     );

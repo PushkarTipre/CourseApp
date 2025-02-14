@@ -1,6 +1,5 @@
 import 'dart:developer';
 
-import 'package:course_app/common/widgets/search_widget.dart';
 import 'package:course_app/global.dart';
 import 'package:course_app/pages/home/widgets/home_widget.dart';
 import 'package:flutter/material.dart';
@@ -21,6 +20,7 @@ class Home extends ConsumerStatefulWidget {
 
 class _HomeState extends ConsumerState<Home> {
   late PageController controller;
+  String userToken = Global.storageService.getUserProfile().token ?? "";
 
   @override
   void didChangeDependencies() {
@@ -32,8 +32,6 @@ class _HomeState extends ConsumerState<Home> {
 
   @override
   Widget build(BuildContext context) {
-    String userToken = Global.storageService.getUserProfile().token ?? "";
-
     final purchasedCourses = ref.watch(purchasedCoursesProvider(userToken));
 
     return Scaffold(
@@ -41,6 +39,7 @@ class _HomeState extends ConsumerState<Home> {
       appBar: homeAppBar(ref),
       body: RefreshIndicator(
         onRefresh: () {
+          ref.refresh(purchasedCoursesProvider(userToken));
           return ref.refresh(homeCourseListProvider.notifier).fetchCourseList();
         },
         child: Padding(
@@ -81,28 +80,25 @@ class _HomeState extends ConsumerState<Home> {
                     log("Mapped Banners: $banners");
 
                     return HomeBanner(
-                      courseNames:
-                          courseNames, // Pass the list of course names.
+                      courseNames: courseNames,
                       controller: controller,
                       banners: banners,
                       courseIds: courseIds,
                     );
                   },
                   loading: () => HomeBanner(
-                    courseNames: [],
+                    courseNames: const [],
                     controller: controller,
-                    courseIds: [],
-
-                    banners: [], // Placeholder for loading state.
+                    courseIds: const [],
+                    banners: const [],
                   ),
                   error: (error, stack) {
                     log("Error loading banners: $error");
                     return HomeBanner(
-                      courseNames: [],
+                      courseNames: const [],
                       controller: controller,
-                      courseIds: [],
-
-                      banners: [], // Placeholder for error state.
+                      courseIds: const [],
+                      banners: const [],
                     );
                   },
                 ),
@@ -110,7 +106,7 @@ class _HomeState extends ConsumerState<Home> {
                 SizedBox(
                   height: 10.h,
                 ),
-                HelloText(
+                const HelloText(
                   text: "Choose your course",
                   color: Colors.black,
                   fontSize: 20,

@@ -291,5 +291,137 @@ class _CourseLessonListControllerProviderElement
   @override
   int get index => (origin as CourseLessonListControllerProvider).index;
 }
+
+String _$checkVideoAccessControllerHash() =>
+    r'e902c1658c591b30dad8c5fd6785cfb497d9917e';
+
+/// See also [checkVideoAccessController].
+@ProviderFor(checkVideoAccessController)
+const checkVideoAccessControllerProvider = CheckVideoAccessControllerFamily();
+
+/// See also [checkVideoAccessController].
+class CheckVideoAccessControllerFamily extends Family<AsyncValue<bool>> {
+  /// See also [checkVideoAccessController].
+  const CheckVideoAccessControllerFamily();
+
+  /// See also [checkVideoAccessController].
+  CheckVideoAccessControllerProvider call({
+    required int courseId,
+  }) {
+    return CheckVideoAccessControllerProvider(
+      courseId: courseId,
+    );
+  }
+
+  @override
+  CheckVideoAccessControllerProvider getProviderOverride(
+    covariant CheckVideoAccessControllerProvider provider,
+  ) {
+    return call(
+      courseId: provider.courseId,
+    );
+  }
+
+  static const Iterable<ProviderOrFamily>? _dependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get dependencies => _dependencies;
+
+  static const Iterable<ProviderOrFamily>? _allTransitiveDependencies = null;
+
+  @override
+  Iterable<ProviderOrFamily>? get allTransitiveDependencies =>
+      _allTransitiveDependencies;
+
+  @override
+  String? get name => r'checkVideoAccessControllerProvider';
+}
+
+/// See also [checkVideoAccessController].
+class CheckVideoAccessControllerProvider
+    extends AutoDisposeFutureProvider<bool> {
+  /// See also [checkVideoAccessController].
+  CheckVideoAccessControllerProvider({
+    required int courseId,
+  }) : this._internal(
+          (ref) => checkVideoAccessController(
+            ref as CheckVideoAccessControllerRef,
+            courseId: courseId,
+          ),
+          from: checkVideoAccessControllerProvider,
+          name: r'checkVideoAccessControllerProvider',
+          debugGetCreateSourceHash:
+              const bool.fromEnvironment('dart.vm.product')
+                  ? null
+                  : _$checkVideoAccessControllerHash,
+          dependencies: CheckVideoAccessControllerFamily._dependencies,
+          allTransitiveDependencies:
+              CheckVideoAccessControllerFamily._allTransitiveDependencies,
+          courseId: courseId,
+        );
+
+  CheckVideoAccessControllerProvider._internal(
+    super._createNotifier, {
+    required super.name,
+    required super.dependencies,
+    required super.allTransitiveDependencies,
+    required super.debugGetCreateSourceHash,
+    required super.from,
+    required this.courseId,
+  }) : super.internal();
+
+  final int courseId;
+
+  @override
+  Override overrideWith(
+    FutureOr<bool> Function(CheckVideoAccessControllerRef provider) create,
+  ) {
+    return ProviderOverride(
+      origin: this,
+      override: CheckVideoAccessControllerProvider._internal(
+        (ref) => create(ref as CheckVideoAccessControllerRef),
+        from: from,
+        name: null,
+        dependencies: null,
+        allTransitiveDependencies: null,
+        debugGetCreateSourceHash: null,
+        courseId: courseId,
+      ),
+    );
+  }
+
+  @override
+  AutoDisposeFutureProviderElement<bool> createElement() {
+    return _CheckVideoAccessControllerProviderElement(this);
+  }
+
+  @override
+  bool operator ==(Object other) {
+    return other is CheckVideoAccessControllerProvider &&
+        other.courseId == courseId;
+  }
+
+  @override
+  int get hashCode {
+    var hash = _SystemHash.combine(0, runtimeType.hashCode);
+    hash = _SystemHash.combine(hash, courseId.hashCode);
+
+    return _SystemHash.finish(hash);
+  }
+}
+
+mixin CheckVideoAccessControllerRef on AutoDisposeFutureProviderRef<bool> {
+  /// The parameter `courseId` of this provider.
+  int get courseId;
+}
+
+class _CheckVideoAccessControllerProviderElement
+    extends AutoDisposeFutureProviderElement<bool>
+    with CheckVideoAccessControllerRef {
+  _CheckVideoAccessControllerProviderElement(super.provider);
+
+  @override
+  int get courseId => (origin as CheckVideoAccessControllerProvider).courseId;
+}
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import '../../lesson_detail/controller/lesson_controller.dart';
 import '../widget/course_detail_widgets.dart';
 
 class CourseDetail extends ConsumerStatefulWidget {
@@ -33,6 +32,7 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
     var lessondata =
         ref.watch(courseLessonListControllerProvider(index: args.toInt()));
     // var lessonData = ref.watch(lessonDataControllerProvider);
+
     return Scaffold(
       appBar: buildGlobalAppBar(title: "Course Detail"),
       body: Padding(
@@ -50,7 +50,9 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
                             CourseDetailThumbnail(courseItem: data),
                             CourseDetailIconText(courseItem: data),
                             CourseDetailDescription(courseItem: data),
-                            CourseDetailGoBuyButton(courseItem: data),
+                            CourseDetailGoBuyButton(
+                              courseItem: data,
+                            ),
                             CourseDetailIncludes(
                               courseItem: data,
                             ),

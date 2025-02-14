@@ -38,3 +38,20 @@ Future<List<LessonItem>?> courseLessonListController(
 
   return null;
 }
+
+@riverpod
+Future<bool> checkVideoAccessController(
+  CheckVideoAccessControllerRef ref, {
+  required int courseId,
+}) async {
+  try {
+    // Call the repository method to check video access
+    final response = await CourseRepo.checkVideoAccess(courseId: courseId);
+    log("Response for video access: ${response.msg}");
+
+    return response.hasAccess ?? false;
+  } catch (e) {
+    log("Error occurred while checking video access: $e");
+    return false;
+  }
+}

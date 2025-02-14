@@ -10,9 +10,9 @@ class SignInRepo {
     await FirebaseAuth.instance.currentUser?.getIdToken(true);
     await FirebaseAuth.instance.currentUser?.reload();
 
-    // Logging for verification
-    print("User signed up: ${credential.user?.uid}");
-    print("User's refreshToken after reload: ${credential.user?.refreshToken}");
+    // // Logging for verification
+    // print("User signed up: ${credential.user?.uid}");
+    // print("User's refreshToken after reload: ${credential.user?.refreshToken}");
 
     return credential;
   }

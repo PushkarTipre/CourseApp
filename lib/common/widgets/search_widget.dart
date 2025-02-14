@@ -7,19 +7,18 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class AppSearchBar extends StatelessWidget {
-  AppSearchBar({super.key, this.func, this.searchFunc});
+  const AppSearchBar({super.key, this.func, this.searchFunc});
 
   final VoidCallback? func;
-  Function(String value)? searchFunc;
+  final Function(String value)? searchFunc;
 
   @override
   Widget build(BuildContext context) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
-      //crossAxisAlignment: CrossAxisAlignment.baseline,
       children: [
         Container(
-          width: 280.w,
+          width: 335.w,
           height: 40.h,
           decoration: appBoxShadow(
               color: AppColors.primaryBackground,
@@ -30,7 +29,7 @@ class AppSearchBar extends StatelessWidget {
                 margin: EdgeInsets.only(left: 17.w),
                 child: const AppImage(imagePath: Img_Res.searchIcon),
               ),
-              Container(
+              SizedBox(
                 width: 240.w,
                 height: 40.h,
                 child: AppTextFieldOnly(
@@ -43,18 +42,18 @@ class AppSearchBar extends StatelessWidget {
             ],
           ),
         ),
-        GestureDetector(
-          onTap: func,
-          child: Container(
-            padding: EdgeInsets.all(5.w),
-            height: 40.h,
-            width: 40.w,
-            decoration: appBoxShadow(
-              boxBorder: Border.all(color: AppColors.primaryElement),
-            ),
-            child: const AppImage(imagePath: Img_Res.searchButton),
-          ),
-        )
+        // GestureDetector(
+        //   onTap: func,
+        //   child: Container(
+        //     padding: EdgeInsets.all(5.w),
+        //     height: 40.h,
+        //     width: 40.w,
+        //     decoration: appBoxShadow(
+        //       boxBorder: Border.all(color: AppColors.primaryElement),
+        //     ),
+        //     child: const AppImage(imagePath: Img_Res.searchButton),
+        //   ),
+        // )
       ],
     );
   }

@@ -3,6 +3,7 @@ import 'dart:developer';
 import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/global.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 
 class HttpUtil {
   late Dio dio;
@@ -23,28 +24,15 @@ class HttpUtil {
     );
     dio = Dio(options);
 
-
     dio.interceptors.add(InterceptorsWrapper(onRequest: (options, handler) {
-      print("Full URL being accessed: ${options.uri}");
-      print("Request URL: ${options.uri}");
-      print("Request Method: ${options.method}");
-      print("Request Headers: ${options.headers}");
-      print("Request Data: ${options.data}");
       return handler.next(options);
     }, onResponse: (response, handler) {
-      print("Response Status Code: ${response.statusCode}");
-      print("Response Headers: ${response.headers}");
-      print("Response Data: ${response.data}");
       return handler.next(response);
     }, onError: (DioException e, handler) {
-      print("Error Type: ${e.type}");
-      print("Error Message: ${e.message}");
-      if (e.response != null) {
-        print("Error Response Status: ${e.response?.statusCode}");
-        print("Error Response Data: ${e.response?.data}");
-      }
+      if (e.response != null) {}
       ErrorEntity errorInfo = createErrorEntity(e);
       onError(errorInfo);
+      return handler.next(e);
     }));
   }
 
@@ -84,11 +72,12 @@ class HttpUtil {
     log("Done");
     return response.data ?? response;
   }
+
   Future get(
-      String path, {
-        Map<String, dynamic>? queryParameters,
-        Options? options,
-      }) async {
+    String path, {
+    Map<String, dynamic>? queryParameters,
+    Options? options,
+  }) async {
     log("GET");
     Options requestOptions = options ?? Options();
     requestOptions.headers = requestOptions.headers ?? {};
@@ -174,7 +163,7 @@ void onError(ErrorEntity eInfo) {
       print("Permission denied cannot continue ahead!!");
       break;
     case 403:
-      print("Forbidden");
+      log("Forbidden");
       break;
     case 404:
       print("Not found");

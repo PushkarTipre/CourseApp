@@ -16,19 +16,23 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.white,
-        appBar: buildGlobalAppBar(title: "Profile"),
-        body: SingleChildScrollView(
-            child: SizedBox(
-                width: MediaQuery.of(context).size.width,
-                child: const Column(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      ProfileImageWidget(),
-                      ProfileNameWidget(),
-                      ProfileDescriptionWidget(),
-                      ProfileCourses(),
-                      ProfileListItems()
-                    ]))));
+      backgroundColor: Colors.white,
+      appBar: buildGlobalAppBar(title: "Profile"),
+      body: SingleChildScrollView(
+        child: SizedBox(
+          width: MediaQuery.of(context).size.width,
+          child: const Column(
+            crossAxisAlignment: CrossAxisAlignment.center,
+            children: [
+              ProfileImageWidget(),
+              ProfileNameWidget(),
+              ProfileDescriptionWidget(),
+              ProfileCourses(),
+              ProfileListItems()
+            ],
+          ),
+        ),
+      ),
+    );
   }
 }

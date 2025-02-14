@@ -16,7 +16,7 @@ Future<List<AllQuizResultData>?> csvExportQuizResultController(
   try {
     final response = await CsvRepo.getAllResult(uniqueId: uniqueId);
     if (response.code == 200) {
-      return response.data; // Now returns List<AllQuizResultData>
+      return response.data;
     } else {
       log("Request failed ${response.code} ${response.msg}");
     }

@@ -73,8 +73,8 @@ class _BuyCourseState extends ConsumerState<BuyCourse> {
             TextButton(
               child: const Text('OK'),
               onPressed: () {
-                Navigator.of(context).pop(); // Close the dialog
-                Navigator.of(context).pop(); // Return to the previous screen
+                Navigator.of(context).pop();
+                Navigator.of(context).pop();
               },
             ),
           ],
@@ -126,38 +126,6 @@ class _BuyCourseState extends ConsumerState<BuyCourse> {
       });
     }
   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     if (courseId == null) {
-//       return const Scaffold(
-//         body: Center(child: Text("Loading course information...")),
-//       );
-//     }
-//     var courseBuyData =
-//         ref.watch(buyCourseControllerProvider(index: args.toInt()));
-//
-//     return Scaffold(
-//       body: courseBuyData.when(
-//         data: (data) {
-//           if (data == null) return const SizedBox();
-//
-//           Map<String, dynamic> options = (data);
-//
-//           if (!_paymentInitiated) {
-//             WidgetsBinding.instance.addPostFrameCallback((_) {
-//               initiatePayment(options);
-//             });
-//           }
-//
-//           return const Center(child: Text("Processing payment..."));
-//         },
-//         error: (error, stackTrace) => const Text("Error loading course data"),
-//         loading: () => const Center(child: CircularProgressIndicator()),
-//       ),
-//     );
-//   }
-// }
 
   @override
   Widget build(BuildContext context) {
