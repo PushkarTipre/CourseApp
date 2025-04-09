@@ -8,6 +8,8 @@ import 'package:course_app/pages/search/view/search.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../category_course/view/category_course.dart';
+
 var bottomTabs = <BottomNavigationBarItem>[
   BottomNavigationBarItem(
       icon: _bottomContainer(),
@@ -26,12 +28,12 @@ var bottomTabs = <BottomNavigationBarItem>[
           color: AppColors.primaryElement, imagePath: Img_Res.play_Circle),
       backgroundColor: AppColors.primaryBackground,
       label: 'Play'),
-  // BottomNavigationBarItem(
-  //     icon: _bottomContainer(imagePath: Img_Res.message_Circle),
-  //     activeIcon: _bottomContainer(
-  //         color: AppColors.primaryElement, imagePath: Img_Res.message_Circle),
-  //     backgroundColor: AppColors.primaryBackground,
-  //     label: 'Chat'),
+  BottomNavigationBarItem(
+      icon: _bottomContainer(imagePath: Img_Res.book),
+      activeIcon: _bottomContainer(
+          color: AppColors.primaryElement, imagePath: Img_Res.book),
+      backgroundColor: AppColors.primaryBackground,
+      label: 'Chat'),
   BottomNavigationBarItem(
       icon: _bottomContainer(imagePath: Img_Res.profilePhoto),
       activeIcon: _bottomContainer(
@@ -45,7 +47,7 @@ Widget _bottomContainer(
     double height = 15,
     String imagePath = Img_Res.home,
     Color color = AppColors.primaryFourElementText}) {
-  return Container(
+  return SizedBox(
     width: width.w,
     height: height.w,
     child: appImageWithColour(iconPath: imagePath, color: color),
@@ -57,10 +59,7 @@ Widget appScreens({int index = 0}) {
     const Home(),
     const Search(),
     const MyCourses(),
-    // const Center(
-    //   child:
-    //       AppImage(imagePath: Img_Res.message_Circle, width: 250, height: 250),
-    // ),
+    const CourseListScreen(),
     const Profile()
   ];
   return screens[index];

@@ -21,6 +21,8 @@ class Sign_Up extends ConsumerStatefulWidget {
 
 class _Sign_UpState extends ConsumerState<Sign_Up> {
   late SignupController _controller;
+  bool _obscurePassword = true;
+  bool _obscureConfirmPassword = true;
   @override
   void initState() {
     // TODO: implement initState
@@ -79,7 +81,20 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                     text: 'Password',
                     iconName: Img_Res.lock,
                     hintText: 'Enter your password',
-                    obscureText: true,
+                    obscureText: _obscurePassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                    ),
                     func: (value) {
                       ref
                           .read(registerNotifierProvider.notifier)
@@ -93,7 +108,20 @@ class _Sign_UpState extends ConsumerState<Sign_Up> {
                     text: 'Confirm Password',
                     iconName: Img_Res.lock,
                     hintText: 'Enter your password again',
-                    obscureText: true,
+                    obscureText: _obscureConfirmPassword,
+                    suffixIcon: IconButton(
+                      icon: Icon(
+                        _obscureConfirmPassword
+                            ? Icons.visibility_off
+                            : Icons.visibility,
+                        color: Colors.grey,
+                      ),
+                      onPressed: () {
+                        setState(() {
+                          _obscureConfirmPassword = !_obscureConfirmPassword;
+                        });
+                      },
+                    ),
                     func: (value) {
                       ref
                           .read(registerNotifierProvider.notifier)

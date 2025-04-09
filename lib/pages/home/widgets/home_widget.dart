@@ -13,6 +13,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/models/course_enties.dart';
 import '../../../global.dart';
 
 class UserName extends StatelessWidget {
@@ -81,7 +82,7 @@ class HomeBanner extends ConsumerWidget {
       children: [
         if (hasBanners)
           Container(
-            height: 320.h,
+            height: 340.h,
             padding: EdgeInsets.symmetric(horizontal: 6.w),
             child: PageView.builder(
               controller: controller,
@@ -200,7 +201,8 @@ class HomeBanner extends ConsumerWidget {
                                         );
                                       },
                                       style: ElevatedButton.styleFrom(
-                                        backgroundColor: theme.primaryColor,
+                                        backgroundColor:
+                                            AppColors.primaryElement,
                                         foregroundColor: Colors.white,
                                         padding: EdgeInsets.symmetric(
                                           vertical: 12.h,
@@ -276,7 +278,7 @@ class HomeBanner extends ConsumerWidget {
               size: Size(8.w, 8.w),
               activeSize: Size(24.w, 8.w),
               color: Colors.grey.shade300,
-              activeColor: theme.primaryColor,
+              activeColor: AppColors.primaryElement,
               spacing: EdgeInsets.symmetric(horizontal: 4.w),
               activeShape: RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(4.w),
@@ -316,15 +318,15 @@ AppBar homeAppBar(WidgetRef ref) {
   );
 }
 
-class HomeMenuBar extends StatefulWidget {
-  const HomeMenuBar({super.key});
+class HomeMenuBar extends StatelessWidget {
+  final int selectedIndex;
+  final Function(int) onTabChanged;
 
-  @override
-  _HomeMenuBarState createState() => _HomeMenuBarState();
-}
-
-class _HomeMenuBarState extends State<HomeMenuBar> {
-  int selectedIndex = 0; // Track the selected tab index
+  const HomeMenuBar({
+    super.key,
+    required this.selectedIndex,
+    required this.onTabChanged,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -342,9 +344,7 @@ class _HomeMenuBarState extends State<HomeMenuBar> {
             children: [
               Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(() {
-                    selectedIndex = 0;
-                  }),
+                  onTap: () => onTabChanged(0),
                   child: Container(
                     decoration: BoxDecoration(
                       color: selectedIndex == 0
@@ -354,10 +354,9 @@ class _HomeMenuBarState extends State<HomeMenuBar> {
                       boxShadow: selectedIndex == 0
                           ? [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2))
                             ]
                           : [],
                     ),
@@ -376,12 +375,10 @@ class _HomeMenuBarState extends State<HomeMenuBar> {
                   ),
                 ),
               ),
-              SizedBox(width: 8.w), // Spacing between tabs
+              SizedBox(width: 8.w),
               Expanded(
                 child: GestureDetector(
-                  onTap: () => setState(() {
-                    selectedIndex = 1;
-                  }),
+                  onTap: () => onTabChanged(1),
                   child: Container(
                     decoration: BoxDecoration(
                       color: selectedIndex == 1
@@ -391,10 +388,9 @@ class _HomeMenuBarState extends State<HomeMenuBar> {
                       boxShadow: selectedIndex == 1
                           ? [
                               BoxShadow(
-                                color: Colors.grey.withOpacity(0.3),
-                                blurRadius: 4,
-                                offset: const Offset(0, 2),
-                              ),
+                                  color: Colors.grey.withOpacity(0.3),
+                                  blurRadius: 4,
+                                  offset: const Offset(0, 2))
                             ]
                           : [],
                     ),
@@ -423,38 +419,45 @@ class _HomeMenuBarState extends State<HomeMenuBar> {
 
 class CourseItemGrid extends StatelessWidget {
   final WidgetRef ref;
-  const CourseItemGrid({super.key, required this.ref});
+  final AsyncValue<List<CourseItem>?> courses;
+  const CourseItemGrid({super.key, required this.ref, required this.courses});
 
   @override
   Widget build(BuildContext context) {
-    final courseState = ref.watch(homeCourseListProvider);
-
+    // final courseState = ref.watch(popularCoursesProvider);
+    // log("Course State: $courseState");
     return Padding(
       padding: EdgeInsets.symmetric(vertical: 15.h, horizontal: 6.w),
-      child: courseState.when(
-        data: (data) => GridView.builder(
-            shrinkWrap: true,
-            physics: const ScrollPhysics(),
-            gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-              crossAxisCount: 2,
-              crossAxisSpacing: 15.w,
-              mainAxisSpacing: 15.h,
-              childAspectRatio: 0.75, // Adjusted ratio for better layout
-            ),
-            itemCount: data?.length,
-            itemBuilder: (_, int index) {
-              return AppBoxDecorationImage(
-                imagePath:
-                    "${AppConstants.IMAGE_UPLOADS_PATH}${data?[index].thumbnail}",
-                courseItem: data![index],
-                func: () {
-                  Navigator.of(context).pushNamed(AppRoutesName.COURSE_DETAIL,
-                      arguments: {"id": data[index].id!});
-                },
-              );
-            }),
+      child: courses.when(
+        data: (data) {
+          if (data == null) {
+            return const Center(
+              child: Text("No data found"),
+            );
+          }
+          return GridView.builder(
+              shrinkWrap: true,
+              physics: const ScrollPhysics(),
+              gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                crossAxisCount: 2,
+                crossAxisSpacing: 15.w,
+                mainAxisSpacing: 15.h,
+                childAspectRatio: 0.75, // Adjusted ratio for better layout
+              ),
+              itemCount: data.length,
+              itemBuilder: (_, int index) {
+                return AppBoxDecorationImage(
+                  imagePath:
+                      "${AppConstants.IMAGE_UPLOADS_PATH}${data[index].thumbnail}",
+                  courseItem: data[index],
+                  func: () {
+                    Navigator.of(context).pushNamed(AppRoutesName.COURSE_DETAIL,
+                        arguments: {"id": data[index].id!});
+                  },
+                );
+              });
+        },
         error: (error, stackTrace) {
-          print(stackTrace.toString());
           return const Center(
               child: Text(
                   "Something went wrong. Please restart the app and check internet connection."));

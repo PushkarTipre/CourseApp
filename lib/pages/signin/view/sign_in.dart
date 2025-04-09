@@ -30,6 +30,8 @@ class _Sign_InState extends ConsumerState<Sign_In> {
     super.didChangeDependencies();
   }
 
+  bool obscurePassword = true;
+
   @override
   Widget build(BuildContext context) {
     final signInProvider = ref.watch(sign_in_notifierProvider);
@@ -42,12 +44,58 @@ class _Sign_InState extends ConsumerState<Sign_In> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  thirdPartyLogin(),
-                  Center(
-                      child: const Text14Normal(
-                          text: 'Or use your email account to login')),
+                  Container(
+                    width: double.infinity,
+                    height: 220.h,
+                    margin:
+                        EdgeInsets.symmetric(horizontal: 25.w, vertical: 20.h),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(20.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 15,
+                          spreadRadius: 1,
+                          offset: const Offset(0, 5),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(20.r),
+                      child: Stack(
+                        children: [
+                          // Your asset image
+                          Image.asset(
+                            Img_Res.pvg, // Replace with your actual asset path
+                            width: double.infinity,
+                            height: double.infinity,
+                            fit: BoxFit.fill,
+                          ),
+                          // Gradient overlay for better text visibility if needed
+                          Container(
+                            decoration: BoxDecoration(
+                              gradient: LinearGradient(
+                                begin: Alignment.topCenter,
+                                end: Alignment.bottomCenter,
+                                colors: [
+                                  Colors.transparent,
+                                  AppColors.primaryElement.withOpacity(0.5),
+                                ],
+                              ),
+                            ),
+                          ),
+                          // Welcome text overlay
+                        ],
+                      ),
+                    ),
+                  ),
+
+                  // thirdPartyLogin(),
+                  // Center(
+                  //     child: const Text14Normal(
+                  //         text: 'Or use your email account to login')),
                   SizedBox(
-                    height: 50.h,
+                    height: 20.h,
                   ),
                   AppTextFields(
                       controller: _controller.emailController,
@@ -61,11 +109,24 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                     height: 20.h,
                   ),
                   AppTextFields(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            obscurePassword = !obscurePassword;
+                          });
+                        },
+                      ),
                       controller: _controller.passwordController,
                       text: 'Password',
                       iconName: Img_Res.lock,
                       hintText: 'Enter your password',
-                      obscureText: true,
+                      obscureText: obscurePassword,
                       func: (value) => ref
                           .read(sign_in_notifierProvider.notifier)
                           .onUserPasswordChange(value)),
@@ -77,7 +138,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                     child: textUnderline(text: 'Forgot Password?'),
                   ),
                   SizedBox(
-                    height: 100.h,
+                    height: 50.h,
                   ),
                   Center(
                       child: AppButton(
@@ -99,7 +160,7 @@ class _Sign_InState extends ConsumerState<Sign_In> {
                 ],
               ),
             )
-          : Center(
+          : const Center(
               child: CircularProgressIndicator(
               backgroundColor: Colors.blue,
               color: AppColors.primaryElement,

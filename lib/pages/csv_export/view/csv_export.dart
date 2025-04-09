@@ -11,7 +11,6 @@ import 'package:intl/intl.dart';
 import '../../../common/models/all_quiz_result.dart';
 import '../controller/csv_export_controller.dart';
 
-// Main screen widget
 class AnalyticsScreen extends ConsumerWidget {
   const AnalyticsScreen({super.key});
 
@@ -59,7 +58,7 @@ class AnalyticsExportUtil {
     }
   }
 
-  static Future<String> exportAnalyticsToCSV(WidgetRef ref) async {
+  static Future<String> exportAnalyticsToCSV(dynamic refOrReader) async {
     try {
       final prefs = await SharedPreferences.getInstance();
       final analyticsKeys = prefs
@@ -74,8 +73,8 @@ class AnalyticsExportUtil {
 
       final uniqueId = Global.storageService.getUserProfile().unique_id;
       log("The unique ID is $uniqueId");
-      final quizResult = await ref.read(
-        csvExportQuizResultControllerProvider(uniqueId: "6766fa42531ad").future,
+      final quizResult = await refOrReader.read(
+        csvExportQuizResultControllerProvider(uniqueId: uniqueId ?? "").future,
       );
 
       for (String key in analyticsKeys) {
@@ -125,7 +124,7 @@ class AnalyticsExportUtil {
 
             // Create the row with grouped values
             String row = [
-              videoId,
+              uniqueId,
               userId, // User ID
               userName,
               courseId,
@@ -173,6 +172,79 @@ class AnalyticsExportUtil {
 
 // Handler class for export operations
 class AnalyticsExportHandler {
+  static Future<void> uploadAnalyticsFile(
+      BuildContext context, WidgetRef ref, String filePath) async {
+    try {
+      // Show loading indicator
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (BuildContext context) {
+          return const Center(
+            child: CircularProgressIndicator(),
+          );
+        },
+      );
+
+      // Get the file ready to upload
+      File csvFile = File(filePath);
+      final userId = Global.storageService.getUserProfile().unique_id;
+
+      // Upload the file
+      final result = await ref.read(csvUploadControllerProvider(
+        csvFile: csvFile,
+        userId: userId ?? "",
+      ).future);
+
+      // Close loading indicator
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Show result dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title:
+                  Text(result != null ? 'Upload Successful' : 'Upload Failed'),
+              content: Text(result != null
+                  ? 'Analytics CSV file uploaded successfully.'
+                  : 'Failed to upload analytics file.'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    } catch (e) {
+      // Close loading indicator if it's showing
+      if (context.mounted) {
+        Navigator.pop(context);
+
+        // Show error dialog
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: const Text('Upload Error'),
+              content: Text('Failed to upload analytics: $e'),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.pop(context),
+                  child: const Text('OK'),
+                ),
+              ],
+            );
+          },
+        );
+      }
+    }
+  }
+
   static Future<void> exportAnalytics(
       BuildContext context, WidgetRef ref) async {
     try {
@@ -218,6 +290,13 @@ class AnalyticsExportHandler {
                 TextButton(
                   onPressed: () => Navigator.pop(context),
                   child: const Text('OK'),
+                ),
+                TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                    uploadAnalyticsFile(context, ref, filePath);
+                  },
+                  child: const Text('Upload to Server'),
                 ),
               ],
             );

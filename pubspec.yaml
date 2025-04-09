@@ -61,6 +61,8 @@ dependencies:
   google_fonts: ^6.2.1
   better_player: ^0.0.84
   better_player_enhanced: ^0.0.5
+  flutter_svg: ^2.0.17
+  android_alarm_manager_plus: ^4.0.7
 
 dev_dependencies:
   flutter_test:

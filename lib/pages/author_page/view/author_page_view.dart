@@ -42,29 +42,32 @@ class _AuthorPageViewState extends ConsumerState<AuthorPageView> {
               : Padding(
                   padding:
                       EdgeInsets.symmetric(vertical: 20.h, horizontal: 25.w),
-                  child: Column(
-                    children: [
-                      AuthorMenu(
-                        authorInfo: value,
-                      ),
-                      AuthorDescription(
-                        authorInfo: value,
-                      ),
-                      // SizedBox(
-                      //   height: 20.h,
-                      // ),
-                      // //go chat button
-                      // AppButton(
-                      //   text: "Go Chat",
-                      //   onPressed: () {
-                      //     print("I am tapped");
-                      //   },
-                      // ),
-                      SizedBox(
-                        height: 20.h,
-                      ),
-                      AuthorCourses(authorCourseList: authorCourseList.value!),
-                    ],
+                  child: SingleChildScrollView(
+                    child: Column(
+                      children: [
+                        AuthorMenu(
+                          authorInfo: value,
+                        ),
+                        AuthorDescription(
+                          authorInfo: value,
+                        ),
+                        // SizedBox(
+                        //   height: 20.h,
+                        // ),
+                        // //go chat button
+                        // AppButton(
+                        //   text: "Go Chat",
+                        //   onPressed: () {
+                        //     print("I am tapped");
+                        //   },
+                        // ),
+                        SizedBox(
+                          height: 20.h,
+                        ),
+                        AuthorCourses(
+                            authorCourseList: authorCourseList.value!),
+                      ],
+                    ),
                   ),
                 ),
           AsyncError(:final error) => Text('Error $error'),

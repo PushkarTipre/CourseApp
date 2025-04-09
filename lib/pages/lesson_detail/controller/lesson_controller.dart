@@ -46,7 +46,7 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
           fit: BoxFit.fill,
           autoPlay: true,
           expandToFill: true,
-          startAt: Duration(seconds: 0),
+          startAt: const Duration(seconds: 0),
           controlsConfiguration: BetterPlayerControlsConfiguration(
             enableProgressBar: true,
             enableProgressText: true,
@@ -314,7 +314,8 @@ class LessonDataController extends _$LessonDataController {
         analyticsService.onVideoRestart();
         isRestart = false;
       }
-      analyticsService.logPlayStart(); // This sets the actual start time
+      analyticsService.logPlayStart(
+          courseId: courseId.toString(), videoId: currentVideoIndex.toString());
       playPause(true);
     } else if (event.betterPlayerEventType == BetterPlayerEventType.finished) {
       _handleVideoCompletion();

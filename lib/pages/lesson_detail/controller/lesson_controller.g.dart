@@ -7,7 +7,7 @@ part of 'lesson_controller.dart';
 // **************************************************************************
 
 String _$lessonDetailControllerHash() =>
-    r'9dbe4a12311c3e29fa9067824b8d85d224959f25';
+    r'9fa113ea21f54a86a5f038e1b9eed98dfb46d746';
 
 /// Copied from Dart SDK
 class _SystemHash {
@@ -158,7 +158,7 @@ class _LessonDetailControllerProviderElement
 }
 
 String _$lessonDataControllerHash() =>
-    r'f8f44ab2834ae4020e715ff69202e6bcfff753f1';
+    r'971c4879150684188f39cf87d7a8646cabfc5b96';
 
 /// See also [LessonDataController].
 @ProviderFor(LessonDataController)

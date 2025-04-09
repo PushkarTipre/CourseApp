@@ -44,7 +44,6 @@ class CourseListResponseEntity {
       );
 }
 
-//api post response msg
 class CourseDetailResponseEntity {
   int? code;
   String? msg;

@@ -1,20 +1,20 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:course_app/common/utils/img_res.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
-import 'package:course_app/common/widgets/app_bar.dart';
-import 'package:course_app/common/widgets/app_shadows.dart';
-import 'package:course_app/common/widgets/image_widgets.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-import 'package:flutter_windowmanager/flutter_windowmanager.dart';
+
 import 'package:better_player_enhanced/better_player.dart';
+import '../../../common/models/lesson_entities.dart';
 import '../../../common/services/storage.dart';
-import '../../csv_export/view/csv_export.dart';
+import '../../../common/utils/app_colors.dart';
+import '../../course_details/widget/course_detail_widgets.dart';
 
 import '../../../global.dart';
+import '../../csv_export/view/csv_export.dart';
 import 'VideoAnalyticsScreen.dart';
 import '../controller/lesson_controller.dart';
 import '../lesson_time/repo/analytics.dart';
@@ -30,21 +30,37 @@ class LessonDetail extends ConsumerStatefulWidget {
 
 class _LessonDetailState extends ConsumerState<LessonDetail> {
   int videoIndex = 0;
-
+  String? currentVideoId;
   late StorageService storageService;
+  bool isInitialized = false;
 
-  Future<void> secureScreen() async {
-    await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
-  }
+  // Future<void> secureScreen() async {
+  //   await FlutterWindowManager.addFlags(FlutterWindowManager.FLAG_SECURE);
+  // }
+  //
+  // Future<void> unsecureScreen() async {
+  //   await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+  // }
 
-  Future<void> unsecureScreen() async {
-    await FlutterWindowManager.clearFlags(FlutterWindowManager.FLAG_SECURE);
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Extract arguments first to ensure they're available for the provider
+    final args =
+        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    if (args != null) {
+      final courseId = args['courseId'];
+      log("Setting course ID in didChangeDependencies: $courseId");
+      // Set the course ID which will trigger the data fetch
+      ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
+    }
   }
 
   @override
   void initState() {
     super.initState();
-    secureScreen();
+    // secureScreen();
     initializeStorageService();
   }
 
@@ -58,7 +74,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
   void dispose() {
     videoPlayerController?.dispose();
 
-    unsecureScreen();
+    // unsecureScreen();
     super.dispose();
   }
 
@@ -66,12 +82,13 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     setState(() {
       videoIndex = index;
       if (ref.read(lessonDataControllerProvider).value?.lessonItem != null) {
-        // Make sure we're getting the course_video_id from the correct index
         currentVideoId = ref
             .read(lessonDataControllerProvider)
             .value
             ?.lessonItem[index]
             .course_video_id;
+
+        log("Current Video ID: $currentVideoId");
 
         ref
             .read(lessonDataControllerProvider.notifier)
@@ -87,6 +104,44 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     ref.read(lessonDataControllerProvider.notifier).playNextVid(videoUrl);
   }
 
+  void _initializeVideoIdFromData(LessonVideo data) {
+    log("Initializing video ID from data");
+
+    if (data.lessonItem.isNotEmpty) {
+      setState(() {
+        try {
+          currentVideoId = data.lessonItem[videoIndex].course_video_id;
+          log("Setting currentVideoId to: $currentVideoId");
+
+          if (currentVideoId != null && currentVideoId!.isNotEmpty) {
+            try {
+              int parsedId = int.parse(currentVideoId!);
+              ref
+                  .read(lessonDataControllerProvider.notifier)
+                  .updateCurrentVideoIndex(parsedId);
+              log("Initial video ID set to $currentVideoId");
+            } catch (e) {
+              log("Error parsing currentVideoId: $e");
+              currentVideoId = videoIndex.toString();
+              log("Fallback: Using index as ID: $currentVideoId");
+            }
+          } else {
+            currentVideoId = videoIndex.toString();
+            log("Fallback: Initial video ID set to $currentVideoId");
+          }
+
+          isInitialized = true;
+        } catch (e) {
+          log("Error in initializeVideoId: $e");
+          currentVideoId = "0";
+          log("Error fallback: Setting currentVideoId to 0");
+        }
+      });
+    } else {
+      log("Cannot initialize video ID: lessonItem is empty");
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final args =
@@ -96,258 +151,348 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     final lessonId = args['lessonID'];
     final description = args['description'];
 
+    log("LessonID: $lessonId");
+    log("CourseID: $courseId");
     log("Description: $description");
 
     ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
+    final lessonDataAsync = ref.watch(lessonDataControllerProvider);
 
-    secureScreen();
+    // secureScreen();
 
     var lessonData = ref.watch(lessonDataControllerProvider);
-
+    ref.listen<AsyncValue<LessonVideo?>>(
+      lessonDataControllerProvider,
+      (previous, current) {
+        current.whenData((data) {
+          if (data != null && data.lessonItem.isNotEmpty && !isInitialized) {
+            log("Data received in listener, initializing video ID");
+            _initializeVideoIdFromData(data);
+          }
+        });
+      },
+    );
     return Scaffold(
-        appBar: buildGlobalAppBar(title: "Lesson detail"),
-        body: Center(
-          child: lessonData.value == null
-              ? const Center(child: CircularProgressIndicator())
-              : SingleChildScrollView(
-                  child: Column(
-                    children: [
-                      lessonData.when(
-                          data: (data) {
-                            if (currentVideoId == null &&
-                                data.lessonItem.isNotEmpty) {
-                              WidgetsBinding.instance.addPostFrameCallback((_) {
-                                setState(() {
-                                  currentVideoId =
-                                      data.lessonItem[0].course_video_id;
-                                });
-                              });
-                            }
-                            return Column(
-                              children: [
-                                AspectRatio(
-                                  aspectRatio: 16 / 9,
-                                  child: Container(
-                                    // width: 325.w,
-                                    // height: 200.h,
-                                    decoration: data.lessonItem.isEmpty
-                                        ? appBoxShadow()
-                                        : networkImageDecoration(
-                                            imagePath:
-                                                "${data.lessonItem[0].thumbnail}"),
-                                    // "${AppConstants.IMAGE_UPLOADS_PATH}${data.lessonItem[0].thumbnail}"),
-                                    child: FutureBuilder(
-                                      future: data.initializeVideoPlayer,
-                                      builder: (context, snapshot) {
-                                        if (snapshot.connectionState ==
-                                            ConnectionState.done) {
-                                          currentVideoId = data
-                                              .lessonItem[videoIndex]
-                                              .course_video_id;
-                                          log("This is the video id $currentVideoId");
-
-                                          return videoPlayerController == null
-                                              ? Container()
-                                              : Stack(
-                                                  children: [
-                                                    BetterPlayer(
-                                                      controller:
-                                                          videoPlayerController!,
-                                                    ),
-                                                    Text(
-                                                      'Last paused at: ${data.lastPausedAt}',
-                                                      style: const TextStyle(
-                                                          fontSize: 16),
-                                                    ),
-
-                                                    // VideoPlayer(
-                                                    //     videoPlayerController!),
-                                                  ],
-                                                );
-                                        } else {
-                                          return const Center(
-                                            child: CircularProgressIndicator(),
-                                          );
-                                        }
-                                      },
-                                    ),
+      appBar: AppBar(
+        title: Text(
+          "Lesson Detail",
+          style: TextStyle(
+            fontSize: 20.sp,
+            fontWeight: FontWeight.w700,
+            color: AppColors.primaryText,
+          ),
+        ),
+        centerTitle: true,
+        elevation: 0,
+        backgroundColor: Colors.white,
+        leading: IconButton(
+          icon: Icon(Icons.arrow_back_ios, color: AppColors.primaryText),
+          onPressed: () => Navigator.of(context).pop(),
+        ),
+      ),
+      body: lessonData.value == null
+          ? const Center(child: CircularProgressIndicator())
+          : lessonData.when(
+              data: (data) {
+                return SingleChildScrollView(
+                  child: Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 20.w),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        // Video Player Container
+                        Container(
+                          margin: EdgeInsets.only(top: 22.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.05),
+                                blurRadius: 12,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: Column(
+                            children: [
+                              AspectRatio(
+                                aspectRatio: 16 / 9,
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(15.r),
+                                  child: FutureBuilder(
+                                    future: data.initializeVideoPlayer,
+                                    builder: (context, snapshot) {
+                                      if (snapshot.connectionState ==
+                                          ConnectionState.done) {
+                                        return videoPlayerController == null
+                                            ? Container()
+                                            : BetterPlayer(
+                                                controller:
+                                                    videoPlayerController!,
+                                              );
+                                      } else {
+                                        return const Center(
+                                          child: CircularProgressIndicator(),
+                                        );
+                                      }
+                                    },
                                   ),
                                 ),
-                                Text(
-                                  'Last paused at: ${data.lastPausedAt}',
-                                  style: const TextStyle(fontSize: 16),
+                              ),
+                              Padding(
+                                padding: EdgeInsets.all(15.r),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      'Last Paused At: ${data.lastPausedAt}',
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color:
+                                            AppColors.primaryThreeElementText,
+                                      ),
+                                    ),
+                                    SizedBox(height: 8.h),
+                                    Text(
+                                      'Lesson Description',
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryText,
+                                      ),
+                                    ),
+                                    Text(
+                                      description,
+                                      style: TextStyle(
+                                        fontSize: 14.sp,
+                                        color:
+                                            AppColors.primaryThreeElementText,
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Text(
-                                  'Lesson Description: $description',
-                                  style: const TextStyle(fontSize: 16),
-                                ),
-                                SizedBox(
-                                  height: 20.h,
-                                ),
-                                // In your settings screen or wherever you want to place the button
-                                ElevatedButton(
-                                  onPressed: () async {
-                                    await analyticsService.clearAnalyticsData(
-                                        courseId: courseId.toString(),
-                                        courseVideoId: currentVideoId!);
+                              ),
+                            ],
+                          ),
+                        ),
 
+                        // Video Controls
+                        Container(
+                          margin: EdgeInsets.only(top: 22.h),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(15.r),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.03),
+                                blurRadius: 10,
+                                spreadRadius: 1,
+                                offset: const Offset(0, 2),
+                              ),
+                            ],
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(15.r),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                              children: [
+                                _buildVideoControlButton(
+                                  icon: Icons.skip_previous,
+                                  onTap: () {
+                                    if (videoIndex > 0) {
+                                      syncVideoIndex(videoIndex - 1);
+                                      onVideoChanged(
+                                          data.lessonItem[videoIndex].url!);
+                                      ref
+                                          .read(lessonDataControllerProvider
+                                              .notifier)
+                                          .playPause(true);
+                                    } else {
+                                      toastInfo(
+                                          "You are at the beginning of the video list");
+                                    }
+                                  },
+                                ),
+                                _buildVideoControlButton(
+                                  icon: data.isPlay
+                                      ? Icons.pause
+                                      : Icons.play_arrow,
+                                  onTap: () {
+                                    if (data.isPlay) {
+                                      videoPlayerController?.pause();
+                                      ref
+                                          .read(lessonDataControllerProvider
+                                              .notifier)
+                                          .playPause(false);
+                                    } else {
+                                      videoPlayerController?.play();
+                                      ref
+                                          .read(lessonDataControllerProvider
+                                              .notifier)
+                                          .playPause(true);
+                                    }
+                                  },
+                                ),
+                                _buildVideoControlButton(
+                                  icon: Icons.skip_next,
+                                  onTap: () {
+                                    if (videoIndex <
+                                        data.lessonItem.length - 1) {
+                                      videoIndex++;
+                                      var videoUrl =
+                                          data.lessonItem[videoIndex].url;
+                                      ref
+                                          .read(lessonDataControllerProvider
+                                              .notifier)
+                                          .playNextVid(videoUrl!);
+                                      ref
+                                          .read(lessonDataControllerProvider
+                                              .notifier)
+                                          .playPause(true);
+                                    } else {
+                                      toastInfo(
+                                          "You have watched all the videos");
+                                    }
+                                  },
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: CourseDetailButton(
+                                text: 'Clear Analytics',
+                                onTap: () async {
+                                  if (currentVideoId != null) {
+                                    // Clear specific video analytics
+                                    await analyticsService.clearAnalyticsData(
+                                      courseId: courseId.toString(),
+                                      courseVideoId: currentVideoId!,
+                                    );
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
-                                          content: Text(
-                                              'All analytics data cleared!')),
+                                          content:
+                                              Text('Video Analytics Cleared!')),
                                     );
-                                  },
-                                  child: const Text('Clear All Analytics Data'),
-                                ),
+                                  } else {
+                                    // Show a message that no video is selected
+                                    ScaffoldMessenger.of(context).showSnackBar(
+                                      const SnackBar(
+                                          content: Text('No video selected')),
+                                    );
+                                  }
+                                },
+                                backgroundColor: Colors.redAccent,
+                                icon: Icons.clear,
+                              ),
+                            ),
+                            SizedBox(width: 10.w),
+                            Expanded(
+                              child: CourseDetailButton(
+                                text: 'View Analytics',
+                                onTap: () {
+                                  if (currentVideoId != null) {
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(builder: (context) {
+                                        // log("Current Video ID: $currentVideoId");
+                                        return VideoAnalyticsScreen2(
+                                          courseId: courseId.toString(),
+                                          videoId: currentVideoId!,
+                                          videoTitle:
+                                              data.lessonItem[videoIndex].name!,
+                                        );
+                                      }),
+                                    );
+                                  }
+                                },
+                                icon: Icons.analytics_outlined,
+                              ),
+                            ),
+                          ],
+                        ),
 
-                                ElevatedButton(
-                                    onPressed: () {
-                                      log("Current video id: $currentVideoId");
-                                      Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) =>
-                                              VideoAnalyticsScreen2(
-                                            courseId: courseId.toString(),
-                                            videoId: currentVideoId!,
-                                            videoTitle: data
-                                                .lessonItem[videoIndex].name!,
-                                          ),
-                                        ),
-                                      );
-                                    },
-                                    child: const Text('View Analytics')),
-
-                                ElevatedButton.icon(
-                                  onPressed: () =>
-                                      AnalyticsExportHandler.exportAnalytics(
-                                          context, ref),
-                                  icon: const Icon(Icons.download),
-                                  label: const Text('Export Analytics'),
-                                ),
-
-                                //video controls
-                                Padding(
-                                  padding: EdgeInsets.only(
-                                      left: 25.w, right: 25.w, top: 10.h),
-                                  child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.center,
-                                    children: [
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (videoIndex > 0) {
-                                            syncVideoIndex(videoIndex - 1);
-                                            onVideoChanged(data
-                                                .lessonItem[videoIndex].url!);
-                                            ref
-                                                .read(
-                                                    lessonDataControllerProvider
-                                                        .notifier)
-                                                .playPause(true);
-                                          } else {
-                                            toastInfo("No earlier videos");
-                                          }
-                                        },
-                                        child: AppImage(
-                                          width: 24.w,
-                                          height: 24.h,
-                                          imagePath: Img_Res.left,
-                                        ),
-                                      ),
-                                      SizedBox(
-                                        width: 15.h,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          if (data.isPlay) {
-                                            videoPlayerController?.pause();
-                                            ref
-                                                .read(
-                                                    lessonDataControllerProvider
-                                                        .notifier)
-                                                .playPause(false);
-                                          } else {
-                                            videoPlayerController?.play();
-                                            ref
-                                                .read(
-                                                    lessonDataControllerProvider
-                                                        .notifier)
-                                                .playPause(true);
-                                          }
-                                        },
-                                        child: data.isPlay
-                                            ? AppImage(
-                                                width: 24.w,
-                                                height: 24.h,
-                                                imagePath: Img_Res.pause,
-                                              )
-                                            : AppImage(
-                                                width: 24.w,
-                                                height: 24.h,
-                                                imagePath: Img_Res.play_Circle),
-                                      ),
-                                      SizedBox(
-                                        width: 15.h,
-                                      ),
-                                      GestureDetector(
-                                        onTap: () {
-                                          videoIndex = videoIndex + 1;
-                                          if (videoIndex >=
-                                              data.lessonItem.length) {
-                                            videoIndex =
-                                                data.lessonItem.length - 1;
-                                            toastInfo(
-                                                "You have seen all the videos");
-                                            return;
-                                          }
-                                          var videoUrl =
-                                              data.lessonItem[videoIndex].url;
-                                          ref
-                                              .read(lessonDataControllerProvider
-                                                  .notifier)
-                                              .playNextVid(videoUrl!);
-                                          ref
-                                              .read(lessonDataControllerProvider
-                                                  .notifier)
-                                              .playPause(true);
-                                        },
-                                        child: AppImage(
-                                          width: 24.w,
-                                          height: 24.h,
-                                          imagePath: Img_Res.right,
-                                        ),
-                                      )
-                                    ],
-                                  ),
-                                ),
-
-                                SizedBox(
-                                  height: 10.h,
-                                ),
-                                //video list
-                                Padding(
-                                  padding:
-                                      EdgeInsets.only(left: 25.w, right: 25.w),
-                                  child: LessonVideos(
-                                    lessonData: data.lessonItem,
-                                    ref: ref,
-                                    syncVidIndex: syncVideoIndex,
-                                    courseId: courseId,
-                                    lessonId: lessonId!,
-                                  ),
-                                )
-                              ],
-                            );
+                        CourseDetailButton(
+                          text: ' Analytics',
+                          onTap: () {
+                            if (currentVideoId != null) {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(builder: (context) {
+                                  // log("Current Video ID: $currentVideoId");
+                                  return const AnalyticsScreen();
+                                }),
+                              );
+                            }
                           },
-                          error: (e, t) => const Text("error"),
-                          loading: () => const Text("Loading")),
-                    ],
+                          icon: Icons.analytics_outlined,
+                        ),
+
+                        // Video List
+                        Padding(
+                          padding: EdgeInsets.only(top: 22.h),
+                          child: LessonVideos(
+                            lessonData: data.lessonItem,
+                            ref: ref,
+                            syncVidIndex: syncVideoIndex,
+                            courseId: courseId,
+                            lessonId: lessonId!,
+                          ),
+                        ),
+                      ],
+                    ),
                   ),
-                ),
-        ));
+                );
+              },
+              error: (e, t) => Text("Error: $e"),
+              loading: () => const Center(child: CircularProgressIndicator()),
+            ),
+    );
   }
 
-  String? currentVideoId;
+  Widget _buildVideoControlButton({
+    required IconData icon,
+    required VoidCallback onTap,
+  }) {
+    return GestureDetector(
+      onTap: onTap,
+      child: Container(
+        width: 50.w,
+        height: 50.h,
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [
+              AppColors.primaryElement,
+              AppColors.primaryElement.withOpacity(0.8),
+            ],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+          borderRadius: BorderRadius.circular(15.r),
+          boxShadow: [
+            BoxShadow(
+              color: AppColors.primaryElement.withOpacity(0.25),
+              blurRadius: 10,
+              offset: const Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Center(
+          child: Icon(
+            icon,
+            color: Colors.white,
+            size: 24.sp,
+          ),
+        ),
+      ),
+    );
+  }
 }
 
 class ClearVideoTimestampsButton extends StatefulWidget {

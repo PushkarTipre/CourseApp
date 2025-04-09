@@ -23,22 +23,21 @@ class ProfileImageWidget extends StatelessWidget {
             Navigator.of(context).pushNamed(AppRoutesName.EDIT_PROFILE);
           },
           child: Container(
-              alignment: Alignment.bottomRight,
-              width: 80.w,
-              height: 80.h,
-              decoration: profileImage.avatar == null
-                  ? BoxDecoration(
-                      color: Colors.blue,
-                      borderRadius: BorderRadius.circular(20.w),
-                      image: const DecorationImage(
-                          image: AssetImage(Img_Res.headPic)))
-                  : BoxDecoration(
-                      borderRadius: BorderRadius.circular(20.w),
-                      image: DecorationImage(
-                          image: NetworkImage(
-                              "${AppConstants.IMAGE_UPLOADS_PATH}${profileImage.avatar}"))),
-              child: AppImage(
-                  width: 25.w, height: 25.h, imagePath: Img_Res.edit_img)),
+            alignment: Alignment.bottomRight,
+            width: 80.w,
+            height: 80.h,
+            decoration: profileImage.avatar == null
+                ? BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20.w),
+                    image: const DecorationImage(
+                        image: AssetImage(Img_Res.headPic)))
+                : BoxDecoration(
+                    borderRadius: BorderRadius.circular(20.w),
+                    image: DecorationImage(
+                        image: NetworkImage(
+                            "${AppConstants.IMAGE_UPLOADS_PATH}${profileImage.avatar}"))),
+          ),
         );
       },
     );
@@ -77,7 +76,7 @@ class ProfileDescriptionWidget extends StatelessWidget {
           child: Text9Normal(
             text: profileName.description != null
                 ? "${profileName.description}"
-                : "Empty",
+                : "",
             color: AppColors.primarySecondaryElementText,
           ),
         );

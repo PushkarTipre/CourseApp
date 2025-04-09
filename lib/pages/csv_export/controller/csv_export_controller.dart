@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:io';
 
 import 'package:course_app/common/models/all_quiz_result.dart';
 import 'package:course_app/pages/csv_export/repo/csv_repo.dart';
@@ -21,6 +22,26 @@ Future<List<AllQuizResultData>?> csvExportQuizResultController(
     }
   } catch (e) {
     log("Error occurred while getting quiz result: $e");
+  }
+  return null;
+}
+
+@riverpod
+Future<Map<String, dynamic>?> csvUploadController(
+  CsvUploadControllerRef ref, {
+  required File csvFile,
+  required String userId,
+  Map<String, dynamic>? additionalData,
+}) async {
+  try {
+    final response = await CsvRepo.uploadCsvFile(
+      csvFile: csvFile,
+      userId: userId,
+      additionalData: additionalData,
+    );
+    return response;
+  } catch (e) {
+    log("Error occurred while uploading CSV file: $e");
   }
   return null;
 }

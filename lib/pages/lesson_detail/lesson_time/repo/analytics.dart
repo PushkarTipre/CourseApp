@@ -16,6 +16,8 @@ class VideoAnalyticsService {
   DateTime? _actualStartTime;
   bool _isCurrentSessionValid = false; // New flag to track session validity
 
+  String? _currentVideoId; // Track the current video being played
+
   VideoAnalyticsService(this._storage) {
     if (!_storage.isLoggedIn()) {
       throw Exception('User must be logged in to track video analytics');
@@ -36,9 +38,19 @@ class VideoAnalyticsService {
     };
   }
 
-  void logPlayStart() {
+  void logPlayStart({required String courseId, required String videoId}) {
     _actualStartTime = DateTime.now();
     _isCurrentSessionValid = true; // Mark session as valid when playback starts
+
+    // Track the current video ID
+    final userProfile = Global.storageService.getUserProfile();
+    _currentVideoId =
+        '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
+
+    // If this is a new video, ensure we treat it as a new session
+    if (_currentVideoId != _currentVideoId) {
+      _isNewScreenNavigation = true;
+    }
   }
 
   void onEnterVideoScreen() {
@@ -62,12 +74,25 @@ class VideoAnalyticsService {
       final userProfile = Global.storageService.getUserProfile();
       final uniqueVideoId =
           '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
+
+      // If video ID changed, force a new session
+      if (_currentVideoId != uniqueVideoId) {
+        _isNewScreenNavigation = true;
+        _currentVideoId = uniqueVideoId;
+      }
+
       final analytics = await _getVideoAnalytics(uniqueVideoId);
       final now = DateTime.now();
 
-      // Create new session if this is a new screen navigation
+      // Determine if we need a new session
+      bool needNewSession = analytics!.watchSessions.isEmpty ||
+          !_isCurrentSessionValid ||
+          _isNewScreenNavigation ||
+          _isVideoRestart;
+
       WatchSession currentSession;
-      if (analytics!.watchSessions.isEmpty || !_isCurrentSessionValid) {
+      if (needNewSession) {
+        // Create a new session
         currentSession = WatchSession(
             date: _formatDate(_actualStartTime ?? now), // Use actual start time
             startTime: _formatTimestamp(
@@ -76,44 +101,31 @@ class VideoAnalyticsService {
             pauseEvents: []);
         analytics.watchSessions.add(currentSession);
         _isCurrentSessionValid = true; // Mark the new session as valid
+        _isNewScreenNavigation = false; // Reset flag
+        _isVideoRestart = false; // Reset flag
       } else {
+        // Use the existing session
         currentSession = analytics.watchSessions.last;
-        if (_isNewScreenNavigation && _isVideoRestart) {
-          currentSession = WatchSession(
-              date:
-                  _formatDate(_actualStartTime ?? now), // Use actual start time
-              startTime: _formatTimestamp(
-                  _actualStartTime ?? now), // Use actual start time
-              endTime: _formatTimestamp(now), // Current time for end
-              pauseEvents: []);
-          analytics.watchSessions.add(currentSession);
-        }
       }
-/*
-if (currentSession.pauseEvents.isNotEmpty)
 
-
- */
-      // Reset the new screen navigation flag after handling session creation
-      _isNewScreenNavigation = false;
-      // Update session end time
-      final updatedSession = WatchSession(
-        date: _formatDate(_actualStartTime ?? now), // Use actual start time,
-        startTime: currentSession.startTime,
-        endTime: _formatTimestamp(now), // Use actual end time
-        pauseEvents: [
-          ...currentSession.pauseEvents,
-          PauseEvent(
-            timestamp: _formatTimestamp(now),
-            duration: _formatDuration(position),
-            videoProgress: (position.inSeconds / totalDuration.inSeconds) * 100,
-          ),
-        ],
+      // Create pause event
+      final pauseEvent = PauseEvent(
+        timestamp: _formatTimestamp(now),
+        duration: _formatDuration(position),
+        videoProgress: (position.inSeconds / totalDuration.inSeconds) * 100,
       );
 
-      final sessionIndex = analytics.watchSessions.length - 1;
+      // Update the session
+      final updatedSession = WatchSession(
+        date: currentSession.date,
+        startTime: currentSession.startTime,
+        endTime: _formatTimestamp(now), // Update end time to now
+        pauseEvents: [...currentSession.pauseEvents, pauseEvent],
+      );
+
+      // Update analytics with the modified session
       final updatedSessions = List<WatchSession>.from(analytics.watchSessions);
-      updatedSessions[sessionIndex] = updatedSession;
+      updatedSessions[updatedSessions.length - 1] = updatedSession;
 
       // Update analytics with new session
       final updatedAnalytics = VideoAnalytics(
@@ -121,11 +133,7 @@ if (currentSession.pauseEvents.isNotEmpty)
         courseId: courseId,
         courseVideoId: videoId,
         videoId: uniqueVideoId,
-        watchSessions: [
-          ...analytics.watchSessions
-              .sublist(0, analytics.watchSessions.length - 1),
-          updatedSession,
-        ],
+        watchSessions: updatedSessions,
         totalWatchTime: _formatDuration(position),
         pauseCount: analytics.pauseCount + 1,
       );
@@ -327,7 +335,8 @@ if (currentSession.pauseEvents.isNotEmpty)
     try {
       if (courseId != null && courseVideoId != null) {
         final userProfile = Global.storageService.getUserProfile();
-        final uniqueVideoId = '${userProfile.id}_${courseId}_$courseVideoId';
+        final uniqueVideoId =
+            '${userProfile.id}_${userProfile.name}_${courseId}_$courseVideoId';
         await _storage.remove('${_analyticsKey}_$uniqueVideoId');
         log('Cleared analytics for course $courseId, video $courseVideoId');
       }

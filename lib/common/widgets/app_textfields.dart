@@ -1,4 +1,3 @@
-import 'package:course_app/common/widgets/text_widget.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
@@ -15,6 +14,7 @@ class AppTextFields extends StatelessWidget {
     this.hintText = 'Enter your info',
     this.obscureText = false,
     this.func,
+    this.suffixIcon,
   });
 
   final TextEditingController? controller;
@@ -23,6 +23,7 @@ class AppTextFields extends StatelessWidget {
   final String hintText;
   final bool obscureText;
   final void Function(String value)? func;
+  final Widget? suffixIcon;
 
   @override
   Widget build(BuildContext context) {
@@ -31,26 +32,54 @@ class AppTextFields extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text14Normal(text: text),
-          SizedBox(
-            height: 5.h,
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 14.sp,
+              fontWeight: FontWeight.w500,
+              color: AppColors.primaryThreeElementText,
+              letterSpacing: 0.2,
+            ),
           ),
+          SizedBox(height: 8.h),
           Container(
             width: 325.w,
             height: 50.h,
-            //color: Colors.red,
-            decoration: appBoxDecorationTextField(),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(16.r),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.08),
+                  blurRadius: 12,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 3),
+                ),
+              ],
+              border: Border.all(
+                color: AppColors.primaryFourElementText.withOpacity(0.3),
+              ),
+            ),
             child: Row(
               children: [
                 Container(
                   margin: EdgeInsets.only(left: 17.w),
-                  child: AppImage(imagePath: iconName),
+                  child: AppImage(
+                    imagePath: iconName,
+                    width: 20.w,
+                    height: 20.h,
+                  ),
                 ),
-                AppTextFieldOnly(
+                SizedBox(width: 10.w),
+                Expanded(
+                  child: AppTextFieldOnly(
                     controller: controller,
                     hintText: hintText,
                     func: func,
-                    obscureText: obscureText),
+                    obscureText: obscureText,
+                  ),
+                ),
+                if (suffixIcon != null) suffixIcon!,
               ],
             ),
           ),
@@ -61,26 +90,37 @@ class AppTextFields extends StatelessWidget {
 }
 
 BoxDecoration appBoxDecorationTextField({
-  Color color = AppColors.primaryBackground,
-  Color borderColor = AppColors.primaryFourElementText,
-  double radius = 15,
+  Color color = Colors.white,
+  Color borderColor = Colors.transparent,
+  double radius = 16,
 }) {
   return BoxDecoration(
-      color: color,
-      borderRadius: BorderRadius.circular(radius),
-      border: Border.all(color: borderColor));
+    color: color,
+    borderRadius: BorderRadius.circular(radius.r),
+    border: Border.all(color: borderColor.withOpacity(0.3)),
+    boxShadow: [
+      BoxShadow(
+        color: Colors.black.withOpacity(0.08),
+        blurRadius: 12,
+        spreadRadius: 1,
+        offset: const Offset(0, 3),
+      ),
+    ],
+  );
 }
 
 class AppTextFieldOnly extends StatelessWidget {
-  const AppTextFieldOnly(
-      {super.key,
-      this.hintText = '',
-      this.width = 280,
-      this.height = 50,
-      this.controller,
-      this.search = false,
-      this.func,
-      this.obscureText = false});
+  const AppTextFieldOnly({
+    super.key,
+    this.hintText = '',
+    this.width = 280,
+    this.height = 50,
+    this.controller,
+    this.search = false,
+    this.func,
+    this.obscureText = false,
+  });
+
   final String hintText;
   final double width;
   final double height;
@@ -100,21 +140,106 @@ class AppTextFieldOnly extends StatelessWidget {
         onSubmitted: search == true ? (value) => func!(value) : null,
         textInputAction: TextInputAction.search,
         keyboardType: TextInputType.multiline,
+        style: TextStyle(
+          fontSize: 14.sp,
+          color: AppColors.primaryText,
+          fontWeight: FontWeight.w500,
+        ),
         decoration: InputDecoration(
           contentPadding: EdgeInsets.only(top: 5.h, left: 10.w),
           hintText: hintText,
+          hintStyle: TextStyle(
+            fontSize: 14.sp,
+            color: AppColors.primaryThreeElementText.withOpacity(0.5),
+            fontWeight: FontWeight.w400,
+          ),
           border: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
           enabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
           focusedBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
           disabledBorder: const OutlineInputBorder(
-              borderSide: BorderSide(color: Colors.transparent)),
+            borderSide: BorderSide(color: Colors.transparent),
+          ),
         ),
         maxLines: 1,
         autocorrect: false,
         obscureText: obscureText,
+      ),
+    );
+  }
+}
+
+class SearchTextField extends StatelessWidget {
+  const SearchTextField({
+    super.key,
+    this.controller,
+    this.hintText = 'Search...',
+    this.onSubmitted,
+    this.onChanged,
+  });
+
+  final TextEditingController? controller;
+  final String hintText;
+  final Function(String)? onSubmitted;
+  final Function(String)? onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: 325.w,
+      height: 50.h,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            spreadRadius: 1,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
+      child: Row(
+        children: [
+          Container(
+            margin: EdgeInsets.only(left: 17.w),
+            child: Icon(
+              Icons.search,
+              size: 20.sp,
+              color: AppColors.primaryThreeElementText,
+            ),
+          ),
+          SizedBox(width: 10.w),
+          Expanded(
+            child: TextField(
+              controller: controller,
+              onChanged: onChanged,
+              onSubmitted: onSubmitted,
+              textInputAction: TextInputAction.search,
+              style: TextStyle(
+                fontSize: 14.sp,
+                color: AppColors.primaryText,
+                fontWeight: FontWeight.w500,
+              ),
+              decoration: InputDecoration(
+                hintText: hintText,
+                hintStyle: TextStyle(
+                  fontSize: 14.sp,
+                  color: AppColors.primaryThreeElementText.withOpacity(0.5),
+                  fontWeight: FontWeight.w400,
+                ),
+                border: InputBorder.none,
+                contentPadding: EdgeInsets.only(top: 5.h, left: 10.w),
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

@@ -29,10 +29,10 @@ class HomeUserProfile extends _$HomeUserProfile {
   }
 }
 
-@Riverpod(keepAlive: true)
-class HomeCourseList extends _$HomeCourseList {
-  Future<List<CourseItem>?> fetchCourseList() async {
-    var result = await CourseAPI.courseList();
+@riverpod
+class PopularCourses extends _$PopularCourses {
+  Future<List<CourseItem>?> fetchPopularCourseList() async {
+    var result = await CourseAPI.popularCourses();
     if (result.code == 200) {
       return result.data;
     }
@@ -41,7 +41,23 @@ class HomeCourseList extends _$HomeCourseList {
 
   @override
   FutureOr<List<CourseItem>?> build() async {
-    return fetchCourseList();
+    return fetchPopularCourseList();
+  }
+}
+
+@riverpod
+class NewestCourses extends _$NewestCourses {
+  Future<List<CourseItem>?> fetchNewCoursesList() async {
+    var result = await CourseAPI.newestCourses();
+    if (result.code == 200) {
+      return result.data;
+    }
+    return null;
+  }
+
+  @override
+  FutureOr<List<CourseItem>?> build() async {
+    return fetchNewCoursesList();
   }
 }
 

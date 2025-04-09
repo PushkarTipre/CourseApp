@@ -132,7 +132,7 @@ class AppBoxDecorationImage extends StatelessWidget {
                       Flexible(
                         // Wrap FadeText in Flexible
                         child: FadeText(
-                          text: "${courseItem!.lesson_num!} Lessons",
+                          text: "${courseItem!.lesson_num!} Lessons" ?? "",
                           color: AppColors.primaryThreeElementText,
                           fontSize: 12.sp,
                         ),

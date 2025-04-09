@@ -197,21 +197,37 @@ final homeUserProfileProvider =
 );
 
 typedef _$HomeUserProfile = AutoDisposeAsyncNotifier<UserProfile>;
-String _$homeCourseListHash() => r'26c1cc848e76d9688be1994a1f463faf6d0f3981';
+String _$popularCoursesHash() => r'730945396ed155d5babadcd79488000d576fbb9d';
 
-/// See also [HomeCourseList].
-@ProviderFor(HomeCourseList)
-final homeCourseListProvider =
-    AsyncNotifierProvider<HomeCourseList, List<CourseItem>?>.internal(
-  HomeCourseList.new,
-  name: r'homeCourseListProvider',
+/// See also [PopularCourses].
+@ProviderFor(PopularCourses)
+final popularCoursesProvider = AutoDisposeAsyncNotifierProvider<PopularCourses,
+    List<CourseItem>?>.internal(
+  PopularCourses.new,
+  name: r'popularCoursesProvider',
   debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
       ? null
-      : _$homeCourseListHash,
+      : _$popularCoursesHash,
   dependencies: null,
   allTransitiveDependencies: null,
 );
 
-typedef _$HomeCourseList = AsyncNotifier<List<CourseItem>?>;
+typedef _$PopularCourses = AutoDisposeAsyncNotifier<List<CourseItem>?>;
+String _$newestCoursesHash() => r'539d860108338423051c2dcc014f5b66c7ff8686';
+
+/// See also [NewestCourses].
+@ProviderFor(NewestCourses)
+final newestCoursesProvider =
+    AutoDisposeAsyncNotifierProvider<NewestCourses, List<CourseItem>?>.internal(
+  NewestCourses.new,
+  name: r'newestCoursesProvider',
+  debugGetCreateSourceHash: const bool.fromEnvironment('dart.vm.product')
+      ? null
+      : _$newestCoursesHash,
+  dependencies: null,
+  allTransitiveDependencies: null,
+);
+
+typedef _$NewestCourses = AutoDisposeAsyncNotifier<List<CourseItem>?>;
 // ignore_for_file: type=lint
 // ignore_for_file: subtype_of_sealed_class, invalid_use_of_internal_member, invalid_use_of_visible_for_testing_member

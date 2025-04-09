@@ -1,10 +1,12 @@
 import 'dart:developer';
+import 'package:course_app/common/utils/app_colors.dart';
 import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/pages/mycourses/provider/mycourses_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
+import '../../../common/routes/app_routes_name.dart';
 import '../../../global.dart';
 
 class MyCourses extends ConsumerStatefulWidget {
@@ -55,7 +57,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
       body: myCoursesAsync.when(
         data: (myCourses) {
           if (myCourses!.isEmpty) {
-            return Center(child: Text('No courses found.'));
+            return const Center(child: Text('No courses found.'));
           }
 
           return RefreshIndicator(
@@ -90,57 +92,61 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                               final course = myCourses[index];
                               return Container(
                                 margin: EdgeInsets.symmetric(horizontal: 5.w),
-                                child: Stack(
-                                  children: [
-                                    // Course Image
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(15.r),
-                                        image: DecorationImage(
-                                          image: NetworkImage(
-                                              "${AppConstants.IMAGE_UPLOADS_PATH}${course.thumbnail}"),
-                                          fit: BoxFit.cover,
+                                child: InkWell(
+                                  onTap: () {
+                                    Navigator.of(context).pushNamed(
+                                        AppRoutesName.COURSE_DETAIL,
+                                        arguments: {"id": course.courseId});
+                                  },
+                                  child: Stack(
+                                    children: [
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15.r),
+                                          image: DecorationImage(
+                                            image: NetworkImage(
+                                                "${AppConstants.IMAGE_UPLOADS_PATH}${course.thumbnail}"),
+                                            fit: BoxFit.cover,
+                                          ),
                                         ),
                                       ),
-                                    ),
-                                    // Gradient Overlay
-                                    Container(
-                                      decoration: BoxDecoration(
-                                        borderRadius:
-                                            BorderRadius.circular(15.r),
-                                        gradient: LinearGradient(
-                                          begin: Alignment.topCenter,
-                                          end: Alignment.bottomCenter,
-                                          colors: [
-                                            Colors.transparent,
-                                            Colors.black.withOpacity(0.7),
+                                      Container(
+                                        decoration: BoxDecoration(
+                                          borderRadius:
+                                              BorderRadius.circular(15.r),
+                                          gradient: LinearGradient(
+                                            begin: Alignment.topCenter,
+                                            end: Alignment.bottomCenter,
+                                            colors: [
+                                              Colors.transparent,
+                                              Colors.black.withOpacity(0.7),
+                                            ],
+                                          ),
+                                        ),
+                                      ),
+                                      Positioned(
+                                        bottom: 20.h,
+                                        left: 20.w,
+                                        right: 20.w,
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              course.courseName,
+                                              style: TextStyle(
+                                                fontSize: 18.sp,
+                                                fontWeight: FontWeight.bold,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            SizedBox(height: 10.h),
                                           ],
                                         ),
                                       ),
-                                    ),
-                                    // Course Info
-                                    Positioned(
-                                      bottom: 20.h,
-                                      left: 20.w,
-                                      right: 20.w,
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            course.courseName,
-                                            style: TextStyle(
-                                              fontSize: 18.sp,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          SizedBox(height: 10.h),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                                    ],
+                                  ),
                                 ),
                               );
                             },
@@ -159,7 +165,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                                   decoration: BoxDecoration(
                                     shape: BoxShape.circle,
                                     color: currentPage == index
-                                        ? Theme.of(context).primaryColor
+                                        ? AppColors.primaryElement
                                         : Colors.grey.withOpacity(0.5),
                                   ),
                                 ),
@@ -203,7 +209,11 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                             color: Colors.transparent,
                             child: InkWell(
                               borderRadius: BorderRadius.circular(15.r),
-                              onTap: () {},
+                              onTap: () {
+                                Navigator.of(context).pushNamed(
+                                    AppRoutesName.COURSE_DETAIL,
+                                    arguments: {"id": course.courseId});
+                              },
                               child: Padding(
                                 padding: EdgeInsets.all(12.w),
                                 child: Row(
@@ -238,6 +248,15 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
                                             overflow: TextOverflow.ellipsis,
                                           ),
                                           SizedBox(height: 8.h),
+                                          Text(
+                                            course.description,
+                                            style: TextStyle(
+                                              fontSize: 14.sp,
+                                              color: Colors.grey,
+                                            ),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -258,7 +277,7 @@ class _MyCoursesState extends ConsumerState<MyCourses> {
         loading: () => const Center(child: CircularProgressIndicator()),
         error: (error, stackTrace) {
           log('Error loading courses: $error');
-          return Center(child: Text('Failed to load courses.'));
+          return const Center(child: Text('Failed to load courses.'));
         },
       ),
     );

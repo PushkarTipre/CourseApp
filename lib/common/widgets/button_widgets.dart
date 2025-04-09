@@ -11,6 +11,8 @@ class AppButton extends StatelessWidget {
   final double width;
   final double height;
   final bool isLogin;
+  final bool isOutlined;
+
   const AppButton({
     super.key,
     this.text = "",
@@ -18,6 +20,7 @@ class AppButton extends StatelessWidget {
     this.width = 325,
     this.height = 50,
     this.isLogin = true,
+    this.isOutlined = false,
   });
 
   @override
@@ -27,16 +30,37 @@ class AppButton extends StatelessWidget {
       child: Container(
         width: width.w,
         height: height.h,
-        decoration: appBoxShadow(
-          boxBorder: Border.all(color: AppColors.primaryFourElementText),
+        decoration: BoxDecoration(
           color: isLogin ? AppColors.primaryElement : Colors.white,
+          borderRadius: BorderRadius.circular(16.r),
+          border: isOutlined
+              ? Border.all(
+                  color: AppColors.primaryElement.withOpacity(0.3),
+                  width: 1.5,
+                )
+              : null,
+          boxShadow: [
+            BoxShadow(
+              color: isLogin
+                  ? AppColors.primaryElement.withOpacity(0.2)
+                  : Colors.black.withOpacity(0.08),
+              blurRadius: 15,
+              spreadRadius: 1,
+              offset: const Offset(0, 5),
+            ),
+          ],
         ),
         child: Center(
-            child: Text16Normal(
-                text: text,
-                color: isLogin
-                    ? AppColors.primaryBackground
-                    : AppColors.primaryElement)),
+          child: Text(
+            text,
+            style: TextStyle(
+              fontSize: 16.sp,
+              fontWeight: FontWeight.w600,
+              color: isLogin ? Colors.white : AppColors.primaryElement,
+              letterSpacing: 0.2,
+            ),
+          ),
+        ),
       ),
     );
   }

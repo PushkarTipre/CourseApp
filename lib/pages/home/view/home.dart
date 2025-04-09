@@ -21,6 +21,7 @@ class Home extends ConsumerStatefulWidget {
 class _HomeState extends ConsumerState<Home> {
   late PageController controller;
   String userToken = Global.storageService.getUserProfile().token ?? "";
+  int selectedIndex = 0;
 
   @override
   void didChangeDependencies() {
@@ -33,14 +34,23 @@ class _HomeState extends ConsumerState<Home> {
   @override
   Widget build(BuildContext context) {
     final purchasedCourses = ref.watch(purchasedCoursesProvider(userToken));
+    // Watch provider based on selectedIndex
+    final courses = selectedIndex == 0
+        ? ref.watch(popularCoursesProvider)
+        : ref.watch(newestCoursesProvider);
 
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: homeAppBar(ref),
       body: RefreshIndicator(
-        onRefresh: () {
-          ref.refresh(purchasedCoursesProvider(userToken));
-          return ref.refresh(homeCourseListProvider.notifier).fetchCourseList();
+        onRefresh: () async {
+          ref.invalidate(purchasedCoursesProvider(userToken));
+
+          if (selectedIndex == 0) {
+            ref.refresh(popularCoursesProvider);
+          } else {
+            ref.refresh(newestCoursesProvider);
+          }
         },
         child: Padding(
           padding: EdgeInsets.symmetric(horizontal: 25.w),
@@ -111,8 +121,16 @@ class _HomeState extends ConsumerState<Home> {
                   color: Colors.black,
                   fontSize: 20,
                 ),
-                const HomeMenuBar(),
-                CourseItemGrid(ref: ref),
+                HomeMenuBar(
+                  selectedIndex: selectedIndex,
+                  onTabChanged: (index) {
+                    setState(() {
+                      log("Selected Index: $index");
+                      selectedIndex = index;
+                    });
+                  },
+                ),
+                CourseItemGrid(ref: ref, courses: courses),
                 // banner(ref: ref, controller: controller)
               ],
             ),

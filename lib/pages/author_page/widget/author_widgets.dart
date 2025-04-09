@@ -1,14 +1,11 @@
 import 'package:course_app/common/models/course_enties.dart';
 import 'package:course_app/common/utils/constants.dart';
 import 'package:course_app/common/utils/img_res.dart';
-import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../common/utils/app_colors.dart';
-import '../../../common/widgets/app_shadows.dart';
 import '../../../common/widgets/image_widgets.dart';
-import '../../../common/widgets/text_widget.dart';
 
 class AuthorMenu extends StatelessWidget {
   const AuthorMenu({super.key, required this.authorInfo});
@@ -16,102 +13,155 @@ class AuthorMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
-      width: 325.w,
+    return Container(
+      width: 340.w,
       height: 220.h,
       child: Stack(
         children: [
+          // Background Image
           Container(
-            width: 325.w,
+            width: 340.w,
             height: 160.h,
             decoration: BoxDecoration(
-              borderRadius: BorderRadius.circular(20.h),
+              borderRadius: BorderRadius.circular(20.r),
               image: DecorationImage(
-                fit: BoxFit.fitWidth,
+                fit: BoxFit.cover,
                 image: AssetImage(Img_Res.background),
               ),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withOpacity(0.1),
+                  blurRadius: 15,
+                  spreadRadius: 1,
+                  offset: const Offset(0, 5),
+                ),
+              ],
             ),
           ),
+          // Author Card
           Positioned(
-              bottom: 0,
-              left: 0,
-              child: Container(
-                width: 325.w,
-                margin: EdgeInsets.only(left: 20.h),
-                child: Row(
-                  children: [
-                    Container(
-                      width: 80.w,
-                      height: 80.h,
-                      decoration: BoxDecoration(
-                        color: Colors.blue,
-                        borderRadius: BorderRadius.circular(20.w),
-                        image: DecorationImage(
-                          fit: BoxFit.fill,
-                          image: NetworkImage(
-                              "${AppConstants.IMAGE_UPLOADS_PATH}${authorInfo.avatar}"),
+            bottom: 0,
+            left: 20.w,
+            right: 20.w,
+            child: Container(
+              padding: EdgeInsets.all(16.r),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(16.r),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.08),
+                    blurRadius: 12,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 3),
+                  ),
+                ],
+              ),
+              child: Row(
+                children: [
+                  // Author Avatar
+                  Container(
+                    width: 80.w,
+                    height: 80.h,
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(16.r),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.1),
+                          blurRadius: 8,
+                          offset: const Offset(0, 2),
+                        ),
+                      ],
+                    ),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(16.r),
+                      child: Image.network(
+                        "${AppConstants.IMAGE_UPLOADS_PATH}${authorInfo.avatar}",
+                        fit: BoxFit.cover,
+                        errorBuilder: (context, error, stackTrace) => Container(
+                          color: AppColors.primaryElement.withOpacity(0.2),
+                          child: Icon(
+                            Icons.person,
+                            color: AppColors.primaryElement,
+                            size: 40.sp,
+                          ),
                         ),
                       ),
                     ),
-                    Column(
+                  ),
+                  SizedBox(width: 16.w),
+                  // Author Details
+                  Expanded(
+                    child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Container(
-                            margin: EdgeInsets.only(left: 6.w),
-                            child: Text13Normal(
-                              text: "${authorInfo.name}",
-                            )),
-                        Container(
-                            margin: EdgeInsets.only(left: 6.w),
-                            child: Text9Normal(
-                              text: authorInfo.job ?? "",
-                            )),
-                        SizedBox(
-                          height: 5.h,
+                        Text(
+                          authorInfo.name ?? "Author",
+                          style: TextStyle(
+                            fontSize: 18.sp,
+                            fontWeight: FontWeight.w700,
+                            color: AppColors.primaryText,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
                         ),
-                        const Row(
-                          mainAxisAlignment: MainAxisAlignment.start,
-                          children: [
-                            AuthorTextAndIcon(
-                                text: "10", icon: Img_Res.people, first: true),
-                            AuthorTextAndIcon(
-                                text: "90", icon: Img_Res.star, first: false),
-                            AuthorTextAndIcon(
-                                text: "12",
-                                icon: Img_Res.downloadDetail,
-                                first: false)
-                          ],
-                        )
+                        SizedBox(height: 4.h),
+                        Text(
+                          authorInfo.job ?? "Professional",
+                          style: TextStyle(
+                            fontSize: 14.sp,
+                            fontWeight: FontWeight.w500,
+                            color: AppColors.primaryThreeElementText,
+                            letterSpacing: 0.2,
+                          ),
+                          maxLines: 1,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                        SizedBox(height: 10.h),
+
+                        // Row(
+                        //   children: [
+                        //     _buildStatItem(Img_Res.people, "10", true),
+                        //     _buildStatItem(Img_Res.star, "90", false),
+                        //     _buildStatItem(Img_Res.downloadDetail, "12", false),
+                        //   ],
+                        // ),
                       ],
-                    )
-                  ],
-                ),
-              ))
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
         ],
       ),
     );
   }
-}
 
-class AuthorTextAndIcon extends StatelessWidget {
-  const AuthorTextAndIcon(
-      {super.key, required this.text, required this.icon, required this.first});
-
-  final String text;
-  final String icon;
-  final bool first;
-
-  @override
-  Widget build(BuildContext context) {
+  Widget _buildStatItem(String icon, String text, bool isFirst) {
     return Container(
-      margin: EdgeInsets.only(left: first == true ? 3.w : 20.w),
+      margin: EdgeInsets.only(right: 16.w),
+      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
+      decoration: BoxDecoration(
+        color: AppColors.primaryElement.withOpacity(0.1),
+        borderRadius: BorderRadius.circular(20.r),
+      ),
       child: Row(
         children: [
-          AppImage(imagePath: icon),
-          Text11Normal(
-            text: text,
-            color: AppColors.primaryThreeElementText,
-          )
+          AppImage(
+            imagePath: icon,
+            width: 16.w,
+            height: 16.h,
+          ),
+          SizedBox(width: 6.w),
+          Text(
+            text,
+            style: TextStyle(
+              fontSize: 13.sp,
+              fontWeight: FontWeight.w600,
+              color: AppColors.primaryElement,
+            ),
+          ),
         ],
       ),
     );
@@ -125,23 +175,56 @@ class AuthorDescription extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      width: 325.w,
-      margin: EdgeInsets.only(top: 10.h),
+      width: 340.w,
+      margin: EdgeInsets.only(top: 20.h),
+      padding: EdgeInsets.all(16.r),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(16.r),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 12,
+            spreadRadius: 1,
+            offset: const Offset(0, 3),
+          ),
+        ],
+      ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text16Normal(
-            text: "About me",
-            color: AppColors.primaryText,
-            weight: FontWeight.bold,
+          Row(
+            children: [
+              Container(
+                height: 20.h,
+                width: 4.w,
+                decoration: BoxDecoration(
+                  color: AppColors.primaryElement,
+                  borderRadius: BorderRadius.circular(2.r),
+                ),
+              ),
+              SizedBox(width: 8.w),
+              Text(
+                "About Me",
+                style: TextStyle(
+                  fontSize: 18.sp,
+                  fontWeight: FontWeight.w800,
+                  color: AppColors.primaryText,
+                  letterSpacing: 0.3,
+                ),
+              ),
+            ],
           ),
-          Container(
-            margin: EdgeInsets.only(top: 8.h),
-            child: Text11Normal(
-              text: authorInfo.description ?? "",
+          SizedBox(height: 12.h),
+          Text(
+            authorInfo.description ?? "No description available",
+            style: TextStyle(
+              fontSize: 14.sp,
+              height: 1.5,
               color: AppColors.primaryThreeElementText,
+              letterSpacing: 0.2,
             ),
-          )
+          ),
         ],
       ),
     );
@@ -158,85 +241,276 @@ class AuthorCourses extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    //log("My course data: ${lessonData.length}");
     return Container(
-      margin: EdgeInsets.only(top: 20.h),
+      margin: EdgeInsets.only(top: 20.h, bottom: 25.h),
+      width: 340.w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          authorCourseList.isNotEmpty
-              ? const Text14Normal(
-                  text: "Lessons List",
-                  color: AppColors.primaryText,
-                  weight: FontWeight.bold,
-                )
-              : const SizedBox(),
-          SizedBox(
-            height: 10.h,
-          ),
-          ListView.builder(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            itemCount: authorCourseList.length,
-            itemBuilder: (_, index) {
-              return Container(
-                margin: EdgeInsets.only(top: 10.h),
-                padding: EdgeInsets.symmetric(horizontal: 10.w),
-                width: 325.w,
-                height: 80.h,
-                decoration: appBoxShadow(
-                  radius: 10.w,
-                  color: const Color.fromRGBO(255, 255, 255, 1),
-                  bR: 3,
-                  sR: 2,
+          if (authorCourseList.isNotEmpty) ...[
+            Row(
+              children: [
+                Container(
+                  height: 22.h,
+                  width: 5.w,
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryElement,
+                    borderRadius: BorderRadius.circular(2.5.r),
+                  ),
                 ),
-                child: InkWell(
-                  onTap: () {
-                    Navigator.of(context).pushNamed("/course_detail",
-                        arguments: {"id": authorCourseList[index].id});
-                  },
-                  child: Row(
-                    children: [
-                      AppBoxDecorationImage(
-                        height: 60.h,
-                        width: 60.w,
-                        imagePath:
-                            "${AppConstants.IMAGE_UPLOADS_PATH}${authorCourseList[index].thumbnail}",
-                        fit: BoxFit.fill,
+                SizedBox(width: 10.w),
+                Text(
+                  "Author Courses",
+                  style: TextStyle(
+                    fontSize: 20.sp,
+                    fontWeight: FontWeight.w800,
+                    color: AppColors.primaryText,
+                    letterSpacing: 0.3,
+                  ),
+                ),
+                Spacer(),
+                Container(
+                  padding: EdgeInsets.symmetric(
+                    horizontal: 12.w,
+                    vertical: 6.h,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.primaryElement.withOpacity(0.1),
+                    borderRadius: BorderRadius.circular(20.r),
+                  ),
+                  child: Text(
+                    "${authorCourseList.length} Courses",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      fontWeight: FontWeight.w600,
+                      color: AppColors.primaryElement,
+                    ),
+                  ),
+                ),
+              ],
+            ),
+            SizedBox(height: 20.h),
+          ],
+
+          if (authorCourseList.isEmpty)
+            Container(
+              width: 340.w,
+              height: 180.h,
+              decoration: BoxDecoration(
+                color: Colors.grey.shade50,
+                borderRadius: BorderRadius.circular(20.r),
+                border: Border.all(
+                  color: Colors.grey.shade200,
+                  width: 1,
+                ),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.03),
+                    blurRadius: 15,
+                    spreadRadius: 1,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              alignment: Alignment.center,
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  Container(
+                    width: 70.w,
+                    height: 70.h,
+                    decoration: BoxDecoration(
+                      color: Colors.grey.shade100,
+                      shape: BoxShape.circle,
+                    ),
+                    alignment: Alignment.center,
+                    child: Icon(
+                      Icons.book_outlined,
+                      size: 36.sp,
+                      color: Colors.grey.shade400,
+                    ),
+                  ),
+                  SizedBox(height: 15.h),
+                  Text(
+                    "No courses available",
+                    style: TextStyle(
+                      fontSize: 17.sp,
+                      color: Colors.grey.shade600,
+                      fontWeight: FontWeight.w600,
+                      letterSpacing: 0.3,
+                    ),
+                  ),
+                  SizedBox(height: 6.h),
+                  Text(
+                    "Author hasn't published any courses yet",
+                    style: TextStyle(
+                      fontSize: 14.sp,
+                      color: Colors.grey.shade500,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+
+          // Course List with improved styling
+          if (authorCourseList.isNotEmpty)
+            ListView.builder(
+              shrinkWrap: true,
+              physics: const NeverScrollableScrollPhysics(),
+              itemCount: authorCourseList.length,
+              itemBuilder: (_, index) {
+                final course = authorCourseList[index];
+                return Container(
+                  margin: EdgeInsets.only(bottom: 15.h),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(18.r),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.06),
+                        blurRadius: 12,
+                        spreadRadius: 0,
+                        offset: const Offset(0, 3),
                       ),
-                      SizedBox(
-                        width: 10.w,
-                      ),
-                      Expanded(
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          crossAxisAlignment: CrossAxisAlignment.start,
+                    ],
+                  ),
+                  child: Material(
+                    color: Colors.transparent,
+                    borderRadius: BorderRadius.circular(18.r),
+                    child: InkWell(
+                      borderRadius: BorderRadius.circular(18.r),
+                      onTap: () {
+                        Navigator.of(context).pushNamed(
+                          "/course_detail",
+                          arguments: {"id": course.id},
+                        );
+                      },
+                      child: Padding(
+                        padding: EdgeInsets.all(14.r),
+                        child: Row(
                           children: [
-                            Text13Normal(
-                              text: authorCourseList[index].name ??
-                                  "No Name Available",
-                              color: AppColors.primaryText,
+                            // Course Thumbnail
+                            Container(
+                              height: 80.h,
+                              width: 80.w,
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(14.r),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withOpacity(0.15),
+                                    blurRadius: 10,
+                                    spreadRadius: 0,
+                                    offset: const Offset(0, 3),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(14.r),
+                                child: Image.network(
+                                  "${AppConstants.IMAGE_UPLOADS_PATH}${course.thumbnail}",
+                                  fit: BoxFit.cover,
+                                  errorBuilder: (context, error, stackTrace) =>
+                                      Container(
+                                    color: Colors.grey.shade200,
+                                    child: Icon(
+                                      Icons.book,
+                                      color: AppColors.primaryElement,
+                                      size: 32.sp,
+                                    ),
+                                  ),
+                                ),
+                              ),
                             ),
-                            Text10Normal(
-                              text:
-                                  "There are ${authorCourseList[index].lesson_num} lessons",
-                              color: AppColors.primaryText,
+                            SizedBox(width: 16.w),
+
+                            // Course details
+                            Expanded(
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Text(
+                                    course.name ?? "No Name Available",
+                                    style: TextStyle(
+                                      fontSize: 16.sp,
+                                      fontWeight: FontWeight.w700,
+                                      color: AppColors.primaryText,
+                                      height: 1.3,
+                                    ),
+                                    maxLines: 1,
+                                    overflow: TextOverflow.ellipsis,
+                                  ),
+                                  SizedBox(height: 8.h),
+                                  Row(
+                                    children: [
+                                      Container(
+                                        padding: EdgeInsets.symmetric(
+                                          horizontal: 10.w,
+                                          vertical: 4.h,
+                                        ),
+                                        decoration: BoxDecoration(
+                                          color: AppColors.primaryElement
+                                              .withOpacity(0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(12.r),
+                                        ),
+                                        child: Text(
+                                          "${course.lesson_num} Lessons",
+                                          style: TextStyle(
+                                            fontSize: 12.sp,
+                                            fontWeight: FontWeight.w600,
+                                            color: AppColors.primaryElement,
+                                          ),
+                                        ),
+                                      ),
+                                      SizedBox(width: 8.w),
+                                      if (course.is_free == 1)
+                                        Container(
+                                          padding: EdgeInsets.symmetric(
+                                            horizontal: 10.w,
+                                            vertical: 4.h,
+                                          ),
+                                          decoration: BoxDecoration(
+                                            color: Colors.green.shade100,
+                                            borderRadius:
+                                                BorderRadius.circular(12.r),
+                                          ),
+                                          child: Text(
+                                            "Free",
+                                            style: TextStyle(
+                                              fontSize: 12.sp,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green.shade700,
+                                            ),
+                                          ),
+                                        ),
+                                    ],
+                                  ),
+                                ],
+                              ),
+                            ),
+
+                            // Right arrow
+                            Container(
+                              width: 36.w,
+                              height: 36.h,
+                              decoration: BoxDecoration(
+                                color: Colors.grey.shade100,
+                                shape: BoxShape.circle,
+                              ),
+                              child: Icon(
+                                Icons.arrow_forward_ios,
+                                size: 14.sp,
+                                color: Colors.grey.shade600,
+                              ),
                             ),
                           ],
                         ),
                       ),
-                      //Expanded(child: Container()),
-                      // AppImage(
-                      //   imagePath: Img_Res.arrowRight,
-                      //   width: 24.w,
-                      //   height: 24.h,
-                      // )
-                    ],
+                    ),
                   ),
-                ),
-              );
-            },
-          )
+                );
+              },
+            ),
         ],
       ),
     );

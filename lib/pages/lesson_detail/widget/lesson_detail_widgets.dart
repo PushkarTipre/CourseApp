@@ -49,7 +49,6 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
     return lesson.quiz != null || lesson.quiz_json != null;
   }
 
-  // Function to play video
   void playVideo(int index) {
     widget.syncVidIndex?.call(index);
     var vidUrl = widget.lessonData[index].url;
@@ -57,14 +56,12 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
   }
 
   void _showResultsDialog(int score) {
-    // Initialize the animation controller
     dialogController.forward();
 
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => WillPopScope(
-        // Prevent back button from dismissing until animation completes
         onWillPop: () async => false,
         child: ScaleTransition(
           scale: dialogAnimation,
@@ -220,8 +217,6 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                   // Close loading dialog in case of error
                   Navigator.of(context).pop();
 
-                  // Log error and show user-friendly message
-                  print("Quiz Start Error: $e");
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
                         content:
@@ -415,7 +410,6 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                   ),
                 ),
               ),
-              // Separate clickable arrow for quiz
               if (quizAvailable)
                 InkWell(
                   onTap: () => openQuiz(index),

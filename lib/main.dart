@@ -1,4 +1,3 @@
-
 import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
 
@@ -17,6 +16,7 @@ Future<void> main() async {
   await Global.init();
   //HttpUtil().post("api/login");
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
+
   runApp(const ProviderScope(child: MyApp()));
 }
 
