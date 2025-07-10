@@ -155,23 +155,17 @@ ErrorEntity createErrorEntity(DioException error) {
 }
 
 void onError(ErrorEntity eInfo) {
-  print("Error Code: ${eInfo.code}");
-  print("Error Message: ${eInfo.message}");
   switch (eInfo.code) {
     case 401:
-      print("Permission denied cannot continue ahead!!");
       break;
     case 403:
       log("Forbidden");
       break;
     case 404:
-      print("Not found");
       break;
     case 500:
-      print("Internal server error");
       break;
     default:
-      print("Unknown error");
       break;
   }
 }

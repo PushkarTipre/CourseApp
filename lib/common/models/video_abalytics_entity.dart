@@ -9,6 +9,7 @@ class VideoAnalytics {
   final String totalWatchTime;
   final int pauseCount;
   final UserProfile userProfile;
+  final int totalVideosInCourse;
   VideoAnalytics({
     required this.courseId,
     required this.courseVideoId,
@@ -17,6 +18,7 @@ class VideoAnalytics {
     required this.totalWatchTime,
     required this.pauseCount,
     required this.userProfile,
+    required this.totalVideosInCourse,
   });
 
   Map<String, dynamic> toJson() => {
@@ -28,6 +30,7 @@ class VideoAnalytics {
         'totalWatchTime': totalWatchTime,
         'pauseCount': pauseCount,
         'userProfile': userProfile.toJson(),
+        'totalVideosInCourse': totalVideosInCourse,
       };
 
   factory VideoAnalytics.fromJson(Map<String, dynamic> json) => VideoAnalytics(
@@ -40,5 +43,6 @@ class VideoAnalytics {
         totalWatchTime: json['totalWatchTime'],
         pauseCount: json['pauseCount'],
         userProfile: UserProfile.fromJson(json['userProfile']),
+        totalVideosInCourse: json['totalVideosInCourse'],
       );
 }

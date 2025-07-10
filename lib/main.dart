@@ -2,6 +2,7 @@ import 'package:course_app/common/routes/routes.dart';
 import 'package:course_app/common/utils/app_styles.dart';
 
 import 'package:course_app/global.dart';
+import 'package:course_app/pages/csv_export/view/csv_export.dart';
 
 import 'package:firebase_crashlytics/firebase_crashlytics.dart';
 
@@ -14,7 +15,11 @@ Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   WebViewPlatform.instance = WebViewPlatform.instance;
   await Global.init();
+  initializeBackgroundTasks();
   //HttpUtil().post("api/login");
+
+  // Initialize Firebase and the background analytics service silently
+
   FirebaseCrashlytics.instance.setCrashlyticsCollectionEnabled(true);
 
   runApp(const ProviderScope(child: MyApp()));

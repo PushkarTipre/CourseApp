@@ -5,7 +5,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 import '../../../common/utils/app_colors.dart';
-import '../../../common/widgets/image_widgets.dart';
 
 class AuthorMenu extends StatelessWidget {
   const AuthorMenu({super.key, required this.authorInfo});
@@ -13,9 +12,9 @@ class AuthorMenu extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return SizedBox(
       width: 340.w,
-      height: 220.h,
+      height: 210.h,
       child: Stack(
         children: [
           // Background Image
@@ -24,7 +23,7 @@ class AuthorMenu extends StatelessWidget {
             height: 160.h,
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(20.r),
-              image: DecorationImage(
+              image: const DecorationImage(
                 fit: BoxFit.cover,
                 image: AssetImage(Img_Res.background),
               ),
@@ -77,7 +76,7 @@ class AuthorMenu extends StatelessWidget {
                       borderRadius: BorderRadius.circular(16.r),
                       child: Image.network(
                         "${AppConstants.IMAGE_UPLOADS_PATH}${authorInfo.avatar}",
-                        fit: BoxFit.cover,
+                        fit: BoxFit.fill,
                         errorBuilder: (context, error, stackTrace) => Container(
                           color: AppColors.primaryElement.withOpacity(0.2),
                           child: Icon(
@@ -137,99 +136,70 @@ class AuthorMenu extends StatelessWidget {
       ),
     );
   }
-
-  Widget _buildStatItem(String icon, String text, bool isFirst) {
-    return Container(
-      margin: EdgeInsets.only(right: 16.w),
-      padding: EdgeInsets.symmetric(horizontal: 10.w, vertical: 6.h),
-      decoration: BoxDecoration(
-        color: AppColors.primaryElement.withOpacity(0.1),
-        borderRadius: BorderRadius.circular(20.r),
-      ),
-      child: Row(
-        children: [
-          AppImage(
-            imagePath: icon,
-            width: 16.w,
-            height: 16.h,
-          ),
-          SizedBox(width: 6.w),
-          Text(
-            text,
-            style: TextStyle(
-              fontSize: 13.sp,
-              fontWeight: FontWeight.w600,
-              color: AppColors.primaryElement,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
 }
 
-class AuthorDescription extends StatelessWidget {
-  const AuthorDescription({super.key, required this.authorInfo});
-  final AuthorItem authorInfo;
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: 340.w,
-      margin: EdgeInsets.only(top: 20.h),
-      padding: EdgeInsets.all(16.r),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(16.r),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 12,
-            spreadRadius: 1,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: [
-              Container(
-                height: 20.h,
-                width: 4.w,
-                decoration: BoxDecoration(
-                  color: AppColors.primaryElement,
-                  borderRadius: BorderRadius.circular(2.r),
-                ),
-              ),
-              SizedBox(width: 8.w),
-              Text(
-                "About Me",
-                style: TextStyle(
-                  fontSize: 18.sp,
-                  fontWeight: FontWeight.w800,
-                  color: AppColors.primaryText,
-                  letterSpacing: 0.3,
-                ),
-              ),
-            ],
-          ),
-          SizedBox(height: 12.h),
-          Text(
-            authorInfo.description ?? "No description available",
-            style: TextStyle(
-              fontSize: 14.sp,
-              height: 1.5,
-              color: AppColors.primaryThreeElementText,
-              letterSpacing: 0.2,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-}
+// class AuthorDescription extends StatelessWidget {
+//   const AuthorDescription({super.key, required this.authorInfo});
+//   final AuthorItem authorInfo;
+//
+//   @override
+//   Widget build(BuildContext context) {
+//     return Container(
+//       width: 340.w,
+//       margin: EdgeInsets.only(top: 20.h),
+//       padding: EdgeInsets.all(16.r),
+//       decoration: BoxDecoration(
+//         color: Colors.white,
+//         borderRadius: BorderRadius.circular(16.r),
+//         boxShadow: [
+//           BoxShadow(
+//             color: Colors.black.withOpacity(0.05),
+//             blurRadius: 12,
+//             spreadRadius: 1,
+//             offset: const Offset(0, 3),
+//           ),
+//         ],
+//       ),
+//       child: Column(
+//         crossAxisAlignment: CrossAxisAlignment.start,
+//         children: [
+//           Row(
+//             children: [
+//               Container(
+//                 height: 20.h,
+//                 width: 4.w,
+//                 decoration: BoxDecoration(
+//                   color: AppColors.primaryElement,
+//                   borderRadius: BorderRadius.circular(2.r),
+//                 ),
+//               ),
+//               // SizedBox(width: 8.w),
+//               // Text(
+//               //   "About Me",
+//               //   style: TextStyle(
+//               //     fontSize: 18.sp,
+//               //     fontWeight: FontWeight.w800,
+//               //     color: AppColors.primaryText,
+//               //     letterSpacing: 0.3,
+//               //   ),
+//               // ),
+//             ],
+//           ),
+//           // SizedBox(height: 12.h),
+//           // Text(
+//           //   authorInfo.description ?? "No description available",
+//           //   style: TextStyle(
+//           //     fontSize: 14.sp,
+//           //     height: 1.5,
+//           //     color: AppColors.primaryThreeElementText,
+//           //     letterSpacing: 0.2,
+//           //   ),
+//           // ),
+//         ],
+//       ),
+//     );
+//   }
+// }
 
 class AuthorCourses extends StatelessWidget {
   final List<CourseItem> authorCourseList;
@@ -268,7 +238,7 @@ class AuthorCourses extends StatelessWidget {
                     letterSpacing: 0.3,
                   ),
                 ),
-                Spacer(),
+                const Spacer(),
                 Container(
                   padding: EdgeInsets.symmetric(
                     horizontal: 12.w,

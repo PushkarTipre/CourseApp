@@ -465,7 +465,8 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                                               Colors.green.shade100;
                                           borderColor = Colors.green;
                                           textColor = Colors.green.shade900;
-                                          resultIcon = Icon(Icons.check_circle,
+                                          resultIcon = const Icon(
+                                              Icons.check_circle,
                                               color: Colors.green);
                                         }
 
@@ -475,7 +476,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                                           backgroundColor = Colors.red.shade100;
                                           borderColor = Colors.red;
                                           textColor = Colors.red.shade900;
-                                          resultIcon = Icon(Icons.cancel,
+                                          resultIcon = const Icon(Icons.cancel,
                                               color: Colors.red);
                                         }
                                       } else if (isSelected) {
@@ -526,7 +527,7 @@ class _QuizScreenState extends ConsumerState<QuizScreen>
                                           ),
                                         ),
                                       );
-                                    }).toList(),
+                                    }),
                                     SizedBox(height: 10.h),
                                   ],
                                 ),

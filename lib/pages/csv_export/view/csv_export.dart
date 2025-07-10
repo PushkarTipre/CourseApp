@@ -2,35 +2,144 @@ import 'dart:convert';
 import 'dart:developer';
 import 'dart:io';
 import 'package:course_app/global.dart';
+import 'package:course_app/pages/csv_export/controller/csv_export_controller.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:path/path.dart' as path;
 import 'package:intl/intl.dart';
+import 'package:workmanager/workmanager.dart';
 
 import '../../../common/models/all_quiz_result.dart';
-import '../controller/csv_export_controller.dart';
 
-class AnalyticsScreen extends ConsumerWidget {
-  const AnalyticsScreen({super.key});
+// Define a unique background task name
+const String backgroundExportTaskName = 'automatedAnalyticsExportTask';
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    return Scaffold(
-      appBar: AppBar(
-        title: const Text('Video Analytics'),
-      ),
-      body: Center(
-        child: ElevatedButton(
-          onPressed: () => AnalyticsExportHandler.exportAnalytics(context, ref),
-          child: const Text('Export Analytics'),
-        ),
-      ),
-    );
+// Initialize WorkManager in your app's main.dart file
+void initializeBackgroundTasks() {
+  Workmanager().initialize(
+    callbackDispatcher,
+    isInDebugMode: false, // Set to false in production
+  );
+
+  // Schedule the daily export task
+  scheduleAnalyticsExport();
+}
+
+// The callback function that will be executed in the background
+@pragma('vm:entry-point')
+void callbackDispatcher() {
+  Global.init();
+  Workmanager().executeTask((taskName, inputData) async {
+    try {
+      await Global.init();
+      if (taskName == backgroundExportTaskName) {
+        log('Executing background analytics export task');
+
+        // Get an instance of ProviderContainer for accessing providers
+        final container = ProviderContainer();
+
+        // Export and upload the analytics
+        await AutomatedAnalyticsService.exportAndUploadAnalytics(container);
+
+        // Dispose of the container after use
+        container.dispose();
+
+        log('Background analytics export task completed successfully');
+      }
+      return Future.value(true);
+    } catch (e) {
+      log('Error in background task: $e');
+      return Future.value(false);
+    }
+  });
+}
+
+// Function to schedule export task to run every minute
+void scheduleAnalyticsExport() {
+  // Cancel any existing tasks with the same name
+  Workmanager().cancelByUniqueName(backgroundExportTaskName);
+
+  // Schedule a periodic task to run every 15 minutes (minimum allowed by WorkManager)
+  Workmanager().registerPeriodicTask(
+    backgroundExportTaskName,
+    backgroundExportTaskName,
+    frequency: const Duration(
+        minutes: 1), // This is the minimum allowed by WorkManager
+    existingWorkPolicy: ExistingWorkPolicy.replace,
+    constraints: Constraints(
+      networkType: NetworkType.connected, // Require internet connectivity
+    ),
+  );
+
+  log('Scheduled analytics export to run every 15 minutes');
+}
+
+// Service class for automated analytics processing
+class AutomatedAnalyticsService {
+  // In the AutomatedAnalyticsService class
+  static Future<void> exportAndUploadAnalytics(
+      ProviderContainer container) async {
+    try {
+      log('Starting analytics export and upload process');
+      final now = DateTime.now();
+      final formattedTime = DateFormat('yyyy-MM-dd HH:mm:ss').format(now);
+      log('[Upload Started] Time: $formattedTime — Starting analytics export and upload process');
+
+      // Check if there's any data to export
+      final prefs = await SharedPreferences.getInstance();
+      final analyticsKeys = prefs
+          .getKeys()
+          .where((key) => key.startsWith('video_analysis_data_'))
+          .toList();
+
+      log('Found ${analyticsKeys.length} analytics records to export');
+
+      if (analyticsKeys.isEmpty) {
+        log('No analytics data found to export');
+        return;
+      }
+
+      // Generate CSV file
+      log('Generating CSV file...');
+      final filePath =
+          await AnalyticsExportUtil.exportAnalyticsToCSV(container);
+      log('Analytics exported to: $filePath');
+
+      // Get the file ready to upload
+      File csvFile = File(filePath);
+      if (!await csvFile.exists()) {
+        log('ERROR: CSV file was not created at path: $filePath');
+        return;
+      }
+
+      final fileSize = await csvFile.length();
+      log('CSV file size: ${fileSize} bytes');
+
+      final userId = Global.storageService.getUserProfile().unique_id;
+      log('Uploading for user ID: $userId');
+
+      // Upload the file using the provider
+      log('Starting upload to server...');
+      final result = await container.read(csvUploadControllerProvider(
+        csvFile: csvFile,
+        userId: userId ?? "",
+      ).future);
+
+      if (result != null) {
+        log('Analytics CSV file uploaded successfully. Server response: $result');
+      } else {
+        log('Failed to upload analytics file. Server returned null response.');
+      }
+    } catch (e, stackTrace) {
+      log('Error in automated analytics export and upload: $e',
+          error: e, stackTrace: stackTrace);
+      rethrow;
+    }
   }
 }
 
-// Utility class for exporting analytics
+// Utility class for exporting analytics - mostly unchanged
 class AnalyticsExportUtil {
   static String formatTimestamp(String timestamp) {
     try {
@@ -68,7 +177,7 @@ class AnalyticsExportUtil {
 
       // CSV header
       List<String> csvRows = [
-        'Unique ID,User ID,User Name,Course ID,Course Video ID,Session Date,Session Start Time,Session End Time,Session Total Watch Time,Total Pause Count,Pause Timestamps,Pause Durations,Video Progress,Quiz Unique Id,Quiz Score,',
+        'Unique ID,User ID,User Name,Course ID,Course Video ID,Session Date,Session Start Time,Session End Time,Session Total Watch Time,Total Pause Count,Pause Timestamps,Pause Durations,Video Progress,Quiz Unique Id,Quiz Score,TotalVideosInCourse',
       ];
 
       final uniqueId = Global.storageService.getUserProfile().unique_id;
@@ -91,6 +200,7 @@ class AnalyticsExportUtil {
           String videoId = analytics['videoId'] ?? '';
           String courseId = analytics['courseId'] ?? '';
           String courseVideoId = analytics['courseVideoId'] ?? '';
+          int totalVideoInCourses = analytics['totalVideosInCourse'] ?? "";
           List<dynamic> watchSessions = analytics['watchSessions'] ?? [];
 
           for (var session in watchSessions) {
@@ -129,6 +239,7 @@ class AnalyticsExportUtil {
               userName,
               courseId,
               courseVideoId,
+
               // Use the full video ID here
               formatDate(session['date'] ?? ''),
               formatTimestamp(session['startTime'] ?? ''),
@@ -140,6 +251,7 @@ class AnalyticsExportUtil {
               progressValues.join(';'),
               formatQuizIds(quizResult),
               formatQuizScores(quizResult),
+              totalVideoInCourses.toString(),
             ].join(',');
 
             csvRows.add(row);
@@ -170,161 +282,28 @@ class AnalyticsExportUtil {
   }
 }
 
-// Handler class for export operations
-class AnalyticsExportHandler {
-  static Future<void> uploadAnalyticsFile(
-      BuildContext context, WidgetRef ref, String filePath) async {
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      );
-
-      // Get the file ready to upload
-      File csvFile = File(filePath);
-      final userId = Global.storageService.getUserProfile().unique_id;
-
-      // Upload the file
-      final result = await ref.read(csvUploadControllerProvider(
-        csvFile: csvFile,
-        userId: userId ?? "",
-      ).future);
-
-      // Close loading indicator
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Show result dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title:
-                  Text(result != null ? 'Upload Successful' : 'Upload Failed'),
-              content: Text(result != null
-                  ? 'Analytics CSV file uploaded successfully.'
-                  : 'Failed to upload analytics file.'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      // Close loading indicator if it's showing
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Show error dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Upload Error'),
-              content: Text('Failed to upload analytics: $e'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
+// This class is now simplified - just contains the actual analytics functionality
+// without any UI elements
+class BackgroundAnalyticsService {
+  // Method to manually trigger the export and upload (if needed for testing)
+  static Future<void> manualExportAndUpload(ProviderContainer container) async {
+    await AutomatedAnalyticsService.exportAndUploadAnalytics(container);
   }
 
-  static Future<void> exportAnalytics(
-      BuildContext context, WidgetRef ref) async {
-    try {
-      // Show loading indicator
-      showDialog(
-        context: context,
-        barrierDismissible: false,
-        builder: (BuildContext context) {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
-        },
-      );
+  // Method to check if the background task is scheduled
+  static Future<bool> isTaskScheduled() async {
+    // This is a simplified check. WorkManager doesn't provide direct API for this
+    // So we use SharedPreferences to track our own scheduling state
+    final prefs = await SharedPreferences.getInstance();
+    return prefs.getBool('analytics_task_scheduled') ?? false;
+  }
 
-      // Generate CSV file
-      String filePath = await AnalyticsExportUtil.exportAnalyticsToCSV(ref);
-
-      // Close loading indicator
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Show success dialog with file path
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Export Successful'),
-              content: SingleChildScrollView(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    const Text('File saved successfully!'),
-                    const SizedBox(height: 8),
-                    Text(
-                      'Location: $filePath',
-                      style: Theme.of(context).textTheme.bodySmall,
-                    ),
-                  ],
-                ),
-              ),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-                TextButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    uploadAnalyticsFile(context, ref, filePath);
-                  },
-                  child: const Text('Upload to Server'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    } catch (e) {
-      // Close loading indicator if it's showing
-      if (context.mounted) {
-        Navigator.pop(context);
-
-        // Show error dialog
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: const Text('Export Error'),
-              content: Text('Failed to export analytics: $e'),
-              actions: [
-                TextButton(
-                  onPressed: () => Navigator.pop(context),
-                  child: const Text('OK'),
-                ),
-              ],
-            );
-          },
-        );
-      }
-    }
+  // Method to manually schedule the task (if needed)
+  static void scheduleTask() {
+    scheduleAnalyticsExport();
+    // Track that we've scheduled the task
+    SharedPreferences.getInstance().then((prefs) {
+      prefs.setBool('analytics_task_scheduled', true);
+    });
   }
 }

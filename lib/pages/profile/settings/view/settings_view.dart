@@ -22,17 +22,17 @@ class SettingsView extends StatelessWidget {
                 context: context,
                 builder: (BuildContext context) {
                   return AlertDialog(
-                    title: Text("Confirm logout"),
-                    content: Text("Confirm logout."),
+                    title: const Text("Confirm logout"),
+                    content: const Text("Confirm logout."),
                     actions: [
                       TextButton(
-                        child: Text("Cancel"),
+                        child: const Text("Cancel"),
                         onPressed: () {
                           Navigator.of(context).pop();
                         },
                       ),
                       TextButton(
-                        child: Text("Confirm"),
+                        child: const Text("Confirm"),
                         onPressed: () {
                           Global.storageService
                               .remove(AppConstants.STORAGE_USER_PROFILE_KEY);

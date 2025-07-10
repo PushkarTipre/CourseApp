@@ -355,13 +355,14 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text13Normal(
+                              maxLines: 2,
                               text: widget.lessonData[index].name ??
                                   "No Name Available",
                               color: AppColors.primaryText,
                             ),
                             if (quizAvailable)
                               Container(
-                                margin: EdgeInsets.only(top: 4.h),
+                                margin: EdgeInsets.symmetric(vertical: 4.h),
                                 child: AnimatedBuilder(
                                   animation: _controller,
                                   builder: (context, child) {

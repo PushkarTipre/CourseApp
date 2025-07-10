@@ -1,5 +1,3 @@
-import 'dart:developer';
-
 import '../../../common/models/category_entity.dart';
 import '../../../common/models/course_enties.dart';
 import '../../../common/utils/http_util.dart';

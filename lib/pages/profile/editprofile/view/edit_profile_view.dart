@@ -14,28 +14,30 @@ class Edit_Profile_View extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return Scaffold(
-      appBar: AppBar(title: Text('Update User')),
+      appBar: AppBar(title: const Text('Update User')),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           children: [
             TextField(
               controller: usernameController,
-              decoration: InputDecoration(labelText: 'New Username (Optional)'),
+              decoration:
+                  const InputDecoration(labelText: 'New Username (Optional)'),
             ),
             TextField(
               controller: avatarController,
               decoration:
-                  InputDecoration(labelText: 'New Avatar URL (Optional)'),
+                  const InputDecoration(labelText: 'New Avatar URL (Optional)'),
             ),
             TextField(
               controller: jobController,
-              decoration: InputDecoration(labelText: 'New Job (Optional)'),
+              decoration:
+                  const InputDecoration(labelText: 'New Job (Optional)'),
             ),
             TextField(
               controller: descriptionController,
-              decoration:
-                  InputDecoration(labelText: 'New Description (Optional)'),
+              decoration: const InputDecoration(
+                  labelText: 'New Description (Optional)'),
             ),
             ElevatedButton(
               onPressed: () async {

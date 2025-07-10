@@ -112,10 +112,7 @@ class _BuyCourseState extends ConsumerState<BuyCourse> {
       }
     };
 
-    print('Razorpay options:');
-    opts.forEach((key, value) {
-      print('$key: $value');
-    });
+    opts.forEach((key, value) {});
 
     try {
       _razorpay.open(opts);

@@ -15,7 +15,7 @@ class VideoAnalyticsService {
   bool _isVideoRestart = false; // New flag to track video restarts
   DateTime? _actualStartTime;
   bool _isCurrentSessionValid = false; // New flag to track session validity
-
+  int _currentTotalVideosInCourse = 0;
   String? _currentVideoId; // Track the current video being played
 
   VideoAnalyticsService(this._storage) {
@@ -35,10 +35,15 @@ class VideoAnalyticsService {
       'commonPausePoints': <double>[],
       'averageViewingDuration': '0:00:00',
       'detailedSessions': [],
+      'totalVideosInCourse': 0,
     };
   }
 
-  void logPlayStart({required String courseId, required String videoId}) {
+  void logPlayStart({
+    required String courseId,
+    required String videoId,
+    required int totalVideosInCourse,
+  }) {
     _actualStartTime = DateTime.now();
     _isCurrentSessionValid = true; // Mark session as valid when playback starts
 
@@ -46,6 +51,7 @@ class VideoAnalyticsService {
     final userProfile = Global.storageService.getUserProfile();
     _currentVideoId =
         '${userProfile.id}_${userProfile.name}_${courseId}_$videoId';
+    _currentTotalVideosInCourse = totalVideosInCourse;
 
     // If this is a new video, ensure we treat it as a new session
     if (_currentVideoId != _currentVideoId) {
@@ -133,6 +139,7 @@ class VideoAnalyticsService {
         courseId: courseId,
         courseVideoId: videoId,
         videoId: uniqueVideoId,
+        totalVideosInCourse: _currentTotalVideosInCourse,
         watchSessions: updatedSessions,
         totalWatchTime: _formatDuration(position),
         pauseCount: analytics.pauseCount + 1,
@@ -187,6 +194,8 @@ class VideoAnalyticsService {
         'averageViewingDuration': averageViewingDuration,
         'detailedSessions':
             analytics.watchSessions.map((s) => s.toJson()).toList(),
+        'totalVideosInCourse':
+            analytics.totalVideosInCourse, // Include in the report
       };
     } catch (e) {
       print('Error generating analytics report: $e');
@@ -203,7 +212,7 @@ class VideoAnalyticsService {
       final userName = parts[1];
       final courseId = parts[2];
       final courseVideoId = parts[3];
-      log("User ID: $userId, User Name: $userName, Course ID: $courseId, Course Video ID: $courseVideoId");
+      log("User ID: $userId, User Name: $userName, Course ID: $courseId, Course Video ID: $courseVideoId, Total Videos in Course: $_currentTotalVideosInCourse");
       if (data.isEmpty) {
         log('No existing analytics found for video $videoId, creating initial analytics');
         return _createInitialAnalytics(courseId, courseVideoId, videoId);
@@ -228,6 +237,7 @@ class VideoAnalyticsService {
   VideoAnalytics _createInitialAnalytics(
       String courseId, String courseVideoId, String uniqueVideoId) {
     final userProfile = Global.storageService.getUserProfile();
+    log("This is total videos in course: $_currentTotalVideosInCourse");
     return VideoAnalytics(
       courseId: courseId,
       courseVideoId: courseVideoId,
@@ -235,6 +245,7 @@ class VideoAnalyticsService {
       watchSessions: [],
       totalWatchTime: "0:00:00",
       pauseCount: 0,
+      totalVideosInCourse: _currentTotalVideosInCourse,
       userProfile: UserProfile(
         id: userProfile.id ?? '',
         name: userProfile.name,

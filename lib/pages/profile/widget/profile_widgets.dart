@@ -1,12 +1,11 @@
 import 'package:course_app/common/utils/img_res.dart';
+import 'package:course_app/global.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
-
-import '../../../common/routes/app_routes_name.dart';
 import '../../../common/utils/app_colors.dart';
 import '../../../common/utils/constants.dart';
-import '../../../common/widgets/image_widgets.dart';
+
 import '../../../common/widgets/text_widget.dart';
 import '../controller/profile_controller.dart';
 
@@ -20,7 +19,7 @@ class ProfileImageWidget extends StatelessWidget {
         var profileImage = ref.read(profileControllerProvider);
         return GestureDetector(
           onTap: () {
-            Navigator.of(context).pushNamed(AppRoutesName.EDIT_PROFILE);
+            // Navigator.of(context).pushNamed(AppRoutesName.EDIT_PROFILE);
           },
           child: Container(
             alignment: Alignment.bottomRight,
@@ -52,10 +51,23 @@ class ProfileNameWidget extends StatelessWidget {
     return Consumer(
       builder: (BuildContext context, WidgetRef ref, Widget? child) {
         var profileName = ref.read(profileControllerProvider);
-        return Container(
-          margin: EdgeInsets.only(top: 12.h),
-          child: Text13Normal(
-              text: profileName.name != null ? "${profileName.name}" : ""),
+        return Column(
+          children: [
+            Container(
+              margin: EdgeInsets.only(top: 12.h),
+              child: Text13Normal(
+                  text: profileName.name != null ? "${profileName.name}" : ""),
+            ),
+            Container(
+              margin: EdgeInsets.only(top: 5.h),
+              child: Text16Normal(
+                text: Global.storageService.getUserProfile().name != null
+                    ? "${Global.storageService.getUserProfile().name}"
+                    : "",
+                color: AppColors.primarySecondaryElementText,
+              ),
+            ),
+          ],
         );
       },
     );

@@ -26,7 +26,7 @@ class ProfileCourses extends StatelessWidget {
             imagePath: Img_Res.profileBook,
             text: "Courses Bought",
             func: () =>
-                Navigator.of(context).pushNamed(AppRoutesName.COURSES_BOUGHT),
+                Navigator.of(context).pushNamed(AppRoutesName.MY_COURSES),
           ),
           // const ProfileLink(
           //   imagePath: Img_Res.profileStar,

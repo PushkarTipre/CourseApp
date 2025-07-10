@@ -118,9 +118,15 @@ class LessonDataController extends _$LessonDataController {
   int currentVideoIndex = 0;
   bool isLoggingInProgress = false;
   int? _courseId;
+  int _totalVideosInCourse = 0; // Add this property
 
   void setCourseId(int courseId) {
     _courseId = courseId;
+  }
+
+  void setTotalVideosInCourse(int count) {
+    _totalVideosInCourse = count;
+    log("Set total videos in course to: $_totalVideosInCourse");
   }
 
   int? get courseId => _courseId;
@@ -314,8 +320,12 @@ class LessonDataController extends _$LessonDataController {
         analyticsService.onVideoRestart();
         isRestart = false;
       }
+      log("Total videos in course in controller: $_totalVideosInCourse");
       analyticsService.logPlayStart(
-          courseId: courseId.toString(), videoId: currentVideoIndex.toString());
+        courseId: courseId.toString(),
+        videoId: currentVideoIndex.toString(),
+        totalVideosInCourse: _totalVideosInCourse,
+      );
       playPause(true);
     } else if (event.betterPlayerEventType == BetterPlayerEventType.finished) {
       _handleVideoCompletion();

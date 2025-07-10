@@ -7,7 +7,7 @@ AppBar buildAppBar({String title = ''}) {
   return AppBar(
     centerTitle: true,
     bottom: PreferredSize(
-        preferredSize: Size.fromHeight(1),
+        preferredSize: const Size.fromHeight(1),
         child: Container(
           color: Colors.grey.withOpacity(0.3),
           height: 1,

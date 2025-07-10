@@ -1,7 +1,7 @@
 import 'package:course_app/common/global_loader/global_loader.dart';
 import 'package:course_app/common/widgets/text_widget.dart';
 import 'package:course_app/pages/signin/controller/sign_in_controller.dart';
-import 'package:course_app/pages/signin/widgets/sign_in_widgets.dart';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';

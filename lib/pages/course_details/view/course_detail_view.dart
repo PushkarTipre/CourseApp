@@ -43,35 +43,52 @@ class _CourseDetailState extends ConsumerState<CourseDetail> {
             children: [
               // lessonData.when(data: (data)=>Container(), error: (error), loading: loading)
               courseData.when(
-                  data: (data) => data == null
+                  data: (courseDataValue) => courseDataValue == null
                       ? const SizedBox()
                       : Column(
                           children: [
-                            CourseDetailThumbnail(courseItem: data),
-                            CourseDetailIconText(courseItem: data),
-                            CourseDetailDescription(courseItem: data),
+                            CourseDetailThumbnail(courseItem: courseDataValue),
+                            CourseDetailIconText(courseItem: courseDataValue),
+                            CourseDetailDescription(
+                                courseItem: courseDataValue),
                             CourseDetailGoBuyButton(
-                              courseItem: data,
+                              courseItem: courseDataValue,
                             ),
                             CourseDetailIncludes(
-                              courseItem: data,
+                              courseItem: courseDataValue,
+                            ),
+                            lessondata.when(
+                              data: (lessonDataValue) => lessonDataValue == null
+                                  ? const SizedBox()
+                                  : LessonInfo(
+                                      lessonData: lessonDataValue,
+                                      ref: ref,
+                                      courseId: args,
+                                      courseItem:
+                                          courseDataValue, // Now we can safely pass the courseItem
+                                    ),
+                              error: (error, stackTrace) =>
+                                  const Text("Error loading lesson data"),
+                              loading: () => SizedBox(
+                                height: 200
+                                    .h, // Reduced height since it's in a Column
+                                child: const Center(
+                                  child: CircularProgressIndicator(),
+                                ),
+                              ),
+                            ),
+                            Padding(
+                              padding: EdgeInsets.only(bottom: 15.h),
+                              child: FeedbackButton(
+                                courseItem: courseDataValue,
+                                completionPercentage: 85,
+                                requiredPercentage: 0,
+                              ),
                             ),
                           ],
                         ),
                   error: (error, stackTrace) =>
                       const Text("Error loading course data"),
-                  loading: () => SizedBox(
-                        height: 500.h,
-                        child: const Center(
-                          child: CircularProgressIndicator(),
-                        ),
-                      )),
-              lessondata.when(
-                  data: (data) => data == null
-                      ? const SizedBox()
-                      : LessonInfo(lessonData: data, ref: ref, courseId: args),
-                  error: (error, stackTrace) =>
-                      const Text("Error loading lesson data"),
                   loading: () => SizedBox(
                         height: 500.h,
                         child: const Center(

@@ -23,7 +23,7 @@ class CoursesSearchController extends AsyncNotifier<List<CourseItem>?> {
       state = AsyncValue.data(response.data);
       return;
     }
-    state = AsyncValue.data([]);
+    state = const AsyncValue.data([]);
   }
 
   searchData(String search) async {
@@ -36,7 +36,7 @@ class CoursesSearchController extends AsyncNotifier<List<CourseItem>?> {
     if (response.code == 200) {
       state = AsyncValue.data(response.data);
     } else {
-      state = AsyncValue.data([]);
+      state = const AsyncValue.data([]);
     }
   }
 }

@@ -14,7 +14,7 @@ class SignInRepo {
 
   static Future<UserLoginResponseEntity> login(
       {LoginRequestEntity? params}) async {
-    print("given info ${jsonEncode(params)}");
+    // print("given info ${jsonEncode(params)}");
     var response =
         await HttpUtil().post("api/login", queryParameters: params?.toJson());
     return UserLoginResponseEntity.fromJson(response);

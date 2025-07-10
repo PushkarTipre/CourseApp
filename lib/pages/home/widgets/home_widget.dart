@@ -70,7 +70,6 @@ class HomeBanner extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final homeScreenBannerIndex = ref.watch(homeScreenBannerIndexProvider);
-    final theme = Theme.of(context);
 
     void onPageChanged(int index) {
       ref.read(homeScreenBannerIndexProvider.notifier).setIndex(index);

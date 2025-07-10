@@ -160,6 +160,7 @@ class CourseItem {
   int? score;
   int? id;
   int? is_free;
+  String? feedback_form_link;
 
   CourseItem({
     this.user_token,
@@ -176,6 +177,7 @@ class CourseItem {
     this.score,
     this.id,
     this.is_free,
+    this.feedback_form_link,
   });
 
   factory CourseItem.fromJson(Map<String, dynamic> json) => CourseItem(
@@ -193,6 +195,7 @@ class CourseItem {
         score: json["score"],
         id: json["id"],
         is_free: json["is_free"],
+        feedback_form_link: json["feedback_form_link"],
       );
 
   Map<String, dynamic> toJson() => {
@@ -210,5 +213,6 @@ class CourseItem {
         "score": score,
         "id": id,
         "is_free": is_free,
+        "feedback_form_link": feedback_form_link,
       };
 }

@@ -11,6 +11,7 @@ import 'package:better_player_enhanced/better_player.dart';
 import '../../../common/models/lesson_entities.dart';
 import '../../../common/services/storage.dart';
 import '../../../common/utils/app_colors.dart';
+import '../../../common/widgets/expandable.dart';
 import '../../course_details/widget/course_detail_widgets.dart';
 
 import '../../../global.dart';
@@ -150,12 +151,18 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     final courseId = args['courseId'];
     final lessonId = args['lessonID'];
     final description = args['description'];
+    final totalVideosInCourse = args['video_length'];
 
     log("LessonID: $lessonId");
     log("CourseID: $courseId");
     log("Description: $description");
+    log("Total Videos in Course: ${totalVideosInCourse.runtimeType}");
 
     ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
+    // Add this line after setting the course ID
+    ref
+        .read(lessonDataControllerProvider.notifier)
+        .setTotalVideosInCourse(totalVideosInCourse);
     final lessonDataAsync = ref.watch(lessonDataControllerProvider);
 
     // secureScreen();
@@ -246,12 +253,31 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
+                                    // Text(
+                                    //   'Last Paused At: ${data.lastPausedAt}',
+                                    //   style: TextStyle(
+                                    //     fontSize: 14.sp,
+                                    //     color:
+                                    //         AppColors.primaryThreeElementText,
+                                    //   ),
+                                    // ),
+
                                     Text(
-                                      'Last Paused At: ${data.lastPausedAt}',
+                                      'Lesson Title',
                                       style: TextStyle(
-                                        fontSize: 14.sp,
-                                        color:
-                                            AppColors.primaryThreeElementText,
+                                        fontSize: 20.sp,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppColors.primaryText,
+                                      ),
+                                    ),
+                                    Text(
+                                      data.lessonItem.isNotEmpty
+                                          ? data.lessonItem[videoIndex].name ??
+                                              ""
+                                          : "No title available",
+                                      style: TextStyle(
+                                        fontSize: 16.sp,
+                                        color: AppColors.primaryText,
                                       ),
                                     ),
                                     SizedBox(height: 8.h),
@@ -263,8 +289,9 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                         color: AppColors.primaryText,
                                       ),
                                     ),
-                                    Text(
-                                      description,
+                                    ExpandableText(
+                                      text: description,
+                                      maxLines: 3,
                                       style: TextStyle(
                                         fontSize: 14.sp,
                                         color:
@@ -362,81 +389,81 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                           ),
                         ),
 
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: CourseDetailButton(
-                                text: 'Clear Analytics',
-                                onTap: () async {
-                                  if (currentVideoId != null) {
-                                    // Clear specific video analytics
-                                    await analyticsService.clearAnalyticsData(
-                                      courseId: courseId.toString(),
-                                      courseVideoId: currentVideoId!,
-                                    );
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content:
-                                              Text('Video Analytics Cleared!')),
-                                    );
-                                  } else {
-                                    // Show a message that no video is selected
-                                    ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: Text('No video selected')),
-                                    );
-                                  }
-                                },
-                                backgroundColor: Colors.redAccent,
-                                icon: Icons.clear,
-                              ),
-                            ),
-                            SizedBox(width: 10.w),
-                            Expanded(
-                              child: CourseDetailButton(
-                                text: 'View Analytics',
-                                onTap: () {
-                                  if (currentVideoId != null) {
-                                    Navigator.push(
-                                      context,
-                                      MaterialPageRoute(builder: (context) {
-                                        // log("Current Video ID: $currentVideoId");
-                                        return VideoAnalyticsScreen2(
-                                          courseId: courseId.toString(),
-                                          videoId: currentVideoId!,
-                                          videoTitle:
-                                              data.lessonItem[videoIndex].name!,
-                                        );
-                                      }),
-                                    );
-                                  }
-                                },
-                                icon: Icons.analytics_outlined,
-                              ),
-                            ),
-                          ],
-                        ),
+                        // Row(
+                        //   mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        //   children: [
+                        //     Expanded(
+                        //       child: CourseDetailButton(
+                        //         text: 'Clear Analytics',
+                        //         onTap: () async {
+                        //           if (currentVideoId != null) {
+                        //             // Clear specific video analytics
+                        //             await analyticsService.clearAnalyticsData(
+                        //               courseId: courseId.toString(),
+                        //               courseVideoId: currentVideoId!,
+                        //             );
+                        //             ScaffoldMessenger.of(context).showSnackBar(
+                        //               const SnackBar(
+                        //                   content:
+                        //                       Text('Video Analytics Cleared!')),
+                        //             );
+                        //           } else {
+                        //             // Show a message that no video is selected
+                        //             ScaffoldMessenger.of(context).showSnackBar(
+                        //               const SnackBar(
+                        //                   content: Text('No video selected')),
+                        //             );
+                        //           }
+                        //         },
+                        //         backgroundColor: Colors.redAccent,
+                        //         icon: Icons.clear,
+                        //       ),
+                        //     ),
+                        //     SizedBox(width: 10.w),
+                        //     Expanded(
+                        //       child: CourseDetailButton(
+                        //         text: 'View Analytics',
+                        //         onTap: () {
+                        //           if (currentVideoId != null) {
+                        //             Navigator.push(
+                        //               context,
+                        //               MaterialPageRoute(builder: (context) {
+                        //                 // log("Current Video ID: $currentVideoId");
+                        //                 return VideoAnalyticsScreen2(
+                        //                   courseId: courseId.toString(),
+                        //                   videoId: currentVideoId!,
+                        //                   videoTitle:
+                        //                       data.lessonItem[videoIndex].name!,
+                        //                 );
+                        //               }),
+                        //             );
+                        //           }
+                        //         },
+                        //         icon: Icons.analytics_outlined,
+                        //       ),
+                        //     ),
+                        //   ],
+                        // ),
 
-                        CourseDetailButton(
-                          text: ' Analytics',
-                          onTap: () {
-                            if (currentVideoId != null) {
-                              Navigator.push(
-                                context,
-                                MaterialPageRoute(builder: (context) {
-                                  // log("Current Video ID: $currentVideoId");
-                                  return const AnalyticsScreen();
-                                }),
-                              );
-                            }
-                          },
-                          icon: Icons.analytics_outlined,
-                        ),
+                        // CourseDetailButton(
+                        //   text: ' Analytics',
+                        //   onTap: () {
+                        //     if (currentVideoId != null) {
+                        //       // Navigator.push(
+                        //       //   context,
+                        //       //   MaterialPageRoute(builder: (context) {
+                        //       //     // log("Current Video ID: $currentVideoId");
+                        //       //     return const AnalyticsScreen();
+                        //       //   }),
+                        //       // );
+                        //     }
+                        //   },
+                        //   icon: Icons.analytics_outlined,
+                        // ),
 
                         // Video List
                         Padding(
-                          padding: EdgeInsets.only(top: 22.h),
+                          padding: EdgeInsets.symmetric(vertical: 12.h),
                           child: LessonVideos(
                             lessonData: data.lessonItem,
                             ref: ref,

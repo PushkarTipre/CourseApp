@@ -173,6 +173,7 @@ class Text13Normal extends StatelessWidget {
       textAlign: align,
       text,
       style: TextStyle(
+        overflow: TextOverflow.ellipsis,
         color: color,
         fontSize: 13.sp,
         fontWeight: weight,

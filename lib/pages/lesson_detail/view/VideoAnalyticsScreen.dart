@@ -52,7 +52,7 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
             .generateAnalyticsReport(courseId.toString(), videoId),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
-            return Center(child: CircularProgressIndicator());
+            return const Center(child: CircularProgressIndicator());
           }
 
           print('Connection State: ${snapshot.connectionState}');
@@ -104,11 +104,11 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   _buildVideoInfoCard(videoTitle),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildOverviewCard(report),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildPausePointsCard(report),
-                  SizedBox(height: 16),
+                  const SizedBox(height: 16),
                   _buildSessionsCard(sessions),
                 ],
               ),
@@ -126,17 +126,17 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Video Information',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 8),
+            const SizedBox(height: 8),
             Text(
               title,
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
             Text(
               'CourseId: $courseId',
@@ -165,26 +165,26 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Overview',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             _buildStatRow(
               'Total Sessions',
               report['totalSessions'].toString(),
               Icons.schedule,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             _buildStatRow(
               'Total Pauses',
               report['totalPauses'].toString(),
               Icons.pause_circle_outline,
             ),
-            SizedBox(height: 12),
+            const SizedBox(height: 12),
             _buildStatRow(
               'Average Duration',
               report['averageViewingDuration'],
@@ -207,21 +207,21 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Common Pause Points',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             Text(
               pausePoints.isEmpty
                   ? 'No common pause points found'
                   : pausePoints
                       .map((point) => '${point.toStringAsFixed(1)}%')
                       .join(', '),
-              style: TextStyle(fontSize: 16),
+              style: const TextStyle(fontSize: 16),
             ),
           ],
         ),
@@ -236,17 +236,17 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(
+            const Text(
               'Viewing Sessions',
               style: TextStyle(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
               ),
             ),
-            SizedBox(height: 16),
+            const SizedBox(height: 16),
             ListView.builder(
               shrinkWrap: true,
-              physics: NeverScrollableScrollPhysics(),
+              physics: const NeverScrollableScrollPhysics(),
               itemCount: sessions.length,
               itemBuilder: (context, index) {
                 final session = sessions[index];
@@ -265,7 +265,7 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
                   children: [
                     ListView.builder(
                       shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
+                      physics: const NeverScrollableScrollPhysics(),
                       itemCount: session.pauseEvents.length,
                       itemBuilder: (context, eventIndex) {
                         final event = session.pauseEvents[eventIndex];
@@ -277,7 +277,7 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
                           subtitle: Text(
                             'Progress: ${event.videoProgress.toStringAsFixed(1)}%',
                           ),
-                          leading: Icon(Icons.pause, size: 20),
+                          leading: const Icon(Icons.pause, size: 20),
                         );
                       },
                     ),
@@ -295,16 +295,16 @@ class VideoAnalyticsScreen2 extends ConsumerWidget {
     return Row(
       children: [
         Icon(icon, size: 24, color: Colors.blue),
-        SizedBox(width: 12),
+        const SizedBox(width: 12),
         Expanded(
           child: Text(
             label,
-            style: TextStyle(fontSize: 16),
+            style: const TextStyle(fontSize: 16),
           ),
         ),
         Text(
           value,
-          style: TextStyle(
+          style: const TextStyle(
             fontSize: 16,
             fontWeight: FontWeight.bold,
           ),

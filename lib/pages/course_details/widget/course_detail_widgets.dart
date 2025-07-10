@@ -5,6 +5,7 @@ import 'package:course_app/common/routes/app_routes_name.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 import '../../../common/models/CheckVideoAccessResponseEntity.dart';
 import '../../../common/models/course_enties.dart';
@@ -883,11 +884,13 @@ class LessonInfo extends StatelessWidget {
   final List<LessonItem> lessonData;
   final WidgetRef ref;
   final int courseId;
+  final CourseItem courseItem; // Add this parameter
   const LessonInfo({
     super.key,
     required this.lessonData,
     required this.ref,
     required this.courseId,
+    required this.courseItem,
   });
 
   Future<void> checkAccessAndNavigate(
@@ -937,6 +940,7 @@ class LessonInfo extends StatelessWidget {
           "lessonID": lesson.id,
           "courseId": courseId,
           "description": lesson.description,
+          "video_length": courseItem.video_length,
         });
       } else {
         log("Access denied: ${accessResponse.msg}");
@@ -1031,7 +1035,7 @@ class LessonInfo extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Container(
-      margin: EdgeInsets.only(top: 30.h, bottom: 25.h),
+      margin: EdgeInsets.only(top: 30.h, bottom: 5.h),
       width: 340.w,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -1319,6 +1323,228 @@ class LessonInfo extends StatelessWidget {
             ),
         ],
       ),
+    );
+  }
+}
+
+class FeedbackButton extends ConsumerWidget {
+  final CourseItem courseItem;
+  final double completionPercentage;
+  final double requiredPercentage;
+
+  const FeedbackButton({
+    super.key,
+    required this.courseItem,
+    required this.completionPercentage,
+    this.requiredPercentage = 75.0,
+  });
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final isEnrolled =
+        ref.watch(enrollmentStatusProvider(courseItem.id!.toString()));
+
+    return FutureBuilder<CheckVideoAccessResponseEntity>(
+      future: CourseRepo.checkVideoAccess(courseId: courseItem.id!),
+      builder: (context, snapshot) {
+        // While checking access, show a loading indicator
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Container(
+            margin: EdgeInsets.only(top: 18.h),
+            height: 56.h,
+            width: 340.w,
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200,
+              borderRadius: BorderRadius.circular(18.r),
+            ),
+            child: Center(
+              child: SizedBox(
+                width: 28.w,
+                height: 28.h,
+                child: CircularProgressIndicator(
+                  strokeWidth: 3.w,
+                  valueColor: const AlwaysStoppedAnimation<Color>(
+                    AppColors.primaryElement,
+                  ),
+                ),
+              ),
+            ),
+          );
+        }
+
+        // If access is granted or user is enrolled, show the feedback button
+        if (snapshot.hasData && snapshot.data?.hasAccess == true ||
+            isEnrolled) {
+          final bool isEnabled = completionPercentage >= requiredPercentage;
+
+          return GestureDetector(
+            onTap: isEnabled
+                ? () {
+                    // Launch the feedback form URL
+                    showDialog(
+                      context: context,
+                      builder: (context) => AlertDialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20.r),
+                        ),
+                        title: Text(
+                          "Course Feedback",
+                          style: TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 18.sp,
+                          ),
+                        ),
+                        content: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Text(
+                              "Thank you for completing the course! We'd love to hear your feedback.",
+                              style: TextStyle(
+                                fontSize: 15.sp,
+                                height: 1.4,
+                              ),
+                            ),
+                            // SizedBox(height: 10.h),
+                            // Text(
+                            //   "Link: ${courseItem.feedback_form_link}",
+                            //   style: TextStyle(
+                            //     fontSize: 14.sp,
+                            //     color: AppColors.primaryElement,
+                            //     fontWeight: FontWeight.w500,
+                            //   ),
+                            // ),
+                          ],
+                        ),
+                        actions: [
+                          TextButton(
+                            onPressed: () => Navigator.of(context).pop(),
+                            child: Text(
+                              "Cancel",
+                              style: TextStyle(
+                                color: Colors.grey.shade700,
+                                fontSize: 15.sp,
+                              ),
+                            ),
+                          ),
+                          ElevatedButton(
+                            onPressed: () async {
+                              Navigator.of(context).pop();
+                              // Launch the URL
+                              final Uri url = Uri.parse(
+                                  courseItem.feedback_form_link ?? "");
+                              if (await canLaunchUrl(url)) {
+                                await launchUrl(url,
+                                    mode: LaunchMode.externalApplication);
+                              } else {
+                                // Show error if URL can't be launched
+                                ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                    content: Text(
+                                        'Could not open the feedback form'),
+                                    backgroundColor: Colors.red,
+                                  ),
+                                );
+                              }
+                            },
+                            style: ElevatedButton.styleFrom(
+                              backgroundColor: AppColors.primaryElement,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(30.r),
+                              ),
+                              padding: EdgeInsets.symmetric(
+                                horizontal: 20.w,
+                                vertical: 10.h,
+                              ),
+                            ),
+                            child: Text(
+                              "Open Feedback Form",
+                              style: TextStyle(
+                                fontWeight: FontWeight.w600,
+                                fontSize: 15.sp,
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  }
+                : null,
+            child: Container(
+              margin: EdgeInsets.only(top: 18.h),
+              width: 340.w,
+              height: 56.h,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  colors: isEnabled
+                      ? [
+                          Colors.amber,
+                          Colors.amber.shade600,
+                        ]
+                      : [
+                          Colors.grey.shade300,
+                          Colors.grey.shade400,
+                        ],
+                  begin: Alignment.topLeft,
+                  end: Alignment.bottomRight,
+                ),
+                borderRadius: BorderRadius.circular(18.r),
+                boxShadow: isEnabled
+                    ? [
+                        BoxShadow(
+                          color: Colors.amber.withOpacity(0.25),
+                          blurRadius: 15,
+                          offset: const Offset(0, 6),
+                          spreadRadius: 0,
+                        ),
+                      ]
+                    : [],
+              ),
+              child: Stack(
+                alignment: Alignment.center,
+                children: [
+                  Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(
+                        Icons.rate_review_outlined,
+                        color: isEnabled ? Colors.white : Colors.grey.shade500,
+                        size: 22.sp,
+                      ),
+                      SizedBox(width: 10.w),
+                      Text(
+                        "Give Feedback",
+                        style: TextStyle(
+                          color:
+                              isEnabled ? Colors.white : Colors.grey.shade500,
+                          fontSize: 17.sp,
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ],
+                  ),
+                  if (!isEnabled)
+                    Positioned(
+                      bottom: 8.h,
+                      child: Text(
+                        "Complete ${requiredPercentage.toInt()}% to unlock",
+                        style: TextStyle(
+                          color: Colors.grey.shade600,
+                          fontSize: 12.sp,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                ],
+              ),
+            ),
+          );
+        }
+
+        // If no access, return an empty space
+        return const SizedBox.shrink();
+      },
     );
   }
 }

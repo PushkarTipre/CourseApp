@@ -17,7 +17,7 @@ class _AuthorPageViewState extends ConsumerState<AuthorPageView> {
   @override
   void didChangeDependencies() {
     final args = ModalRoute.of(context)!.settings.arguments as Map;
-    print("This is args $args");
+
     //author data
     ref.watch(courseAuthorControllerProvider.notifier).init(args["token"]);
     //author course list
@@ -34,7 +34,7 @@ class _AuthorPageViewState extends ConsumerState<AuthorPageView> {
         appBar: buildGlobalAppBar(title: "Author page"),
         body: switch (authorInfo) {
           AsyncData(:final value) => value == null
-              ? Center(
+              ? const Center(
                   child: CircularProgressIndicator(
                     color: Colors.black26,
                   ),
@@ -48,9 +48,9 @@ class _AuthorPageViewState extends ConsumerState<AuthorPageView> {
                         AuthorMenu(
                           authorInfo: value,
                         ),
-                        AuthorDescription(
-                          authorInfo: value,
-                        ),
+                        // AuthorDescription(
+                        //   authorInfo: value,
+                        // ),
                         // SizedBox(
                         //   height: 20.h,
                         // ),

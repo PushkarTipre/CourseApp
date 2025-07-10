@@ -107,20 +107,4 @@ class CsvRepo {
           'Error occurred while uploading CSV files: ${e.toString()}');
     }
   }
-
-  // Get user learning pace
-  static Future<Map<String, dynamic>> getUserLearningPace({
-    required String userId,
-  }) async {
-    try {
-      var response = await HttpUtil().get(
-        "api/getUserLearningPace/$userId",
-      );
-
-      return response;
-    } catch (e) {
-      throw Exception(
-          'Error occurred while fetching user learning pace: ${e.toString()}');
-    }
-  }
 }
