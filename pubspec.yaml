@@ -60,7 +60,7 @@ dependencies:
   animated_shimmer: ^1.0.0
   google_fonts: ^6.2.1
   better_player: ^0.0.84
-  better_player_enhanced: ^0.0.5
+#  better_player_enhanced: ^0.0.5
   flutter_svg: ^2.0.17
 
   firebase_messaging: ^14.9.4
@@ -74,6 +74,7 @@ dev_dependencies:
     sdk: flutter
 dependency_overrides:
   http: ^0.13.0
+  meta: ^1.15.0
 
 
 

@@ -1,13 +1,14 @@
 import 'dart:async';
 import 'dart:developer';
 
+import 'package:better_player/better_player.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
-import 'package:better_player_enhanced/better_player.dart';
+// import 'package:better_player_enhanced/better_player.dart';
 import '../../../common/models/lesson_entities.dart';
 import '../../../common/services/storage.dart';
 import '../../../common/utils/app_colors.dart';
