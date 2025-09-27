@@ -46,4 +46,5 @@ class Img_Res {
   static const String reading = '$_imageBase/reading.png';
   static const String man = '$_imageBase/man.png';
   static const String boy = '$_imageBase/boy.png';
+  static const String profilepic = '$_iconBase/profileDefault.jpg';
 }

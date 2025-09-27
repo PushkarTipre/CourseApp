@@ -186,15 +186,27 @@ class CourseItem {
         description: json["description"],
         thumbnail: json["thumbnail"],
         video: json["video"],
-        price: json["price"].toString(),
+        price: json["price"]?.toString(),
         amount_total: json["amount_total"],
-        lesson_num: json["lesson_num"],
-        video_length: json["video_length"],
-        down_num: json["down_num"],
-        follow: json["follow"],
-        score: json["score"],
-        id: json["id"],
-        is_free: json["is_free"],
+        lesson_num: json["lesson_num"] != null
+            ? int.tryParse(json["lesson_num"].toString())
+            : null,
+        video_length: json["video_length"] != null
+            ? int.tryParse(json["video_length"].toString())
+            : null,
+        down_num: json["down_num"] != null
+            ? int.tryParse(json["down_num"].toString())
+            : null,
+        follow: json["follow"] != null
+            ? int.tryParse(json["follow"].toString())
+            : null,
+        score: json["score"] != null
+            ? int.tryParse(json["score"].toString())
+            : null,
+        id: json["id"] != null ? int.tryParse(json["id"].toString()) : null,
+        is_free: json["is_free"] != null
+            ? int.tryParse(json["is_free"].toString())
+            : null,
         feedback_form_link: json["feedback_form_link"],
       );
 

@@ -46,11 +46,11 @@ class CoursePurchaseData {
 
   factory CoursePurchaseData.fromJson(Map<String, dynamic> json) =>
       CoursePurchaseData(
-        id: json["id"] ?? 0,
+        id: int.tryParse(json["id"]?.toString() ?? "0") ?? 0,
         userToken: json["user_token"] ?? "",
         totalAmount: json["total_amount"] ?? "",
-        courseId: json["course_id"] ?? 0,
-        status: json["status"] ?? 0,
+        courseId: int.tryParse(json["course_id"]?.toString() ?? "0") ?? 0,
+        status: int.tryParse(json["status"]?.toString() ?? "0") ?? 0,
         createdAt:
             DateTime.parse(json["created_at"] ?? DateTime.now().toString()),
         updatedAt: json["updated_at"] != null

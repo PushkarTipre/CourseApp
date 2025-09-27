@@ -1,6 +1,7 @@
 import 'dart:developer';
 
-import 'package:better_player/better_player.dart';
+// import 'package:better_player/better_player.dart';
+import 'package:better_player_enhanced/better_player.dart';
 import 'package:course_app/common/models/lesson_entities.dart';
 
 import 'package:course_app/global.dart';
@@ -20,26 +21,19 @@ BetterPlayerController? videoPlayerController;
 bool isRestart = false;
 final storageService = StorageService().init();
 @riverpod
-Future<void> lessonDetailController(LessonDetailControllerRef ref,
-    {required int index}) async {
+Future<void> lessonDetailController(LessonDetailControllerRef ref, {required int index}) async {
   LessonRequestEntity lessonRequestEntity = LessonRequestEntity();
   lessonRequestEntity.id = index;
-  final response =
-      await LessonRepo.courseLessonDetail(params: lessonRequestEntity);
+  final response = await LessonRepo.courseLessonDetail(params: lessonRequestEntity);
   if (response.code == 200) {
     var url = response.data!.elementAt(0).url!;
 
     int courseVideoId = int.parse(response.data!.elementAt(0).course_video_id!);
     // Update the video index with correct ID immediately
-    ref
-        .read(lessonDataControllerProvider.notifier)
-        .updateCurrentVideoIndex(courseVideoId);
+    ref.read(lessonDataControllerProvider.notifier).updateCurrentVideoIndex(courseVideoId);
     // If this is a restart, trigger a new screen navigation in analytics
     if (isRestart) {
-      ref
-          .read(lessonDataControllerProvider.notifier)
-          .analyticsService
-          .onEnterVideoScreen();
+      ref.read(lessonDataControllerProvider.notifier).analyticsService.onEnterVideoScreen();
     }
     videoPlayerController = BetterPlayerController(
         BetterPlayerConfiguration(
@@ -62,8 +56,7 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
         ),
         betterPlayerDataSource: BetterPlayerDataSource.network(url));
 
-    var initializeVideoPlayerFuture = videoPlayerController
-        ?.setupDataSource(BetterPlayerDataSource.network(url));
+    var initializeVideoPlayerFuture = videoPlayerController?.setupDataSource(BetterPlayerDataSource.network(url));
 
     LessonVideo vidInstance = LessonVideo(
       lessonItem: response.data!,
@@ -79,9 +72,7 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
       }
     });
 
-    ref
-        .read(lessonDataControllerProvider.notifier)
-        .updateLessonData(vidInstance);
+    ref.read(lessonDataControllerProvider.notifier).updateLessonData(vidInstance);
   } else {
     print('request failed ${response.code}');
   }
@@ -89,16 +80,13 @@ Future<void> lessonDetailController(LessonDetailControllerRef ref,
 
 void logPauseTimestamp(LessonDetailControllerRef ref) {
   if (videoPlayerController != null) {
-    final position =
-        videoPlayerController!.videoPlayerController?.value.position;
+    final position = videoPlayerController!.videoPlayerController?.value.position;
     if (position != null) {
       String timestamp = _formatDuration(position);
       print('Video paused at: $timestamp');
 
       // Update the LessonVideo instance with the new timestamp
-      ref
-          .read(lessonDataControllerProvider.notifier)
-          .updateLastPausedAt(timestamp);
+      ref.read(lessonDataControllerProvider.notifier).updateLastPausedAt(timestamp);
     }
   }
 }
@@ -191,10 +179,8 @@ class LessonDataController extends _$LessonDataController {
 
   void logPauseTimestamp() {
     if (videoPlayerController != null) {
-      final position =
-          videoPlayerController!.videoPlayerController?.value.position;
-      final duration =
-          videoPlayerController!.videoPlayerController?.value.duration;
+      final position = videoPlayerController!.videoPlayerController?.value.position;
+      final duration = videoPlayerController!.videoPlayerController?.value.duration;
 
       if (position != null && duration != null) {
         String currentTimestamp = formatDuration(position);
@@ -209,8 +195,7 @@ class LessonDataController extends _$LessonDataController {
         lastPausedTimestamp = formatDuration(position);
         log('Video paused at: $lastPausedTimestamp');
 
-        if (state.value?.lessonItem != null &&
-            state.value!.lessonItem.isNotEmpty) {
+        if (state.value?.lessonItem != null && state.value!.lessonItem.isNotEmpty) {
           String courseVideoId = currentVideoIndex.toString();
           log("Logging pause event for course_video_id: $courseVideoId and courseId: $_courseId");
 
@@ -220,20 +205,16 @@ class LessonDataController extends _$LessonDataController {
           // log("Current course_video_id: $currentVideoIndex");
 
           // Log to analytics service with proper duration information
-          analyticsService.logPauseEvent(
-              courseId.toString(), courseVideoId, position, duration);
+          analyticsService.logPauseEvent(courseId.toString(), courseVideoId, position, duration);
 
           // Generate and print report for debugging
           log("Generating report for course_video_id: $courseVideoId");
-          analyticsService
-              .generateAnalyticsReport(courseId.toString(), courseVideoId)
-              .then((report) {
+          analyticsService.generateAnalyticsReport(courseId.toString(), courseVideoId).then((report) {
             print('Analytics Report: $report');
           });
 
           // Also save to existing storage if needed
-          Global.storageService
-              .saveVideoPauseTimestamp(courseVideoId, lastPausedTimestamp);
+          Global.storageService.saveVideoPauseTimestamp(courseVideoId, lastPausedTimestamp);
         }
 
         update((data) => data.copyWith(lastPausedAt: lastPausedTimestamp));
@@ -272,14 +253,12 @@ class LessonDataController extends _$LessonDataController {
     if (state.value?.lessonItem != null) {
       for (var i = 0; i < state.value!.lessonItem.length; i++) {
         if (state.value!.lessonItem[i].url == url) {
-          updateCurrentVideoIndex(
-              int.parse(state.value!.lessonItem[i].course_video_id!));
+          updateCurrentVideoIndex(int.parse(state.value!.lessonItem[i].course_video_id!));
           break;
         }
       }
     }
 
-    var vidUrl = url;
     videoPlayerController = BetterPlayerController(
         const BetterPlayerConfiguration(
             autoDetectFullscreenAspectRatio: true,
@@ -300,8 +279,14 @@ class LessonDataController extends _$LessonDataController {
             )),
         betterPlayerDataSource: BetterPlayerDataSource.network(url));
 
-    var initializeVideoPlayerFuture = videoPlayerController
-        ?.setupDataSource(BetterPlayerDataSource.network(vidUrl));
+    var initializeVideoPlayerFuture = videoPlayerController?.setupDataSource(BetterPlayerDataSource.network(url));
+
+    videoPlayerController?.addEventsListener((BetterPlayerEvent event) {
+      if (event.betterPlayerEventType == BetterPlayerEventType.exception) {
+        print('Video player error: ${event.parameters}');
+        _handleVideoError(event.parameters);
+      }
+    });
 
     state = AsyncData(state.value!.copyWith(
       initializeVideoPlayer: initializeVideoPlayerFuture,
@@ -323,7 +308,7 @@ class LessonDataController extends _$LessonDataController {
       }
       log("Total videos in course in controller: $_totalVideosInCourse");
       analyticsService.logPlayStart(
-        courseId: courseId.toString(),
+        courseId: _courseId.toString(),
         videoId: currentVideoIndex.toString(),
         totalVideosInCourse: _totalVideosInCourse,
       );
@@ -341,22 +326,18 @@ class LessonDataController extends _$LessonDataController {
       String courseVideoId = currentVideoIndex.toString();
 
       // Log completion event and set up for restart
-      analyticsService.logCompletionEvent(courseId.toString(), courseVideoId);
+      analyticsService.logCompletionEvent(_courseId.toString(), courseVideoId);
 
       // Mark video as completed
-      Global.storageService
-          .markVideoAsCompleted(courseId.toString(), courseVideoId);
+      Global.storageService.markVideoAsCompleted(_courseId.toString(), courseVideoId);
 
       // Generate and print report
-      analyticsService
-          .generateAnalyticsReport(courseId.toString(), courseVideoId)
-          .then((report) {
+      analyticsService.generateAnalyticsReport(_courseId.toString(), courseVideoId).then((report) {
         print('Video Completion Report: $report');
       });
 
       // Save completion timestamp
-      Global.storageService
-          .saveVideoCompletionTimestamp(courseId.toString(), courseVideoId);
+      Global.storageService.saveVideoCompletionTimestamp(_courseId.toString(), courseVideoId);
 
       // Set isRestart flag for the video player
       isRestart = true;
@@ -371,15 +352,18 @@ class LessonDataController extends _$LessonDataController {
     videoPlayerController?.removeEventsListener(_onPlayerEvent);
   }
 
+  void _handleVideoError(Map<String, dynamic>? parameters) {
+    print('Handling video error: $parameters');
+    // Add error handling logic here if needed
+  }
+
   void analyzeVideoData() {
-    List<String> videosWithData =
-        Global.storageService.getAllVideosWithTimestamps();
+    List<String> videosWithData = Global.storageService.getAllVideosWithTimestamps();
 
     for (String videoId in videosWithData) {
       log('\nVideo $videoId - course_video_id = $videoId');
 
-      Map<String, dynamic> stats =
-          Global.storageService.getVideoStatistics(videoId);
+      Map<String, dynamic> stats = Global.storageService.getVideoStatistics(videoId);
       List<Map<String, dynamic>> timestamps = stats['timestamps'];
 
       // Group timestamps by watch session (using date)
@@ -388,8 +372,7 @@ class LessonDataController extends _$LessonDataController {
       for (var entry in timestamps) {
         String datetime = entry['datetime'];
         String timestamp = entry['timestamp'];
-        String dateOnly =
-            DateTime.parse(datetime).toLocal().toString().split(' ')[0];
+        String dateOnly = DateTime.parse(datetime).toLocal().toString().split(' ')[0];
 
         watchSessions.putIfAbsent(dateOnly, () => []);
         watchSessions[dateOnly]!.add(timestamp);

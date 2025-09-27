@@ -1,7 +1,8 @@
 import 'dart:async';
 import 'dart:developer';
 
-import 'package:better_player/better_player.dart';
+// import 'package:better_player/better_player.dart';
+import 'package:better_player_enhanced/better_player.dart';
 import 'package:course_app/common/utils/pop_messages.dart';
 
 import 'package:flutter/material.dart';
@@ -49,8 +50,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     super.didChangeDependencies();
 
     // Extract arguments first to ensure they're available for the provider
-    final args =
-        ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
+    final args = ModalRoute.of(context)?.settings.arguments as Map<String, dynamic>?;
     if (args != null) {
       final courseId = args['courseId'];
       log("Setting course ID in didChangeDependencies: $courseId");
@@ -66,8 +66,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     initializeStorageService();
   }
 
-  VideoAnalyticsService analyticsService =
-      VideoAnalyticsService(Global.storageService);
+  VideoAnalyticsService analyticsService = VideoAnalyticsService(Global.storageService);
   Future<void> initializeStorageService() async {
     storageService = await StorageService().init();
   }
@@ -84,17 +83,11 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
     setState(() {
       videoIndex = index;
       if (ref.read(lessonDataControllerProvider).value?.lessonItem != null) {
-        currentVideoId = ref
-            .read(lessonDataControllerProvider)
-            .value
-            ?.lessonItem[index]
-            .course_video_id;
+        currentVideoId = ref.read(lessonDataControllerProvider).value?.lessonItem[index].course_video_id;
 
         log("Current Video ID: $currentVideoId");
 
-        ref
-            .read(lessonDataControllerProvider.notifier)
-            .updateCurrentVideoIndex(int.parse(currentVideoId!));
+        ref.read(lessonDataControllerProvider.notifier).updateCurrentVideoIndex(int.parse(currentVideoId!));
 
         log("Synced video index to $index");
         log("Synced video ID to $currentVideoId");
@@ -118,9 +111,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
           if (currentVideoId != null && currentVideoId!.isNotEmpty) {
             try {
               int parsedId = int.parse(currentVideoId!);
-              ref
-                  .read(lessonDataControllerProvider.notifier)
-                  .updateCurrentVideoIndex(parsedId);
+              ref.read(lessonDataControllerProvider.notifier).updateCurrentVideoIndex(parsedId);
               log("Initial video ID set to $currentVideoId");
             } catch (e) {
               log("Error parsing currentVideoId: $e");
@@ -146,8 +137,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
   @override
   Widget build(BuildContext context) {
-    final args =
-        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    final args = ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
 
     final courseId = args['courseId'];
     final lessonId = args['lessonID'];
@@ -161,9 +151,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
 
     ref.read(lessonDataControllerProvider.notifier).setCourseId(courseId);
     // Add this line after setting the course ID
-    ref
-        .read(lessonDataControllerProvider.notifier)
-        .setTotalVideosInCourse(totalVideosInCourse);
+    ref.read(lessonDataControllerProvider.notifier).setTotalVideosInCourse(totalVideosInCourse);
     final lessonDataAsync = ref.watch(lessonDataControllerProvider);
 
     // secureScreen();
@@ -232,13 +220,11 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                   child: FutureBuilder(
                                     future: data.initializeVideoPlayer,
                                     builder: (context, snapshot) {
-                                      if (snapshot.connectionState ==
-                                          ConnectionState.done) {
+                                      if (snapshot.connectionState == ConnectionState.done) {
                                         return videoPlayerController == null
                                             ? Container()
                                             : BetterPlayer(
-                                                controller:
-                                                    videoPlayerController!,
+                                                controller: videoPlayerController!,
                                               );
                                       } else {
                                         return const Center(
@@ -272,10 +258,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                       ),
                                     ),
                                     Text(
-                                      data.lessonItem.isNotEmpty
-                                          ? data.lessonItem[videoIndex].name ??
-                                              ""
-                                          : "No title available",
+                                      data.lessonItem.isNotEmpty ? data.lessonItem[videoIndex].name ?? "" : "No title available",
                                       style: TextStyle(
                                         fontSize: 16.sp,
                                         color: AppColors.primaryText,
@@ -295,8 +278,7 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                       maxLines: 3,
                                       style: TextStyle(
                                         fontSize: 14.sp,
-                                        color:
-                                            AppColors.primaryThreeElementText,
+                                        color: AppColors.primaryThreeElementText,
                                       ),
                                     ),
                                   ],
@@ -331,57 +313,35 @@ class _LessonDetailState extends ConsumerState<LessonDetail> {
                                   onTap: () {
                                     if (videoIndex > 0) {
                                       syncVideoIndex(videoIndex - 1);
-                                      onVideoChanged(
-                                          data.lessonItem[videoIndex].url!);
-                                      ref
-                                          .read(lessonDataControllerProvider
-                                              .notifier)
-                                          .playPause(true);
+                                      onVideoChanged(data.lessonItem[videoIndex].url!);
+                                      ref.read(lessonDataControllerProvider.notifier).playPause(true);
                                     } else {
-                                      toastInfo(
-                                          "You are at the beginning of the video list");
+                                      toastInfo("You are at the beginning of the video list");
                                     }
                                   },
                                 ),
                                 _buildVideoControlButton(
-                                  icon: data.isPlay
-                                      ? Icons.pause
-                                      : Icons.play_arrow,
+                                  icon: data.isPlay ? Icons.pause : Icons.play_arrow,
                                   onTap: () {
                                     if (data.isPlay) {
                                       videoPlayerController?.pause();
-                                      ref
-                                          .read(lessonDataControllerProvider
-                                              .notifier)
-                                          .playPause(false);
+                                      ref.read(lessonDataControllerProvider.notifier).playPause(false);
                                     } else {
                                       videoPlayerController?.play();
-                                      ref
-                                          .read(lessonDataControllerProvider
-                                              .notifier)
-                                          .playPause(true);
+                                      ref.read(lessonDataControllerProvider.notifier).playPause(true);
                                     }
                                   },
                                 ),
                                 _buildVideoControlButton(
                                   icon: Icons.skip_next,
                                   onTap: () {
-                                    if (videoIndex <
-                                        data.lessonItem.length - 1) {
+                                    if (videoIndex < data.lessonItem.length - 1) {
                                       videoIndex++;
-                                      var videoUrl =
-                                          data.lessonItem[videoIndex].url;
-                                      ref
-                                          .read(lessonDataControllerProvider
-                                              .notifier)
-                                          .playNextVid(videoUrl!);
-                                      ref
-                                          .read(lessonDataControllerProvider
-                                              .notifier)
-                                          .playPause(true);
+                                      var videoUrl = data.lessonItem[videoIndex].url;
+                                      ref.read(lessonDataControllerProvider.notifier).playNextVid(videoUrl!);
+                                      ref.read(lessonDataControllerProvider.notifier).playPause(true);
                                     } else {
-                                      toastInfo(
-                                          "You have watched all the videos");
+                                      toastInfo("You have watched all the videos");
                                     }
                                   },
                                 ),
@@ -527,12 +487,10 @@ class ClearVideoTimestampsButton extends StatefulWidget {
   const ClearVideoTimestampsButton({super.key});
 
   @override
-  State<ClearVideoTimestampsButton> createState() =>
-      _ClearVideoTimestampsButtonState();
+  State<ClearVideoTimestampsButton> createState() => _ClearVideoTimestampsButtonState();
 }
 
-class _ClearVideoTimestampsButtonState
-    extends State<ClearVideoTimestampsButton> {
+class _ClearVideoTimestampsButtonState extends State<ClearVideoTimestampsButton> {
   void _clearTimestamps() {
     // Clear all video timestamps
     Global.storageService.clearAllVideoTimestamps();

@@ -302,10 +302,16 @@ AppBar homeAppBar(WidgetRef ref) {
           profileState.when(
             data: (data) {
               log("This is HERE :${data.avatar}");
-              return GestureDetector(
-                  child: AppBoxDecorationImage(
-                imagePath: "${AppConstants.IMAGE_UPLOADS_PATH}${data.avatar}",
-              ));
+              return Container(
+                alignment: Alignment.bottomRight,
+                width: 40.w,
+                height: 40.h,
+                decoration: BoxDecoration(
+                    color: Colors.blue,
+                    borderRadius: BorderRadius.circular(20.w),
+                    image: const DecorationImage(
+                        image: AssetImage(Img_Res.profilepic))),
+              );
             },
             error: (error, stack) =>
                 AppImage(width: 18.w, height: 12.h, imagePath: Img_Res.menu),

@@ -25,17 +25,11 @@ class ProfileImageWidget extends StatelessWidget {
             alignment: Alignment.bottomRight,
             width: 80.w,
             height: 80.h,
-            decoration: profileImage.avatar == null
-                ? BoxDecoration(
-                    color: Colors.blue,
-                    borderRadius: BorderRadius.circular(20.w),
-                    image: const DecorationImage(
-                        image: AssetImage(Img_Res.headPic)))
-                : BoxDecoration(
-                    borderRadius: BorderRadius.circular(20.w),
-                    image: DecorationImage(
-                        image: NetworkImage(
-                            "${AppConstants.IMAGE_UPLOADS_PATH}${profileImage.avatar}"))),
+            decoration: BoxDecoration(
+                color: Colors.blue,
+                borderRadius: BorderRadius.circular(20.w),
+                image: const DecorationImage(
+                    image: AssetImage(Img_Res.profilepic))),
           ),
         );
       },

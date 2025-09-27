@@ -36,8 +36,7 @@ class LessonVideos extends ConsumerStatefulWidget {
   ConsumerState<LessonVideos> createState() => _LessonVideosState();
 }
 
-class _LessonVideosState extends ConsumerState<LessonVideos>
-    with TickerProviderStateMixin {
+class _LessonVideosState extends ConsumerState<LessonVideos> with TickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> animation;
 
@@ -84,8 +83,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
               mainAxisSize: MainAxisSize.min,
               children: [
                 TweenAnimationBuilder<double>(
-                  duration: Duration
-                      .zero, // This will show the final value immediately
+                  duration: Duration.zero, // This will show the final value immediately
                   tween: Tween<double>(begin: 0, end: score.toDouble()),
                   builder: (context, value, child) => Text(
                     'Score: ${value.toInt()}',
@@ -154,18 +152,13 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
           content: const SingleChildScrollView(
             child: ListBody(
               children: <Widget>[
-                Text(
-                    'Before attempting the quiz, please read the following instructions carefully:'),
+                Text('Before attempting the quiz, please read the following instructions carefully:'),
                 SizedBox(height: 10),
-                Text('1. You have only one attempt to complete this quiz.',
-                    style: TextStyle(fontWeight: FontWeight.w600)),
+                Text('1. You have only one attempt to complete this quiz.', style: TextStyle(fontWeight: FontWeight.w600)),
                 Text('2. You cannot pause or resume the quiz once started.'),
-                Text(
-                    '3. If you exit the quiz you wont be able to restart the quiz and the score will be marked as 0.'),
-                Text(
-                    '4. Ensure you are in a quiet, distraction-free environment.'),
-                Text(
-                    '5. No external resources or help are allowed during the quiz.'),
+                Text('3. If you exit the quiz you wont be able to restart the quiz and the score will be marked as 0.'),
+                Text('4. Ensure you are in a quiet, distraction-free environment.'),
+                Text('5. No external resources or help are allowed during the quiz.'),
                 Text('6. Answer each question carefully.'),
               ],
             ),
@@ -182,9 +175,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                 Navigator.of(dialogContext).pop();
 
                 try {
-                  final quizData = await ref.read(
-                      startQuizControllerProvider(params: startQuizParams)
-                          .future);
+                  final quizData = await ref.read(startQuizControllerProvider(params: startQuizParams).future);
 
                   if (quizData != null && quizData.quiz?.completed == true) {
                     final score = quizData.quiz?.score ?? 0;
@@ -209,8 +200,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                   } else {
                     // Handle case where quiz data is null
                     ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                          content: Text("Failed to start the quiz.")),
+                      const SnackBar(content: Text("Failed to start the quiz.")),
                     );
                   }
                 } catch (e) {
@@ -218,9 +208,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                   Navigator.of(context).pop();
 
                   ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                        content:
-                            Text("An error occurred while starting the quiz.")),
+                    const SnackBar(content: Text("An error occurred while starting the quiz.")),
                   );
                 }
               },
@@ -310,9 +298,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                                 animation: _controller,
                                 builder: (context, child) {
                                   return Transform.scale(
-                                    scale: 0.8 +
-                                        (0.2 *
-                                            sin(_controller.value * 3.14 * 2)),
+                                    scale: 0.8 + (0.2 * sin(_controller.value * 3.14 * 2)),
                                     child: Container(
                                       padding: EdgeInsets.all(8.r),
                                       decoration: BoxDecoration(
@@ -321,15 +307,12 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                                             Colors.purple.shade400,
                                             Colors.pink.shade400,
                                           ],
-                                          transform: GradientRotation(
-                                              _controller.value * 2 * 3.14),
+                                          transform: GradientRotation(_controller.value * 2 * 3.14),
                                         ),
-                                        borderRadius:
-                                            BorderRadius.circular(12.r),
+                                        borderRadius: BorderRadius.circular(12.r),
                                         boxShadow: [
                                           BoxShadow(
-                                            color:
-                                                Colors.purple.withOpacity(0.3),
+                                            color: Colors.purple.withOpacity(0.3),
                                             blurRadius: 8,
                                             spreadRadius: 2,
                                           )
@@ -356,8 +339,7 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                           children: [
                             Text13Normal(
                               maxLines: 2,
-                              text: widget.lessonData[index].name ??
-                                  "No Name Available",
+                              text: widget.lessonData[index].name ?? "No Name Available",
                               color: AppColors.primaryText,
                             ),
                             if (quizAvailable)
@@ -367,20 +349,14 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                                   animation: _controller,
                                   builder: (context, child) {
                                     return ShaderMask(
-                                      shaderCallback: (bounds) =>
-                                          LinearGradient(
+                                      shaderCallback: (bounds) => LinearGradient(
                                         colors: [
                                           Colors.purple.shade400,
                                           Colors.pink.shade400,
                                           Colors.orange.shade400,
                                           Colors.purple.shade400,
                                         ],
-                                        stops: [
-                                          0.0,
-                                          _controller.value,
-                                          _controller.value + 0.3,
-                                          1.0
-                                        ],
+                                        stops: [0.0, _controller.value, _controller.value + 0.3, 1.0],
                                       ).createShader(bounds),
                                       child: Row(
                                         children: [
@@ -420,16 +396,14 @@ class _LessonVideosState extends ConsumerState<LessonVideos>
                       animation: _controller,
                       builder: (context, child) {
                         return Transform.translate(
-                          offset:
-                              Offset(5 * sin(_controller.value * 3.14 * 2), 0),
+                          offset: Offset(5 * sin(_controller.value * 3.14 * 2), 0),
                           child: ShaderMask(
                             shaderCallback: (bounds) => LinearGradient(
                               colors: [
                                 Colors.purple.shade400,
                                 Colors.pink.shade400,
                               ],
-                              transform: GradientRotation(
-                                  _controller.value * 2 * 3.14),
+                              transform: GradientRotation(_controller.value * 2 * 3.14),
                             ).createShader(bounds),
                             child: Icon(
                               Icons.arrow_forward_ios,

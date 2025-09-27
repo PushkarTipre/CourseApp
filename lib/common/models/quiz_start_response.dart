@@ -44,20 +44,16 @@ class QuizStartItem {
   QuizStartItem.fromJson(Map<String, dynamic> json)
       : quiz = json['quiz'] != null ? QuizAttempt.fromJson(json['quiz']) : null,
         quizUrl = json['quiz_url'],
-        quizStartedAt = json['quiz_started_at'] != null
-            ? DateTime.parse(json['quiz_started_at'])
-            : null,
+        quizStartedAt = json['quiz_started_at'] != null ? DateTime.parse(json['quiz_started_at']) : null,
         courseVideoId = json['course_video_id'];
 
   Map<String, dynamic> toJson() {
     final Map<String, dynamic> data = <String, dynamic>{};
     if (quiz != null) {
-      data['quiz'] =
-          quiz!.toJson(); // Ensure quiz is properly converted to JSON
+      data['quiz'] = quiz!.toJson(); // Ensure quiz is properly converted to JSON
     }
     data['quiz_url'] = quizUrl;
-    data['quiz_started_at'] =
-        quizStartedAt?.toIso8601String(); // Convert DateTime to string
+    data['quiz_started_at'] = quizStartedAt?.toIso8601String(); // Convert DateTime to string
     data['course_video_id'] = courseVideoId;
     return data;
   }

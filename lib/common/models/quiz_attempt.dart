@@ -30,21 +30,17 @@ class QuizAttempt {
   factory QuizAttempt.fromJson(Map<String, dynamic> json) {
     return QuizAttempt(
       id: json['id'],
-      userId: json['user_id'],
+      userId: int.parse(json['user_id'].toString()), // Convert string to int
       userName: json['user_name'],
       uniqueId: json['unique_id'],
       quizUniqueId: json['quiz_unique_id'],
-      courseId: json['course_id'],
-      lessonId: json['lesson_id'],
+      courseId: int.parse(json['course_id'].toString()), // Convert string to int
+      lessonId: int.parse(json['lesson_id'].toString()), // Convert string to int
       courseVideoId: json['course_video_id'].toString(),
       score: json['score'],
       completed: json['completed'],
-      attemptedAt: json['attempted_at'] != null
-          ? DateTime.parse(json['attempted_at'])
-          : DateTime.now(), // Default to current date if null
-      quizStartedAt: json['quiz_started_at'] != null
-          ? DateTime.parse(json['quiz_started_at'])
-          : DateTime.now(), // Default to current date if null
+      attemptedAt: json['attempted_at'] != null ? DateTime.parse(json['attempted_at']) : DateTime.now(), // Default to current date if null
+      quizStartedAt: json['quiz_started_at'] != null ? DateTime.parse(json['quiz_started_at']) : DateTime.now(), // Default to current date if null
     );
   }
 

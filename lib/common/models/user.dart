@@ -114,9 +114,9 @@ class UserProfile {
       description: json["description"],
       avatar: json["avatar"],
       online: json["online"],
-      type: json["type"],
+      type: json["type"] != null ? int.tryParse(json["type"].toString()) : null,
       job: json["job"],
-      id: json["id"].toString(),
+      id: json["id"]?.toString(),
     );
   }
 

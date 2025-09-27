@@ -66,7 +66,7 @@ void scheduleAnalyticsExport() {
     backgroundExportTaskName,
     frequency: const Duration(
         minutes: 1), // This is the minimum allowed by WorkManager
-    existingWorkPolicy: ExistingWorkPolicy.replace,
+    existingWorkPolicy: ExistingPeriodicWorkPolicy.replace,
     constraints: Constraints(
       networkType: NetworkType.connected, // Require internet connectivity
     ),
